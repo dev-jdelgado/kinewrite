@@ -1,0 +1,66 @@
+import React from "react";
+import { Settings, UserCircle2 } from "lucide-react";
+
+import logo from "../../assets/logo.png";
+
+const DashboardHeader = ({
+    onSettings,
+}) => {
+    return (
+        <header
+            className="
+                bg-white
+                shadow-md
+                px-10
+                py-6
+                flex
+                items-center
+                justify-between
+            "
+        >
+            <div className="flex items-center gap-6">
+                <div
+                    className="
+                        w-16
+                        h-16
+                        rounded-full
+                        bg-orange-500
+                        text-white
+                        flex
+                        items-center
+                        justify-center
+                    "
+                >
+                    <UserCircle2 size={42} />
+                </div>
+
+                <img
+                    src={logo}
+                    alt="KineWrite"
+                    className="h-20 w-auto object-contain"
+                />
+            </div>
+
+            <button
+                onClick={onSettings}
+                className="
+                    w-20
+                    h-20
+                    rounded-full
+                    bg-orange-500
+                    text-white
+                    flex
+                    items-center
+                    justify-center
+                    shadow-lg
+                    hover:scale-110
+                    transition-all
+                "
+            >
+                <Settings size={42} />
+            </button>
+        </header>
+    );
+};
+
+export default DashboardHeader;

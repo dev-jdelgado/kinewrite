@@ -1,21 +1,7 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <h1 className="text-6xl font-bold text-blue-600">
-          KineWrite
-        </h1>
-      </section>
-    </>
-  )
+    return <AppRoutes />;
 }
 
-export default App
+export default App;

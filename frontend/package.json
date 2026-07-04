@@ -18,6 +18,7 @@
     "dayjs": "^1.11.21",
     "framer-motion": "^12.42.2",
     "konva": "^10.3.0",
+    "lucide-react": "^1.23.0",
     "react": "^19.2.7",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.7",
