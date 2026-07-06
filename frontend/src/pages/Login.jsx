@@ -11,6 +11,7 @@ import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 
 import { useAuth } from "../contexts/AuthContext";
+import KinewriteLogo from "../assets/logo.png";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -62,17 +63,10 @@ const Login = () => {
 
     return (
         <AuthLayout>
+            <img src={KinewriteLogo} alt="Kinewritelogo" className="absolute max-w-60 top-25" />
             <div className="bg-white rounded-3xl shadow-xl p-10 w-full">
-                <div className="flex justify-center mb-6">
-                    <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center">
-                        <FaPenNib className="text-orange-500 text-3xl" />
-                    </div>
-                </div>
-                <PageHeader
-                    title="KineWrite"
-                    subtitle="Dysgraphia Remediation"
-                    align="center"
-                />
+                
+               
                 <form
                     className="space-y-6"
                     onSubmit={handleSubmit}
