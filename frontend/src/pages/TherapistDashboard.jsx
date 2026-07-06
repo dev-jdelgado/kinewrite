@@ -26,8 +26,7 @@ const TherapistDashboard = () => {
 
             <PageContainer>
 
-                <div className="grid grid-cols-3 gap-16">
-
+                <div className="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-16">
                     <DashboardCard
                         title="Student Management"
                         image={managementBG}
