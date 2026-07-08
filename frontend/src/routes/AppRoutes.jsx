@@ -38,12 +38,7 @@ const AppRoutes = () => {
                 }
             />
 
-<<<<<<< HEAD
             {/* Student Records */}
-=======
-            
-            {/* Start Exercises */}
->>>>>>> d8b6c2fc4e8a2ad87296cddc92f8c9f631e1740d
             <Route
                 path="/student-records"
                 element={
