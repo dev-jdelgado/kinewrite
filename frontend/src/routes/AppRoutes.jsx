@@ -5,6 +5,7 @@ import TherapistDashboard from "../pages/TherapistDashboard";
 import StudentManagement from "../pages/StudentManagement";
 import StudentSelection from "../pages/StudentSelection";
 import StudentRecords from "../pages/StudentRecords";
+import Settings from "../pages/Settings"
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -34,6 +35,17 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute>
                         <StudentManagement />
+                    </ProtectedRoute>
+                }
+            />
+
+            
+            {/* Account Settings */}
+            <Route
+                path="/account-settings"
+                element={
+                    <ProtectedRoute>
+                        <Settings />
                     </ProtectedRoute>
                 }
             />

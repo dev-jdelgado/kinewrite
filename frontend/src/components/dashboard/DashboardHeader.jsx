@@ -1,11 +1,13 @@
 import React from "react";
 import { Settings, UserCircle2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import logo from "../../assets/logo.png";
 
-const DashboardHeader = ({
-    onSettings,
-}) => {
+const DashboardHeader = () => {
+
+    const navigate = useNavigate();
+
     return (
         <header
             className="
@@ -19,7 +21,7 @@ const DashboardHeader = ({
             "
         >
             <div className="flex items-center gap-6">
-                <div
+                {/* <div
                     className="
                         w-16
                         h-16
@@ -32,7 +34,7 @@ const DashboardHeader = ({
                     "
                 >
                     <UserCircle2 size={42} />
-                </div>
+                </div> */}
 
                 <img
                     src={logo}
@@ -42,7 +44,7 @@ const DashboardHeader = ({
             </div>
 
             <button
-                onClick={onSettings}
+                onClick={() => navigate("/account-settings")}
                 className="
                     w-20
                     h-20
