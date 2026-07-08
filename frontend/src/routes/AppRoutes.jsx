@@ -36,6 +36,7 @@ const AppRoutes = () => {
                 }
             />
 
+            
             {/* Start Exercises */}
             <Route
                 path="/exercise"

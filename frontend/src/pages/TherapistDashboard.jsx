@@ -13,6 +13,8 @@ import exerciseBG from "../assets/dashboard/start-exercises.jpg";
 import managementIcon from "../assets/icons/student-management.png";
 import recordsIcon from "../assets/icons/student-records.png";
 import exerciseIcon from "../assets/icons/start-exercise.png";
+import Star from '../assets/login/star.png';
+import Star1 from '../assets/login/star1.png';
 
 const TherapistDashboard = () => {
     const navigate = useNavigate();
@@ -53,9 +55,9 @@ const TherapistDashboard = () => {
                             navigate("/exercise")
                         }
                     />
-
-                </div>
-
+                    <img src={Star} alt="Sun" className="hidden lg:block absolute w-20 top-40 right-0 animate-spin-slow"/>
+                    <img src={Star1} alt="Sun" className="hidden lg:block absolute w-20 bottom-20 left-1 animate-spin-slow"/>
+                </div>              
             </PageContainer>
 
         </DashboardLayout>
