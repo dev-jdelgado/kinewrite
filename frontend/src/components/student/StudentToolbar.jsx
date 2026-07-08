@@ -22,7 +22,7 @@ const StudentToolbar = ({
                     className="
                         text-4xl
                         font-bold
-                        text-slate-800
+                        text-white
                     "
                 >
                     Student Management
@@ -30,7 +30,7 @@ const StudentToolbar = ({
 
                 <p
                     className="
-                        text-slate-700
+                        text-white
                         mt-2
                     "
                 >
@@ -60,9 +60,10 @@ const StudentToolbar = ({
                         px-8
                         py-3
                         rounded-xl
-                        bg-orange-500
+                        bg-white
                         hover:bg-orange-600
-                        text-white
+                        text-orange-500
+                        hover:text-white
                         font-semibold
                         shadow-lg
                         transition-all

@@ -21,7 +21,7 @@ const StudentRecordsToolbar = ({
                     className="
                         text-4xl
                         font-bold
-                        text-slate-800
+                        text-white
                     "
                 >
                     Student Records
@@ -29,7 +29,7 @@ const StudentRecordsToolbar = ({
 
                 <p
                     className="
-                        text-slate-600
+                        text-white
                         mt-2
                     "
                 >
