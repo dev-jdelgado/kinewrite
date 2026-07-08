@@ -71,7 +71,7 @@ const DashboardCard = ({
                     <img
                         src={icon}
                         alt={title}
-                        className="w-24 h-24 object-contain"
+                        className="w-24 h-24 object-contain transition-transform duration-700 hover:rotate-360"
                     />
                 </div>
 
