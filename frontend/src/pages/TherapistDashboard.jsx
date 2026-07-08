@@ -15,9 +15,11 @@ import recordsIcon from "../assets/icons/student-records.png";
 import exerciseIcon from "../assets/icons/start-exercise.png";
 
 const TherapistDashboard = () => {
+
     const navigate = useNavigate();
 
     return (
+
         <DashboardLayout>
 
             <DashboardHeader
@@ -27,22 +29,19 @@ const TherapistDashboard = () => {
             <PageContainer>
 
                 <div className="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-16">
+
                     <DashboardCard
                         title="Student Management"
                         image={managementBG}
                         icon={managementIcon}
-                        onClick={() =>
-                            navigate("/students")
-                        }
+                        onClick={() => navigate("/students")}
                     />
 
                     <DashboardCard
-                        title="Student Progress"
+                        title="Student Records"
                         image={recordsBG}
                         icon={recordsIcon}
-                        onClick={() =>
-                            navigate("/progress")
-                        }
+                        onClick={() => navigate("/student-records")}
                     />
 
                     <DashboardCard
@@ -50,7 +49,7 @@ const TherapistDashboard = () => {
                         image={exerciseBG}
                         icon={exerciseIcon}
                         onClick={() =>
-                            navigate("/exercise")
+                            navigate("/student-selection?mode=exercise")
                         }
                     />
 
@@ -59,7 +58,9 @@ const TherapistDashboard = () => {
             </PageContainer>
 
         </DashboardLayout>
+
     );
+
 };
 
 export default TherapistDashboard;

@@ -4,19 +4,21 @@ import Login from "../pages/Login";
 import TherapistDashboard from "../pages/TherapistDashboard";
 import StudentManagement from "../pages/StudentManagement";
 import StudentSelection from "../pages/StudentSelection";
+import StudentRecords from "../pages/StudentRecords";
 
 import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
     return (
         <Routes>
+
             {/* Login */}
             <Route
                 path="/"
                 element={<Login />}
             />
 
-            {/* Dashboard */}
+            {/* Therapist Dashboard */}
             <Route
                 path="/dashboard"
                 element={
@@ -36,9 +38,31 @@ const AppRoutes = () => {
                 }
             />
 
-            {/* Start Exercises */}
+            {/* Student Records */}
             <Route
-                path="/exercise"
+                path="/student-records"
+                element={
+                    <ProtectedRoute>
+                        <StudentRecords />
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* Student Progress (Coming Next) */}
+            <Route
+                path="/student-records/:studentId"
+                element={
+                    <ProtectedRoute>
+                        <div className="flex items-center justify-center min-h-screen text-4xl font-bold">
+                            Student Progress Page
+                        </div>
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* Student Selection (Exercise Only) */}
+            <Route
+                path="/student-selection"
                 element={
                     <ProtectedRoute>
                         <StudentSelection />
@@ -46,11 +70,24 @@ const AppRoutes = () => {
                 }
             />
 
-            {/* Temporary */}
+            {/* Exercise Session */}
+            <Route
+                path="/exercise/:studentId"
+                element={
+                    <ProtectedRoute>
+                        <div className="flex items-center justify-center min-h-screen text-4xl font-bold">
+                            Exercise Session Page
+                        </div>
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* Unknown Routes */}
             <Route
                 path="*"
-                element={<Navigate to="/" />}
+                element={<Navigate to="/" replace />}
             />
+
         </Routes>
     );
 };
