@@ -30,7 +30,7 @@ const TherapistDashboard = () => {
 
             <PageContainer>
 
-                <div className="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-16">
+                <div className="grid justify-items-center lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 xl:gap-16 lg:gap-10 sm:gap-12 gap-10 lg:px-10 md:px-20 sm:px-5 px-4">
 
                     <DashboardCard
                         title="Student Management"

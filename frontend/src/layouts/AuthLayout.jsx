@@ -8,6 +8,7 @@ const AuthLayout = ({ children }) => {
         className="min-h-screen bg-cover bg-center bg-no-repeat" 
         style={{backgroundImage: `url(${BgLogin})`}}>
             <PageContainer
+                paddingX="px-6 sm:px-10"
                 maxWidth="xl"
                 className="flex items-center justify-center min-h-screen"
             >

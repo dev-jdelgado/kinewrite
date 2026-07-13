@@ -13,7 +13,8 @@ import Button from "../components/common/Button";
 import { useAuth } from "../contexts/AuthContext";
 import KinewriteLogo from "../assets/logo.png";
 import Balloon from "../assets/login/Balloonlogin.png";
-import Sun from '../assets/login/Sunlogin.png';
+import SunRays from '../assets/login/sun-rays.png';
+import SunCenter from '../assets/login/sun-center.png';
 import Star from '../assets/login/star.png';
 import Star1 from '../assets/login/star1.png';
 
@@ -67,13 +68,25 @@ const Login = () => {
 
     return (
             <AuthLayout>
-                <img src={Sun} alt="Sun" className="hidden lg:block absolute w-60 top-10 left-20 animate-spin-slow"/>
-                <img src={Star} alt="Sun" className="hidden lg:block absolute w-20 top-20 right-70 animate-spin-slow"/>
-                <img src={Star1} alt="Sun" className="hidden lg:block absolute w-20 bottom-60 left-20 animate-spin-slow"/>
-                <img src={Balloon} alt="Balloon" className="hidden lg:block absolute w-60 top-30 right-1 animate-swing"/>
-                <img src={KinewriteLogo} alt="Kinewritelogo" className="absolute max-w-70 xl:top-20 lg:top-10 md:top-10 top-5" />
+                <div className="absolute md:w-60 w-36 top-10 sm:left-20 left-2">
+                    <img
+                        src={SunRays}
+                        alt="Sun Rays"
+                        className="absolute top-2 -left-[3px] inset-0 w-full animate-spin-slow"
+                    />
+
+                    <img
+                        src={SunCenter}
+                        alt="Sun"
+                        className="relative w-full"
+                    />
+                </div>
+                <img src={Star} alt="Sun" className="absolute w-20 md:top-20 top-12 sm:right-70 right-[25%] animate-spin-slow"/>
+                <img src={Star1} alt="Sun" className="absolute w-20 md:bottom-60 bottom-36 sm:left-20 left-12 animate-spin-slow"/>
+                <img src={Balloon} alt="Balloon" className="absolute md:w-60 w-32 top-30 right-1 animate-swing"/>
                 
-                <div className="bg-white rounded-3xl shadow-xl p-10 w-full">
+                <div className="bg-white rounded-3xl shadow-xl w-full relative sm:px-12 px-6 py-10">
+                    <img src={KinewriteLogo} alt="Kinewritelogo" className="absolute sm:max-w-70 max-w-[60%] sm:bottom-72 bottom-[295px] sm:left-[23%] left-[17.6vw]" />
                     <form
                         className="space-y-6"
                         onSubmit={handleSubmit}

@@ -2,16 +2,34 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-const db = require("./config/db");
+// Database
+require("./config/db");
+
 const app = express();
+
+// ==========================================
+// Routes
+// ==========================================
 const authRoutes = require("./routes/authRoutes");
 const studentRoutes = require("./routes/studentRoutes");
+const assessmentRoutes = require("./routes/assessmentRoutes");
 
+// ==========================================
+// Middleware
+// ==========================================
 app.use(cors());
 app.use(express.json());
+
+// ==========================================
+// API Routes
+// ==========================================
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
+app.use("/api/assessments", assessmentRoutes);
 
+// ==========================================
+// API Status
+// ==========================================
 app.get("/", (req, res) => {
     res.json({
         success: true,
@@ -21,6 +39,9 @@ app.get("/", (req, res) => {
     });
 });
 
+// ==========================================
+// Start Server
+// ==========================================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

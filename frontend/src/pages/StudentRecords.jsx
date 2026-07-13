@@ -47,7 +47,7 @@ const StudentRecords = () => {
             <DashboardHeader />
 
             <PageContainer>
-                <BackButton />
+                <BackButton className="mb-6"/>
                 <StudentRecordsToolbar
                     search={search}
                     setSearch={setSearch}

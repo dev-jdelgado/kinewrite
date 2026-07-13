@@ -7,6 +7,10 @@ import StudentSelection from "../pages/StudentSelection";
 import StudentRecords from "../pages/StudentRecords";
 import Settings from "../pages/Settings"
 
+import StudentProgress from "../pages/StudentProgress";
+
+import Assessment from "../pages/Assessment";
+
 import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
@@ -60,14 +64,12 @@ const AppRoutes = () => {
                 }
             />
 
-            {/* Student Progress (Coming Next) */}
+            {/* Student Progress */}
             <Route
                 path="/student-records/:studentId"
                 element={
                     <ProtectedRoute>
-                        <div className="flex items-center justify-center min-h-screen text-4xl font-bold">
-                            Student Progress Page
-                        </div>
+                        <StudentProgress />
                     </ProtectedRoute>
                 }
             />
@@ -90,6 +92,15 @@ const AppRoutes = () => {
                         <div className="flex items-center justify-center min-h-screen text-4xl font-bold">
                             Exercise Session Page
                         </div>
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/assessment/:studentId"
+                element={
+                    <ProtectedRoute>
+                        <Assessment />
                     </ProtectedRoute>
                 }
             />

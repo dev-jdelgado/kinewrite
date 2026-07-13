@@ -21,6 +21,7 @@ const DashboardCard = ({
                 duration-300
                 transition-all
                 w-full
+                max-w-[350px]
                 aspect-square
                 border-[6px]
                 border-white
@@ -64,22 +65,22 @@ const DashboardCard = ({
                     className="
                         bg-[#F7E4C0]
                         rounded-3xl
-                        p-8
+                        xl:p-8 sm:p-6 p-5
                         shadow-xl
                     "
                 >
                     <img
                         src={icon}
                         alt={title}
-                        className="w-24 h-24 object-contain transition-transform duration-700 group-hover:rotate-360"
+                        className="xl:w-24 xl:h-24 w-20 h-20 object-contain transition-transform duration-700 group-hover:rotate-360"
                     />
                 </div>
 
                 <h2
                     className="
-                        mt-6
+                        xl:mt-6 md:mt-2 mt-3
                         text-white
-                        text-4xl
+                        xl:text-4xl text-3xl
                         font-bold
                         drop-shadow-lg
                         text-center

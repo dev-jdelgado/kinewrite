@@ -24,6 +24,21 @@ const avatarColors = [
     "from-blue-500 to-indigo-600",
 ];
 
+const pageContent = {
+    exercise: {
+        title: "Welcome Back!",
+        subtitle: "Choose your profile to continue your learning journey",
+    },
+    records: {
+        title: "Student Records",
+        subtitle: "Select a student to view their records and progress",
+    },
+    assessment: {
+        title: "Pre-Assessment",
+        subtitle: "Select a student to begin the handwriting assessment",
+    },
+};
+
 const StudentSelection = () => {
 
     const navigate = useNavigate();
@@ -32,6 +47,10 @@ const StudentSelection = () => {
     const [search] = useState("");
     const params = new URLSearchParams(location.search);
     const mode = params.get("mode") || "exercise";
+
+    const currentPage =
+        pageContent[mode] || pageContent.exercise;
+
     const filteredStudents = useMemo(() => {
         return students.filter((student) => {
             const keyword = search.toLowerCase();
@@ -43,12 +62,62 @@ const StudentSelection = () => {
         });
     }, [students, search]);
 
+    // ======================================================
+    // Student Navigation
+    // ======================================================
     const handleStudentClick = (student) => {
-        if (mode === "records") {
-            navigate(`/student-records/${student.student_id}`);
-            return;
+
+        switch (mode) {
+
+            // ==========================================
+            // Student Records
+            // ==========================================
+
+            case "records":
+                navigate(
+                    `/student-records/${student.student_id}`
+                );
+                break;
+
+            // ==========================================
+            // Exercises
+            // ==========================================
+
+            case "exercise":
+                if (
+                    student.student_assessment_status ===
+                    "Completed"
+                ) {
+                    navigate(
+                        `/exercise/${student.student_id}`
+                    );
+                } else {
+                    navigate(
+                        `/assessment/${student.student_id}`
+                    );
+                }
+
+                break;
+
+            // ==========================================
+            // Assessment (Future Manual Trigger)
+            // ==========================================
+            case "assessment":
+                navigate(
+                    `/assessment/${student.student_id}`
+                );
+
+                break;
+
+            // ==========================================
+            // Default
+            // ==========================================
+            default:
+                navigate(
+                    `/assessment/${student.student_id}`
+                );
+                break;
         }
-        navigate(`/exercise/${student.student_id}`);
     };
 
     return (
@@ -80,7 +149,8 @@ const StudentSelection = () => {
                         src={watermark}
                         alt=""
                         className="
-                            md:max-w-[900px] max-w-[650px]
+                            md:max-w-[900px]
+                            max-w-[650px]
                             opacity-10
                             select-none
                             pointer-events-none
@@ -88,13 +158,8 @@ const StudentSelection = () => {
                     />
                 </div>
 
-                {/* Back */}
-                <div className="absolute top-8 left-8 z-40">
+                <div className="flex sm:flex-row flex-col-reverse justify-between sm:items-center items-start sm:gap-0 gap-12 py-2 md:px-12 px-6">
                     <BackButton />
-                </div>
-
-                {/* Logo */}
-                <div className="absolute top-5 right-10 z-20">
                     <img
                         src={logo}
                         alt="KineWrite"
@@ -103,7 +168,6 @@ const StudentSelection = () => {
                 </div>
 
                 {/* Main */}
-
                 <div
                     className="
                         relative
@@ -111,30 +175,34 @@ const StudentSelection = () => {
                         flex
                         flex-col
                         items-center
-                        lg:pt-28 pt-40
+                        pt-12
                         px-10
                     "
                 >
                     <h1
                         className="
-                            lg:text-6xl md:text-5xl text-3xl
+                            lg:text-6xl
+                            md:text-5xl
+                            text-3xl
                             font-extrabold
                             text-white
                             drop-shadow-lg
                             text-center
                         "
                     >
-                        Welcome Back!
+                        {currentPage.title}
                     </h1>
                     <p
                         className="
                             mt-3
-                            lg:text-2xl md:text-xl text-lg
+                            lg:text-2xl
+                            md:text-xl
+                            text-lg
                             text-white
                             text-center
                         "
                     >
-                        Choose your profile to continue your learning journey
+                        {currentPage.subtitle}
                     </p>
                     {
                         loading
@@ -153,60 +221,99 @@ const StudentSelection = () => {
                                         grid-cols-2
                                         md:grid-cols-3
                                         lg:grid-cols-5
-                                        lg:gap-x-5 gap-x-12 gap-y-5
+                                        lg:gap-x-5
+                                        gap-x-12
+                                        gap-y-5
                                     "
                                 >
                                     {
-                                        filteredStudents.map((student, index) => (
-                                            <button
-                                                key={student.student_id}
-                                                onClick={() =>
-                                                    handleStudentClick(student)
-                                                }
-                                                className="
-                                                    group
-                                                    flex
-                                                    flex-col
-                                                    items-center justify-content-evenly
-                                                "
-                                            >
-                                                <div
-                                                    className={`
-                                                        sm:w-45 w-32
-                                                        sm:h-45 h-32
-                                                        rounded-3xl
-                                                        bg-gradient-to-br
-                                                        ${avatarColors[index % avatarColors.length]}
-                                                        shadow-2xl
-                                                        transition-all
-                                                        duration-300
-                                                        group-hover:scale-110
-                                                        group-hover:-translate-y-2
-                                                        flex
-                                                        items-center
-                                                        justify-center
-                                                    `}
-                                                >
-                                                    <span className="sm:text-8xl text-7xl">
-                                                        {
-                                                            student.student_gender === "Female"
-                                                                ? "👧"
-                                                                : "👦"
-                                                        }
-                                                    </span>
-                                                </div>
-                                                <h2
+                                        filteredStudents.map(
+                                            (student, index) => (
+                                                <button
+                                                    key={student.student_id}
+
+                                                    onClick={() =>
+                                                        handleStudentClick(student)
+                                                    }
+
                                                     className="
-                                                        lg:mt-3 sm:mt-2 mt-1
-                                                        lg:text-3xl sm:text-2xl text-lg
-                                                        font-bold
-                                                        text-white
+                                                        group
+                                                        flex
+                                                        flex-col
+                                                        items-center
                                                     "
                                                 >
-                                                    {student.student_fname}
-                                                </h2>
-                                            </button>
-                                        ))
+                                                    <div
+                                                        className={`
+                                                            sm:w-45
+                                                            w-32
+                                                            sm:h-45
+                                                            h-32
+                                                            rounded-3xl
+                                                            bg-gradient-to-br
+                                                            ${avatarColors[index % avatarColors.length]}
+                                                            shadow-2xl
+                                                            transition-all
+                                                            duration-300
+                                                            group-hover:scale-110
+                                                            group-hover:-translate-y-2
+                                                            flex
+                                                            items-center
+                                                            justify-center
+                                                            relative
+                                                        `}
+                                                    >
+                                                        <span className="sm:text-8xl text-7xl">
+                                                            {
+                                                                student.student_gender ===
+                                                                "Female"
+                                                                    ? "👧"
+                                                                    : "👦"
+                                                            }
+                                                        </span>
+
+                                                        {/* Status Indicator */}
+                                                        <div
+                                                            className={`
+                                                                absolute
+                                                                top-3
+                                                                right-3
+                                                                w-4
+                                                                h-4
+                                                                rounded-full
+                                                                border-2
+                                                                border-white
+                                                                ${student.student_assessment_status === "Completed"
+                                                                    ? "bg-green-500"
+                                                                    : "bg-orange-400"}
+                                                            `}
+                                                        />
+                                                    </div>
+                                                    <h2
+                                                        className="
+                                                            lg:mt-3
+                                                            sm:mt-2
+                                                            mt-1
+                                                            lg:text-3xl
+                                                            sm:text-2xl
+                                                            text-lg
+                                                            font-bold
+                                                            text-white
+                                                        "
+                                                    >
+                                                        {student.student_fname}
+                                                    </h2>
+                                                    <p className="text-white/90 text-sm mt-1">
+                                                        {
+                                                            student.student_assessment_status ===
+                                                            "Completed"
+                                                                ? "Ready for Exercises"
+                                                                : "Assessment Required"
+                                                        }
+                                                    </p>
+                                                </button>
+                                            )
+                                        )
                                     }
                                 </div>
                             )
@@ -223,8 +330,10 @@ const StudentSelection = () => {
                             rounded-[40px]
                             bg-[#8C4B09]/80
                             backdrop-blur-md
-                            sm:px-14 px-5
-                            sm:py-10 py-5
+                            sm:px-14
+                            px-5
+                            sm:py-10
+                            py-5
                         "
                     >
                         <div
@@ -232,12 +341,15 @@ const StudentSelection = () => {
                                 grid
                                 grid-cols-2
                                 md:grid-cols-4
-                                sm:gap-10 gap-5
+                                sm:gap-10
+                                gap-5
                                 text-center
                             "
                         >
                             <div>
-                                <div className="sm:text-6xl text-5xl">🎮</div>
+                                <div className="sm:text-6xl text-5xl">
+                                    🎮
+                                </div>
                                 <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
                                     Learn
                                 </h3>
@@ -247,7 +359,9 @@ const StudentSelection = () => {
                             </div>
 
                             <div>
-                                <div className="sm:text-6xl text-5xl">⭐</div>
+                                <div className="sm:text-6xl text-5xl">
+                                    ⭐
+                                </div>
                                 <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
                                     Earn
                                 </h3>
@@ -257,7 +371,9 @@ const StudentSelection = () => {
                             </div>
 
                             <div>
-                                <div className="sm:text-6xl text-5xl">🎯</div>
+                                <div className="sm:text-6xl text-5xl">
+                                    🎯
+                                </div>
                                 <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
                                     Track
                                 </h3>
@@ -267,7 +383,9 @@ const StudentSelection = () => {
                             </div>
 
                             <div>
-                                <div className="sm:text-6xl text-5xl">❤️</div>
+                                <div className="sm:text-6xl text-5xl">
+                                    ❤️
+                                </div>
                                 <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
                                     Feel
                                 </h3>
@@ -275,7 +393,6 @@ const StudentSelection = () => {
                                     Confident
                                 </p>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -286,7 +403,8 @@ const StudentSelection = () => {
                         absolute
                         -bottom-[10vw]
                         -left-[10%]
-                        sm:w-[50vw] w-[65vw]
+                        sm:w-[50vw]
+                        w-[65vw]
                         pointer-events-none
                         select-none
                         z-30
@@ -303,7 +421,8 @@ const StudentSelection = () => {
                         pointer-events-none
                         select-none
                         z-30
-                        sm:block hidden
+                        sm:block
+                        hidden
                     "
                 />
                 <img
@@ -313,7 +432,8 @@ const StudentSelection = () => {
                         absolute
                         -bottom-[10vw]
                         -right-[10vw]
-                        sm:w-[50vw] w-[65vw]
+                        sm:w-[50vw]
+                        w-[65vw]
                         pointer-events-none
                         select-none
                         z-20

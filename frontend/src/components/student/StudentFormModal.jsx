@@ -17,7 +17,6 @@ const StudentFormModal = ({
     onClose,
     student,
 }) => {
-
     const { createStudent, updateStudent } = useStudents();
 
     const [formData, setFormData] = useState(initialState);
@@ -47,31 +46,36 @@ const StudentFormModal = ({
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         if (!formData.student_fname.trim()) {
             toast.error("First name is required.");
             return;
         }
+
         if (!formData.student_lname.trim()) {
             toast.error("Last name is required.");
             return;
         }
+
         if (!formData.student_gender) {
             toast.error("Please select a gender.");
             return;
         }
+
         if (!formData.student_bday) {
             toast.error("Please select the student's birthday.");
             return;
         }
+
         if (!formData.student_grade_level) {
             toast.error("Please select a grade level.");
             return;
         }
-    
+
         setLoading(true);
+
         let success = false;
-    
+
         if (student) {
             success = await updateStudent(
                 student.student_id,
@@ -80,7 +84,9 @@ const StudentFormModal = ({
         } else {
             success = await createStudent(formData);
         }
+
         setLoading(false);
+
         if (success) {
             setFormData(initialState);
             onClose();
@@ -99,7 +105,8 @@ const StudentFormModal = ({
                 flex
                 items-center
                 justify-center
-                p-6
+                p-4
+                sm:p-6
             "
         >
             <div
@@ -109,35 +116,41 @@ const StudentFormModal = ({
                     shadow-2xl
                     w-full
                     max-w-4xl
-                    overflow-hidden
+                    max-h-[90vh]
+                    flex
+                    flex-col
                 "
             >
-
                 {/* Header */}
                 <div
                     className="
                         flex
                         justify-between
                         items-center
-                        px-8
+                        px-6
+                        sm:px-8
                         py-6
                         border-b
+                        shrink-0
                     "
                 >
                     <div>
                         <h2
                             className="
-                                text-3xl
+                                text-2xl
+                                sm:text-3xl
                                 font-bold
                                 text-[#9b4c00]
                             "
                         >
                             {student ? "Edit Student" : "Add Student"}
                         </h2>
-                        <p className="text-slate-500 mt-1">
+
+                        <p className="text-slate-500 mt-1 text-sm sm:text-base">
                             Enter the student's information below.
                         </p>
                     </div>
+
                     <button
                         onClick={onClose}
                         disabled={loading}
@@ -145,14 +158,31 @@ const StudentFormModal = ({
                             p-2
                             rounded-xl
                             hover:bg-slate-100
+                            transition
                         "
                     >
                         <X size={28} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="p-8">
+                <form
+                    onSubmit={handleSubmit}
+                    className="
+                        flex
+                        flex-col
+                        flex-1
+                        overflow-hidden
+                    "
+                >
+                    {/* Scrollable Body */}
+                    <div
+                        className="
+                            flex-1
+                            overflow-y-auto
+                            p-6
+                            sm:p-8
+                        "
+                    >
                         <div className="flex justify-center mb-8">
                             <div
                                 className="
@@ -171,11 +201,13 @@ const StudentFormModal = ({
                                     : "👧"}
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-6">
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="font-medium mb-2 block">
                                     First Name
                                 </label>
+
                                 <input
                                     type="text"
                                     name="student_fname"
@@ -193,12 +225,13 @@ const StudentFormModal = ({
                                         focus:ring-orange-400
                                     "
                                 />
-
                             </div>
+
                             <div>
                                 <label className="font-medium mb-2 block">
                                     Last Name
                                 </label>
+
                                 <input
                                     type="text"
                                     name="student_lname"
@@ -217,10 +250,12 @@ const StudentFormModal = ({
                                     "
                                 />
                             </div>
+
                             <div>
                                 <label className="font-medium mb-2 block">
                                     Gender
                                 </label>
+
                                 <select
                                     name="student_gender"
                                     value={formData.student_gender}
@@ -241,6 +276,7 @@ const StudentFormModal = ({
                                     <option value="Female">Female</option>
                                 </select>
                             </div>
+
                             <div>
                                 <label className="font-medium mb-2 block">
                                     Birthday
@@ -263,12 +299,13 @@ const StudentFormModal = ({
                                         focus:ring-orange-400
                                     "
                                 />
-
                             </div>
+
                             <div>
                                 <label className="font-medium mb-2 block">
                                     Grade Level
                                 </label>
+
                                 <select
                                     name="student_grade_level"
                                     value={formData.student_grade_level}
@@ -288,6 +325,7 @@ const StudentFormModal = ({
                                     <option value="">
                                         Select Grade
                                     </option>
+
                                     {[1, 2, 3, 4, 5, 6].map((grade) => (
                                         <option
                                             key={grade}
@@ -299,10 +337,12 @@ const StudentFormModal = ({
                                 </select>
                             </div>
                         </div>
+
                         <div className="mt-6">
                             <label className="font-medium mb-2 block">
                                 Notes
                             </label>
+
                             <textarea
                                 rows={5}
                                 name="student_notes"
@@ -324,14 +364,19 @@ const StudentFormModal = ({
                         </div>
                     </div>
 
+                    {/* Footer */}
                     <div
                         className="
                             border-t
-                            px-8
+                            px-6
+                            sm:px-8
                             py-6
                             flex
+                            flex-col
+                            sm:flex-row
                             justify-end
                             gap-4
+                            shrink-0
                         "
                     >
                         <button
@@ -339,12 +384,15 @@ const StudentFormModal = ({
                             onClick={onClose}
                             disabled={loading}
                             className="
+                                w-full
+                                sm:w-auto
                                 px-8
                                 py-3
                                 rounded-xl
                                 border
                                 font-semibold
                                 hover:bg-slate-100
+                                transition
                             "
                         >
                             Cancel
@@ -354,6 +402,8 @@ const StudentFormModal = ({
                             type="submit"
                             disabled={loading}
                             className="
+                                w-full
+                                sm:w-auto
                                 px-8
                                 py-3
                                 rounded-xl

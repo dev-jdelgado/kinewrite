@@ -28,7 +28,6 @@ const BackButton = ({
                 hover:shadow-lg
                 transition-all
                 duration-200
-                mb-6
                 ${className}
             `}
         >

@@ -68,7 +68,6 @@ const Student = {
                 studentData.student_notes || null,
             ]
         );
-
         return result.insertId;
     },
 
@@ -101,6 +100,71 @@ const Student = {
     },
 
     // ==========================================
+    // Update Student Classification
+    // ==========================================
+    async updateClassification(
+        connection,
+        studentId,
+        classification
+    ) {
+        await connection.query(
+            `
+            UPDATE students
+            SET
+                student_classification = ?,
+                student_assessment_status = 'Completed'
+            WHERE student_id = ?
+            `,
+            [
+                classification,
+                studentId,
+            ]
+        );
+    },
+
+    // ==========================================
+    // Update Student Current Level
+    // ==========================================
+    async updateCurrentLevel(
+        connection,
+        studentId,
+        level
+    ) {
+
+        await connection.query(
+            `
+            UPDATE students
+            SET student_current_level = ?
+            WHERE student_id = ?
+            `,
+            [
+                level,
+                studentId,
+            ]
+        );
+    },
+
+    // ==========================================
+    // Update Student Last Activity
+    // ==========================================
+    async updateLastActivity(
+        connection,
+        studentId
+    ) {
+        await connection.query(
+            `
+            UPDATE students
+            SET
+                student_last_activity = NOW()
+            WHERE student_id = ?
+            `,
+            [
+                studentId,
+            ]
+        );
+    },
+
+    // ==========================================
     // Soft Delete Student
     // ==========================================
     async archive(id) {
@@ -117,21 +181,50 @@ const Student = {
     // ==========================================
     // Update Student Code
     // ==========================================
-    async updateStudentCode(connection, studentId, studentCode) {
+    async updateStudentCode(
+        connection,
+        studentId,
+        studentCode
+    ) {
         await connection.query(
             `
             UPDATE students
             SET student_code = ?
             WHERE student_id = ?
             `,
-            [studentCode, studentId]
+            [
+                studentCode,
+                studentId,
+            ]
         );
     },
 
+// ==========================================
+// Initialize Student Progress
+// ==========================================
+async initializeProgress(connection, progressData) {
+    const {
+        studentId,
+        currentLevel,
+        classification,
+    } = progressData;
+
+    // Check if a progress record already exists
+    const [existing] = await connection.query(
+        `
+        SELECT progress_id
+        FROM student_progress
+        WHERE student_id = ?
+        `,
+        [
+            studentId,
+        ]
+    );
+
     // ==========================================
-    // Initialize Student Progress
+    // Create New Progress
     // ==========================================
-    async initializeProgress(connection, studentId) {
+    if (existing.length === 0) {
         await connection.query(
             `
             INSERT INTO student_progress
@@ -143,11 +236,39 @@ const Student = {
                 total_stars,
                 current_classification
             )
-            VALUES (?,1,0,0,0,'Not Assessed')
+            VALUES (?, ?, 0, 0, 0, ?)
             `,
-            [studentId]
+            [
+                studentId,
+                currentLevel,
+                classification,
+            ]
         );
-    },
+        return;
+    }
+
+    // ==========================================
+    // Update Existing Progress
+    // ==========================================
+
+    await connection.query(
+
+        `
+        UPDATE student_progress
+        SET
+            current_level = ?,
+            current_classification = ?,
+            updated_at = NOW()
+        WHERE student_id = ?
+        `,
+
+        [
+            currentLevel,
+            classification,
+            studentId,
+        ]
+    );
+},
 };
 
 module.exports = Student;
