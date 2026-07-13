@@ -54,9 +54,33 @@ exports.login = async (req, res) => {
             admin: {
                 id: admin.admin_id,
                 name: admin.admin_name,
-                username: admin.admin_user
+                username: admin.admin_user,
+                email: admin.admin_email,
+                school: admin.admin_school,
+                phone: admin.admin_phone
             }
         });
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const { id, name, email, school, phone } = req.body;
+
+        await Admin.updateProfile(id, name, email, school, phone);
+
+        return res.json({
+            success: true,
+            message: "Profile updated successfully."
+        });
+
     } catch (error) {
         console.error(error);
 
