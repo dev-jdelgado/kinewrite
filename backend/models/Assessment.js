@@ -1,90 +1,167 @@
-const db = require("../config/db");
+const pool = require("../config/db");
 
-const Assessment = {
+class Assessment {
 
     // ==========================================
     // Create Assessment
     // ==========================================
-    async create(connection, assessmentData) {
 
-        const {
-            student_id,
-            assessment_type,
-            visual_motor_score,
-            fine_motor_score,
-            letter_formation_score,
-            assessment_score,
-            assessment_classification,
-            recommended_level,
-            assessment_remarks,
-        } = assessmentData;
+    static async create({
 
-        const [result] = await connection.query(
+        studentId,
+        assessmentType,
+
+    }) {
+
+        const [result] = await pool.query(
 
             `
-            INSERT INTO assessments
-            (
+            INSERT INTO assessments (
+
                 student_id,
-                assessment_type,
-                visual_motor_score,
-                fine_motor_score,
-                letter_formation_score,
-                assessment_score,
-                assessment_classification,
-                recommended_level,
-                assessment_remarks
+                assessment_type
+
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+            VALUES (?, ?)
             `,
 
             [
-                student_id,
-                assessment_type,
-                visual_motor_score,
-                fine_motor_score,
-                letter_formation_score,
-                assessment_score,
-                assessment_classification,
-                recommended_level,
-                assessment_remarks,
+
+                studentId,
+                assessmentType,
+
             ]
+
         );
+
         return result.insertId;
-    },
+
+    }
 
     // ==========================================
-    // Get Assessment By ID
+    // Get Assessment
     // ==========================================
-    async findById(id) {
 
-        const [rows] = await db.query(
+    static async findById(id) {
+
+        const [rows] = await pool.query(
+
             `
             SELECT *
             FROM assessments
             WHERE assessment_id = ?
             `,
+
             [id]
+
         );
-        return rows[0] || null;
-    },
+
+        return rows[0];
+
+    }
 
     // ==========================================
-    // Get Student Assessment History
+    // Student Assessments
     // ==========================================
-    async findByStudent(studentId) {
 
-        const [rows] = await db.query(
+    static async findByStudent(studentId) {
+
+        const [rows] = await pool.query(
+
             `
             SELECT *
             FROM assessments
+
             WHERE student_id = ?
+
             ORDER BY assessment_date DESC
             `,
-            [studentId]
+
+            [
+
+                studentId
+
+            ]
 
         );
+
         return rows;
-    },
-};
+
+    }
+
+    // ==========================================
+    // Save Final Scores
+    // ==========================================
+
+    static async updateScores({
+
+        assessmentId,
+
+        spacingScore,
+
+        alignmentScore,
+
+        strokeScore,
+
+        overallScore,
+
+        classification,
+
+        recommendedLevel,
+
+        remarks,
+
+    }) {
+
+        await pool.query(
+
+            `
+            UPDATE assessments
+
+            SET
+
+                spacing_score = ?,
+
+                alignment_score = ?,
+
+                stroke_score = ?,
+
+                overall_score = ?,
+
+                assessment_classification = ?,
+
+                recommended_level = ?,
+
+                assessment_remarks = ?
+
+            WHERE assessment_id = ?
+            `,
+
+            [
+
+                spacingScore,
+
+                alignmentScore,
+
+                strokeScore,
+
+                overallScore,
+
+                classification,
+
+                recommendedLevel,
+
+                remarks,
+
+                assessmentId,
+
+            ]
+
+        );
+
+    }
+
+}
 
 module.exports = Assessment;

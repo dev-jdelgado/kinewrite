@@ -1,101 +1,211 @@
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-
-import DashboardLayout from "../layouts/DashboardLayout";
-
-import DashboardHeader from "../components/dashboard/DashboardHeader";
-import PageContainer from "../components/common/PageContainer";
-import BackButton from "../components/common/BackButton";
-
-import AssessmentHeader from "../components/assessment/AssessmentHeader";
-import AssessmentStepper from "../components/assessment/AssessmentStepper";
-
-import AssessmentIntro from "../components/assessment/AssessmentIntro";
-import AssessmentInstructions from "../components/assessment/AssessmentInstructions";
-import WritingActivity from "../components/assessment/WritingActivity.jsx";
-import SystemAnalysis from "../components/assessment/SystemAnalysis";
-import AssessmentResults from "../components/assessment/AssessmentResults";
-import AssessmentRemarks from "../components/assessment/AssessmentRemarks";
-import AssessmentFooter from "../components/assessment/AssessmentFooter";
+import {
+    useEffect,
+} from "react";
 
 import {
+    useParams,
+    useSearchParams,
+} from "react-router-dom";
+
+import StudentService from "../services/StudentService";
+import AssessmentService from "../services/AssessmentService";
+
+import AssessmentLayout from "../components/assessment/utils/AssessmentLayout";
+import AssessmentRouter from "../components/assessment/utils/AssessmentRouter";
+
+import {
+
     AssessmentProvider,
+
     useAssessment,
-} from "../contexts/AssessmentContext";
+
+} from "../components/assessment/utils/AssessmentContext";
+
+import preAssessmentActivities from "../components/assessment/data/preAssessmentActivities";
+import postAssessmentActivities from "../components/assessment/data/postAssessmentActivities";
 
 const AssessmentContent = () => {
 
-    const { studentId } = useParams();
+    const {
+
+        studentId,
+
+    } = useParams();
+
+    const [
+
+        searchParams,
+
+    ] = useSearchParams();
 
     const {
-        currentStep,
-        loadStudent,
-        clearStudent,
+
+        setStudent,
+
+        setAssessmentId,
+
+        setAssessmentType,
+
+        setActivities,
+
+        setLoading,
+
+        resetAssessment,
+
     } = useAssessment();
 
     useEffect(() => {
 
-        if (studentId) {
-            loadStudent(studentId);
-        }
+        const initializeAssessment = async () => {
+
+            try {
+
+                setLoading(true);
+
+                // =====================================
+                // Assessment Type
+                // =====================================
+
+                const type =
+
+                    searchParams.get("type") ||
+
+                    "pre";
+
+                setAssessmentType(type);
+
+                // =====================================
+                // Activities
+                // =====================================
+
+                if (type === "pre") {
+
+                    setActivities(
+
+                        preAssessmentActivities
+
+                    );
+
+                }
+
+                else {
+
+                    setActivities(
+
+                        postAssessmentActivities
+
+                    );
+
+                }
+
+                // =====================================
+                // Student
+                // =====================================
+
+                const studentResponse =
+
+                    await StudentService.getStudent(
+
+                        studentId
+
+                    );
+
+                if (
+
+                    studentResponse.success
+
+                ) {
+
+                    setStudent(
+
+                        studentResponse.data.student
+
+                    );
+
+                }
+
+                // =====================================
+                // Start Assessment
+                // =====================================
+
+                const assessmentResponse =
+
+                    await AssessmentService.startAssessment({
+
+                        studentId,
+
+                        assessmentType:
+
+                            type,
+
+                    });
+
+                if (
+
+                    assessmentResponse.success
+
+                ) {
+
+                    setAssessmentId(
+
+                        assessmentResponse
+
+                            .data
+
+                            .assessmentId
+
+                    );
+
+                }
+
+            }
+
+            catch (error) {
+
+                console.error(
+
+                    "Assessment Initialization Failed",
+
+                    error
+
+                );
+
+            }
+
+            finally {
+
+                setLoading(false);
+
+            }
+
+        };
+
+        initializeAssessment();
 
         return () => {
-            clearStudent();
+
+            resetAssessment();
+
         };
-    }, [studentId]);
 
-    const renderStep = () => {
+    }, [
 
-        switch (currentStep) {
+        studentId,
 
-            case 1:
-                return <AssessmentIntro />;
-            case 2:
-                return <AssessmentInstructions />;
-            case 3:
-                return <WritingActivity />;
-            case 4:
-                return <SystemAnalysis />;
-            case 5:
-                return <AssessmentResults />;
-            case 6:
-                return <AssessmentRemarks />;
-        
-            default:
-                return null;
-        }
-    };
+        searchParams,
+
+    ]);
 
     return (
 
-        <DashboardLayout>
-            <DashboardHeader />
-            <PageContainer>
+        <AssessmentLayout>
 
-                <BackButton
-                    to={`/student-records/${studentId}`}
-                    label="Back to Student Profile"
-                />
+            <AssessmentRouter />
 
-                <AssessmentHeader />
-                <AssessmentStepper />
+        </AssessmentLayout>
 
-                <div
-                    className="
-                        mt-8
-                        rounded-3xl
-                        bg-white
-                        shadow-lg
-                        p-8
-                    "
-                >
-                    {renderStep()}
-                </div>
-
-                <AssessmentFooter />
-            </PageContainer>
-        </DashboardLayout>
     );
+
 };
 
 const Assessment = () => {
@@ -103,10 +213,13 @@ const Assessment = () => {
     return (
 
         <AssessmentProvider>
+
             <AssessmentContent />
+
         </AssessmentProvider>
 
     );
+
 };
 
 export default Assessment;

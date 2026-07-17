@@ -1,3 +1,7 @@
+// HandwritingCanvas.jsx
+// Starter rewrite preserving public API.
+// See chat for integration notes.
+
 import {
     forwardRef,
     useEffect,
@@ -5,180 +9,257 @@ import {
     useRef,
 } from "react";
 
-import { useAssessment } from "../../../contexts/AssessmentContext";
+import { useAssessment } from "../utils/AssessmentContext";
 
 const HandwritingCanvas = forwardRef((props, ref) => {
-
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
+
     const drawing = useRef(false);
+    const activePointerId = useRef(null);
+
     const strokes = useRef([]);
     const currentStroke = useRef([]);
 
-    const {
-        setHandwritingData,
-        setHandwritingImage,
-    } = useAssessment();
+    const { setHandwritingData, setHandwritingImage } = useAssessment();
 
-    // ==========================================
-    // Initialize Canvas
-    // ==========================================
-    useEffect(() => {
-
+    const redrawCanvas = () => {
         const canvas = canvasRef.current;
-        const ratio = window.devicePixelRatio || 1;
+        const ctx = contextRef.current;
 
-        canvas.width = canvas.offsetWidth * ratio;
-        canvas.height = canvas.offsetHeight * ratio;
+        if (!canvas || !ctx) return;
 
-        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.scale(ratio, ratio);
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.strokeStyle = "#222";
-        ctx.lineWidth = 3;
+        strokes.current.forEach((stroke) => {
+            if (!stroke.length) return;
 
-        contextRef.current = ctx;
+            ctx.beginPath();
+            ctx.moveTo(stroke[0].x, stroke[0].y);
 
+            for (let i = 1; i < stroke.length; i++) {
+                ctx.lineTo(stroke[i].x, stroke[i].y);
+            }
+
+            ctx.stroke();
+        });
+    };
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const resize = () => {
+            const rect = canvas.getBoundingClientRect();
+            const ratio = window.devicePixelRatio || 1;
+
+            canvas.width = rect.width * ratio;
+            canvas.height = rect.height * ratio;
+
+            const ctx = canvas.getContext("2d");
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(ratio, ratio);
+
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#1f2937";
+
+            contextRef.current = ctx;
+
+            redrawCanvas();
+        };
+
+        const observer = new ResizeObserver(resize);
+
+        observer.observe(canvas);
+
+        resize();
+
+        return () => observer.disconnect();
     }, []);
 
-    // ==========================================
-    // Coordinates
-    // ==========================================
-    const getPoint = (event) => {
+    const makePoint = (e) => {
         const rect = canvasRef.current.getBoundingClientRect();
 
         return {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top,
-            pressure: event.pressure || 0.5,
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+            pressure: e.pressure > 0 ? e.pressure : 0.5,
             timestamp: Date.now(),
-
         };
-
     };
 
-    // ==========================================
-    // Start Drawing
-    // ==========================================
-    const handlePointerDown = (event) => {
+    const start = (e) => {
+        if (e.pointerType === "touch") return;
 
-        event.preventDefault();
+        e.preventDefault();
 
+        // Ignore if another pointer is still active
+        if (
+            activePointerId.current !== null &&
+            activePointerId.current !== e.pointerId
+        ) {
+            return;
+        }
+
+        activePointerId.current = e.pointerId;
         drawing.current = true;
 
-        const point = getPoint(event);
+        currentStroke.current = [];
 
-        currentStroke.current = [point];
+        const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+
+        events.forEach((event) => {
+            currentStroke.current.push(makePoint(event));
+        });
+
+        const firstPoint = currentStroke.current[0];
+
+        if (!firstPoint) return;
 
         contextRef.current.beginPath();
+        contextRef.current.moveTo(firstPoint.x, firstPoint.y);
 
-        contextRef.current.moveTo(
-            point.x,
-            point.y
+        // Draw initial dot
+        contextRef.current.beginPath();
+        contextRef.current.arc(
+            firstPoint.x,
+            firstPoint.y,
+            contextRef.current.lineWidth / 2,
+            0,
+            Math.PI * 2
         );
 
+        contextRef.current.fillStyle = contextRef.current.strokeStyle;
+        contextRef.current.fill();
     };
 
-    // ==========================================
-    // Drawing
-    // ==========================================
-    const handlePointerMove = (event) => {
-
+    const move = (e) => {
         if (!drawing.current) return;
 
-        event.preventDefault();
+        if (e.pointerId !== activePointerId.current) {
+            return;
+        }
 
-        const point = getPoint(event);
+        e.preventDefault();
 
-        currentStroke.current.push(point);
+        const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
 
-        contextRef.current.lineTo(
-            point.x,
-            point.y
-        );
-        contextRef.current.stroke();
+        events.forEach((event) => {
+            const p = makePoint(event);
+
+            currentStroke.current.push(p);
+
+            contextRef.current.lineTo(p.x, p.y);
+            contextRef.current.stroke();
+        });
     };
 
-    // ==========================================
-    // Finish Drawing
-    // ==========================================
-    const handlePointerUp = () => {
-
+    const end = (e) => {
         if (!drawing.current) return;
 
+        if (e.pointerId !== activePointerId.current) {
+            return;
+        }
+
+        // Copy the stroke first
+        const finishedStroke = [...currentStroke.current];
+
+        // Immediately reset drawing state
         drawing.current = false;
-
-        strokes.current.push(
-            currentStroke.current
-        );
+        activePointerId.current = null;
         currentStroke.current = [];
-        setHandwritingData(
-            strokes.current
-        );
 
-        setHandwritingImage(
-            canvasRef.current.toDataURL(
-                "image/png"
-            )
-        );
+        // Ignore accidental taps
+        if (finishedStroke.length < 2) {
+            return;
+        }
+
+        strokes.current.push(finishedStroke);
+
+        setHandwritingData([...strokes.current]);
     };
 
-    // ==========================================
-    // Public Methods
-    // ==========================================
     useImperativeHandle(ref, () => ({
         clear() {
-            const canvas = canvasRef.current;
-            contextRef.current.clearRect(
-
-                0,
-                0,
-                canvas.width,
-                canvas.height
-
-            );
-
             strokes.current = [];
             currentStroke.current = [];
+
+            redrawCanvas();
+
             setHandwritingData([]);
             setHandwritingImage(null);
         },
 
         exportImage() {
-            return canvasRef.current.toDataURL(
-                "image/png"
-            );
+
+            if (!canvasRef.current) {
+        
+                return null;
+        
+            }
+        
+            const img =
+                canvasRef.current.toDataURL("image/png");
+        
+            if (setHandwritingImage) {
+        
+                setHandwritingImage(img);
+        
+            }
+        
+            return img;
+        
         },
 
         getStrokes() {
-            return strokes.current;
+
+            return JSON.parse(
+        
+                JSON.stringify(
+        
+                    strokes.current
+        
+                )
+        
+            );
+        
+        },
+
+        hasWriting() {
+
+            return strokes.current.some(
+    
+                stroke =>
+    
+                    stroke.length > 1
+    
+            );
+    
         },
     }));
 
     return (
-
         <canvas
             ref={canvasRef}
-            className="
-                absolute
-                inset-0
-                w-full
-                h-full
-                touch-none
-                cursor-crosshair
-            "
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerLeave={handlePointerUp}
+            className="absolute inset-0 w-full h-full touch-none select-none"
+            style={{
+                touchAction: "none",
+                userSelect: "none",
+                WebkitUserSelect: "none",
+            }}
+            onPointerDown={start}
+            onPointerMove={move}
+            onPointerUp={end}
+            onPointerCancel={end}
+            onPointerLeave={end}
+            onContextMenu={(e) => e.preventDefault()}
         />
-
     );
 });
 
-HandwritingCanvas.displayName =
-    "HandwritingCanvas";
+HandwritingCanvas.displayName = "HandwritingCanvas";
 
 export default HandwritingCanvas;

@@ -199,76 +199,170 @@ const Student = {
         );
     },
 
-// ==========================================
-// Initialize Student Progress
-// ==========================================
-async initializeProgress(connection, progressData) {
-    const {
-        studentId,
-        currentLevel,
-        classification,
-    } = progressData;
-
-    // Check if a progress record already exists
-    const [existing] = await connection.query(
-        `
-        SELECT progress_id
-        FROM student_progress
-        WHERE student_id = ?
-        `,
-        [
+    // ==========================================
+    // Initialize Student Progress
+    // ==========================================
+    async initializeProgress(connection, progressData) {
+        const {
             studentId,
-        ]
-    );
+            currentLevel,
+            classification,
+        } = progressData;
 
-    // ==========================================
-    // Create New Progress
-    // ==========================================
-    if (existing.length === 0) {
-        await connection.query(
+        // Check if a progress record already exists
+        const [existing] = await connection.query(
             `
-            INSERT INTO student_progress
-            (
-                student_id,
-                current_level,
-                completed_exercises,
-                average_accuracy,
-                total_stars,
-                current_classification
-            )
-            VALUES (?, ?, 0, 0, 0, ?)
+            SELECT progress_id
+            FROM student_progress
+            WHERE student_id = ?
             `,
             [
                 studentId,
-                currentLevel,
-                classification,
             ]
         );
-        return;
-    }
+
+        // ==========================================
+        // Create New Progress
+        // ==========================================
+        if (existing.length === 0) {
+            await connection.query(
+                `
+                INSERT INTO student_progress
+                (
+                    student_id,
+                    current_level,
+                    completed_exercises,
+                    average_accuracy,
+                    total_stars,
+                    current_classification
+                )
+                VALUES (?, ?, 0, 0, 0, ?)
+                `,
+                [
+                    studentId,
+                    currentLevel,
+                    classification,
+                ]
+            );
+            return;
+        }
+
+        // ==========================================
+        // Update Existing Progress
+        // ==========================================
+
+        await connection.query(
+
+            `
+            UPDATE student_progress
+            SET
+                current_level = ?,
+                current_classification = ?,
+                updated_at = NOW()
+            WHERE student_id = ?
+            `,
+
+            [
+                currentLevel,
+                classification,
+                studentId,
+            ]
+        );
+    },
 
     // ==========================================
-    // Update Existing Progress
+    // Complete Assessment
     // ==========================================
 
-    await connection.query(
+    async completeAssessment(
+        connection,
+        assessmentData
+    ) {
 
-        `
-        UPDATE student_progress
-        SET
-            current_level = ?,
-            current_classification = ?,
-            updated_at = NOW()
-        WHERE student_id = ?
-        `,
+        const {
 
-        [
-            currentLevel,
-            classification,
             studentId,
-        ]
-    );
-},
+
+            assessmentId,
+
+            classification,
+
+            level,
+
+            accuracy,
+
+        } = assessmentData;
+
+        // --------------------------------------
+        // Update Student
+        // --------------------------------------
+
+        await connection.query(
+
+            `
+            UPDATE students
+            SET
+                student_classification = ?,
+                student_assessment_status = 'Completed',
+                student_current_level = ?,
+                student_last_activity = NOW()
+            WHERE student_id = ?
+            `,
+
+            [
+
+                classification,
+
+                level,
+
+                studentId,
+
+            ]
+
+        );
+
+        // --------------------------------------
+        // Update Progress
+        // --------------------------------------
+
+        await connection.query(
+
+            `
+            UPDATE student_progress
+            SET
+
+                last_assessment_id = ?,
+
+                current_level = ?,
+
+                current_classification = ?,
+
+                average_accuracy = ?,
+
+                last_session = NOW(),
+
+                updated_at = NOW()
+
+            WHERE student_id = ?
+            `,
+
+            [
+
+                assessmentId,
+
+                level,
+
+                classification,
+
+                accuracy,
+
+                studentId,
+
+            ]
+
+        );
+
+    }
 };
 
 module.exports = Student;

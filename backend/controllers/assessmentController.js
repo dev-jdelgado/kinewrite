@@ -1,137 +1,300 @@
 const AssessmentService = require("../services/AssessmentService");
 
-const assessmentController = {
+class AssessmentController {
 
-    // =====================================================
-    // Complete Assessment
-    // POST /api/assessments
-    // =====================================================
-    async createAssessment(req, res) {
+    // ==========================================
+    // Start Assessment
+    // ==========================================
+
+    static async startAssessment(req, res) {
 
         try {
+
             const {
-                student_id,
-                assessment_type,
-                visual_motor_score,
-                fine_motor_score,
-                letter_formation_score,
-                assessment_score,
-                assessment_classification,
-                recommended_level,
-                assessment_remarks,
+
+                studentId,
+
+                assessmentType,
+
             } = req.body;
 
-            // =============================================
-            // Basic Validation
-            // =============================================
-            if (!student_id) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Student ID is required.",
-                });
-            }
+            const assessmentId =
+                await AssessmentService.startAssessment({
 
-            if (!assessment_type) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Assessment type is required.",
-                });
-            }
+                    studentId,
 
-            const assessment = await AssessmentService.completeAssessment({
-                student_id,
-                assessment_type,
-                visual_motor_score,
-                fine_motor_score,
-                letter_formation_score,
-                assessment_score,
-                assessment_classification,
-                recommended_level,
-                assessment_remarks,
-            });
+                    assessmentType,
+
+                });
 
             return res.status(201).json({
-                success: true,
-                message: "Assessment completed successfully.",
-                data: assessment,
-            });
-        }
 
-        catch (error) {
-            console.error("Assessment Error:", error);
+                success: true,
+
+                message:
+                    "Assessment started successfully.",
+
+                data: {
+
+                    assessmentId,
+
+                },
+
+            });
+
+        } catch (error) {
+
+            console.error(error);
 
             return res.status(500).json({
-                success: false,
-                message: "Failed to complete assessment.",
-                error: error.message,
-            });
-        }
-    },
 
-    // =====================================================
-    // Get Assessment By ID
-    // GET /api/assessments/:id
-    // =====================================================
-    async getAssessment(req, res) {
+                success: false,
+
+                message:
+                    "Failed to start assessment.",
+
+            });
+
+        }
+
+    }
+
+    // ==========================================
+    // Save Activity
+    // ==========================================
+
+    static async saveActivity(req, res) {
 
         try {
+
+            const {
+
+                assessmentId,
+
+            } = req.params;
+
+            const {
+
+                activityNo,
+
+                activityCategory,
+
+                promptText,
+
+                promptType,
+
+                completionTime,
+
+                penLifts,
+
+                strokeCount,
+
+                image,
+
+                strokes,
+
+            } = req.body;
+
+            const attemptId =
+                await AssessmentService.saveActivity({
+
+                    assessmentId,
+
+                    activityNo,
+
+                    activityCategory,
+
+                    promptText,
+
+                    promptType,
+
+                    completionTime,
+
+                    penLifts,
+
+                    strokeCount,
+
+                    image,
+
+                    strokes,
+
+                });
+
+            return res.status(201).json({
+
+                success: true,
+
+                message:
+                    "Activity saved successfully.",
+
+                data: {
+
+                    attemptId,
+
+                },
+
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Failed to save activity.",
+
+            });
+
+        }
+
+    }
+
+    // ==========================================
+    // Analyze Assessment
+    // ==========================================
+
+    static async analyzeAssessment(req, res) {
+
+        try {
+
+            const {
+
+                assessmentId,
+
+            } = req.params;
+
+            const analysis =
+                await AssessmentService.analyzeAssessment(
+
+                    assessmentId
+
+                );
+
+            return res.status(200).json({
+
+                success: true,
+
+                message:
+                    "Assessment analyzed successfully.",
+
+                data: analysis,
+
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    error.message ||
+
+                    "Failed to analyze assessment.",
+
+            });
+
+        }
+
+    }
+
+    // ==========================================
+    // Get Assessment
+    // ==========================================
+
+    static async getAssessment(req, res) {
+
+        try {
+
+            const {
+
+                assessmentId,
+
+            } = req.params;
+
             const assessment =
                 await AssessmentService.getAssessment(
-                    req.params.id
+
+                    assessmentId
+
                 );
-            if (!assessment) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Assessment not found.",
-                });
-            }
 
             return res.status(200).json({
-                success: true,
-                data: assessment,
-            });
-        }
 
-        catch (error) {
+                success: true,
+
+                data: assessment,
+
+            });
+
+        } catch (error) {
+
             console.error(error);
 
             return res.status(500).json({
-                success: false,
-                message: "Failed to retrieve assessment.",
-                error: error.message,
-            });
-        }
-    },
 
-    // =====================================================
-    // Get Student Assessment History
-    // GET /api/assessments/student/:studentId
-    // =====================================================
-    async getStudentHistory(req, res) {
+                success: false,
+
+                message:
+                    "Failed to retrieve assessment.",
+
+            });
+
+        }
+
+    }
+
+    // ==========================================
+    // Student Assessment History
+    // ==========================================
+
+    static async getStudentAssessments(req, res) {
 
         try {
-            const history =
-                await AssessmentService.getStudentHistory(
-                    req.params.studentId
+
+            const {
+
+                studentId,
+
+            } = req.params;
+
+            const assessments =
+                await AssessmentService.getStudentAssessments(
+
+                    studentId
+
                 );
 
             return res.status(200).json({
-                success: true,
-                count: history.length,
-                data: history,
-            });
-        }
 
-        catch (error) {
+                success: true,
+
+                data: assessments,
+
+            });
+
+        } catch (error) {
+
             console.error(error);
 
             return res.status(500).json({
-                success: false,
-                message: "Failed to retrieve assessment history.",
-                error: error.message,
-            });
-        }
-    },
-};
 
-module.exports = assessmentController;
+                success: false,
+
+                message:
+                    "Failed to retrieve assessments.",
+
+            });
+
+        }
+
+    }
+
+}
+
+module.exports = AssessmentController;

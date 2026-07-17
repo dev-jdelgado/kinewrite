@@ -1,27 +1,42 @@
 const express = require("express");
+
 const router = express.Router();
-const assessmentController = require("../controllers/assessmentController");
 
-// ======================================================
-// Assessment Routes
-// ======================================================
+const AssessmentController =
+    require("../controllers/AssessmentController");
 
-// Create Assessment
+// ==========================================
+// Assessment
+// ==========================================
+
+// Start Assessment
 router.post(
-    "/",
-    assessmentController.createAssessment
+    "/start",
+    AssessmentController.startAssessment
 );
 
-// Get Assessment by ID
+// Save Activity
+router.post(
+    "/:assessmentId/activity",
+    AssessmentController.saveActivity
+);
+
+// Analyze Assessment
+router.post(
+    "/:assessmentId/analyze",
+    AssessmentController.analyzeAssessment
+);
+
+// Get Assessment
 router.get(
-    "/:id",
-    assessmentController.getAssessment
+    "/:assessmentId",
+    AssessmentController.getAssessment
 );
 
-// Get Student Assessment History
+// Student Assessment History
 router.get(
     "/student/:studentId",
-    assessmentController.getStudentHistory
+    AssessmentController.getStudentAssessments
 );
 
 module.exports = router;

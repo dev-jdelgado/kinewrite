@@ -1,142 +1,333 @@
-const db = require("../config/db");
-
 const Assessment = require("../models/Assessment");
-const Student = require("../models/Student");
-const ExercisePlan = require("../models/ExercisePlan");
+const AssessmentAttempt = require("../models/AssessmentAttempt");
+const HandwritingSample = require("../models/HandwritingSample");
+const AssessmentAnalysis = require("../models/AssessmentAnalysis");
+
+const HandwritingAnalyzer =
+    require("../utils/HandwritingAnalyzer");
+
+const Student =
+    require("../models/Student");
+
+const pool =
+    require("../config/db");
 
 class AssessmentService {
 
-    // =====================================================
-    // Complete Assessment Workflow
-    // =====================================================
+    // ==========================================
+    // Start Assessment
+    // ==========================================
 
-    static async completeAssessment(data) {
+    static async startAssessment({
 
-        const connection = await db.getConnection();
+        studentId,
 
-        try {
+        assessmentType,
 
-            // =============================================
-            // Begin Transaction
-            // =============================================
-            await connection.beginTransaction();
+    }) {
 
-            // =============================================
-            // Save Assessment
-            // =============================================
-            const assessmentId = await Assessment.create(
-                connection,
-                {
-                    student_id: data.student_id,
+        return await Assessment.create({
 
-                    assessment_type: data.assessment_type,
+            studentId,
 
-                    visual_motor_score:
-                        data.visual_motor_score,
+            assessmentType,
 
-                    fine_motor_score:
-                        data.fine_motor_score,
+        });
 
-                    letter_formation_score:
-                        data.letter_formation_score,
+    }
 
-                    assessment_score:
-                        data.assessment_score,
+    // ==========================================
+    // Save Activity
+    // ==========================================
 
-                    assessment_classification:
-                        data.assessment_classification,
+    static async saveActivity({
 
-                    recommended_level:
-                        data.recommended_level,
+        assessmentId,
 
-                    assessment_remarks:
-                        data.assessment_remarks,
-                }
-            );
+        activityNo,
 
-            // =============================================
-            // Update Student Classification
-            // =============================================
-            await Student.updateClassification(
-                connection,
-                data.student_id,
-                data.assessment_classification
-            );
+        activityCategory,
 
-            // =============================================
-            // Update Student Current Level
-            // =============================================
-            await Student.updateCurrentLevel(
-                connection,
-                data.student_id,
-                data.recommended_level
-            );
+        promptText,
 
-            // =============================================
-            // Update Last Activity
-            // =============================================
-            await Student.updateLastActivity(
-                connection,
-                data.student_id
-            );
+        promptType,
 
-            // =============================================
-            // Create Exercise Plan
-            // =============================================
-            await ExercisePlan.create(
-                connection,
-                {
-                    student_id: data.student_id,
-                    assessment_id: assessmentId,
-                    current_level:
-                        data.recommended_level,
-                }
-            );
+        completionTime,
 
-            // =============================================
-            // Initialize Student Progress
-            // =============================================
-            await Student.initializeProgress(
-                connection,
-                {
-                    studentId: data.student_id,
-                    currentLevel: data.recommended_level,
-                    classification: data.assessment_classification,
-                }
-            );
+        penLifts,
 
-            // =============================================
-            // Commit
-            // =============================================
-            await connection.commit();
-            return await Assessment.findById(
+        strokeCount,
+
+        image,
+
+        strokes,
+
+    }) {
+
+        const attemptId =
+            await AssessmentAttempt.create({
+
+                assessmentId,
+
+                activityNo,
+
+                activityCategory,
+
+                promptText,
+
+                promptType,
+
+                completionTime,
+
+                penLifts,
+
+                strokeCount,
+
+            });
+
+        await HandwritingSample.create({
+
+            attemptId,
+
+            imagePath: image,
+
+            strokeJson: strokes,
+
+        });
+
+        return attemptId;
+
+    }
+
+    // ==========================================
+    // Analyze Assessment
+    // ==========================================
+
+    static async analyzeAssessment(
+
+        assessmentId
+
+    ) {
+
+        const attempts =
+            await AssessmentAttempt.findByAssessment(
+
                 assessmentId
+
             );
-        }
-        catch (error) {
-            await connection.rollback();
-            throw error;
-        }
-        finally {
-            connection.release();
-        }
-    }
 
-    // =====================================================
-    // Assessment History
-    // =====================================================
-    static async getStudentHistory(studentId) {
-        return await Assessment.findByStudent(
-            studentId
+        let allStrokes = [];
+
+        for (const attempt of attempts) {
+
+            const sample =
+                await HandwritingSample.findByAttempt(
+
+                    attempt.attempt_id
+
+                );
+
+            if (
+
+                sample &&
+
+                sample.stroke_json
+
+            ) {
+
+                allStrokes.push(
+
+                    ...sample.stroke_json
+
+                );
+
+            }
+
+        }
+
+        if (!allStrokes.length) {
+
+            throw new Error(
+
+                "No handwriting samples found."
+
+            );
+
+        }
+
+        const analysis =
+            HandwritingAnalyzer.analyze(
+
+                allStrokes
+
+            );
+
+        await AssessmentAnalysis.create({
+
+            assessmentId,
+            
+            spacingScore:
+                analysis.spacing.score,
+            
+            alignmentScore:
+                analysis.alignment.score,
+            
+            strokeScore:
+                analysis.stroke.score,
+            
+            overallScore:
+                analysis.overallScore,
+            
+            classification:
+                analysis.classification,
+            
+        });
+
+        await Assessment.updateScores({
+
+            assessmentId,
+        
+            spacingScore:
+                analysis.spacing.score,
+        
+            alignmentScore:
+                analysis.alignment.score,
+        
+            strokeScore:
+                analysis.stroke.score,
+        
+            overallScore:
+                analysis.overallScore,
+        
+            classification:
+                analysis.classification,
+        
+            recommendedLevel:
+                analysis.therapyLevel,
+        
+            remarks:
+                analysis.remarks,
+        
+        });
+
+        // ==========================================
+        // Update Student
+        // ==========================================
+
+        const assessment =
+
+            await Assessment.findById(
+
+                assessmentId
+
+            );
+
+        const connection = await pool.getConnection();
+
+            try {
+            
+                await connection.beginTransaction();
+            
+                await Student.initializeProgress(connection, {
+                    studentId: assessment.student_id,
+                    currentLevel: analysis.therapyLevel,
+                    classification: analysis.classification,
+                });
+                
+                await Student.completeAssessment(connection, {
+                    studentId: assessment.student_id,
+                    assessmentId,
+                    classification: analysis.classification,
+                    level: analysis.therapyLevel,
+                    accuracy: analysis.overallScore,
+                });
+            
+                await connection.commit();
+            
+            } catch (error) {
+            
+                await connection.rollback();
+                throw error;
+            
+            } finally {
+            
+                connection.release();
+            
+            }
+
+        console.log(
+            JSON.stringify(
+                analysis,
+                null,
+                2
+            )
         );
+
+        return analysis;
+
     }
 
-    // =====================================================
+    // ==========================================
     // Get Assessment
-    // =====================================================
-    static async getAssessment(id) {
-        return await Assessment.findById(id);
+    // ==========================================
+
+    static async getAssessment(
+
+        assessmentId
+
+    ) {
+
+        const assessment =
+            await Assessment.findById(
+
+                assessmentId
+
+            );
+
+        const attempts =
+            await AssessmentAttempt.findByAssessment(
+
+                assessmentId
+
+            );
+
+        const analysis =
+            await AssessmentAnalysis.findByAssessment(
+
+                assessmentId
+
+            );
+
+        return {
+
+            assessment,
+
+            attempts,
+
+            analysis,
+
+        };
+
     }
+
+    // ==========================================
+    // Student Assessment History
+    // ==========================================
+
+    static async getStudentAssessments(
+
+        studentId
+
+    ) {
+
+        return await Assessment.findByStudent(
+
+            studentId
+
+        );
+
+    }
+
 }
 
 module.exports = AssessmentService;
