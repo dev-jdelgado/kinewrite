@@ -12,6 +12,7 @@ const DashboardHeader = () => {
         <header
             className="
                 bg-white
+                dark:bg-blue-200
                 shadow-md
                 px-10
                 py-6
@@ -49,7 +50,7 @@ const DashboardHeader = () => {
                     w-20
                     h-20
                     rounded-full
-                    bg-orange-500
+                    bg-[#43a7f3]
                     text-white
                     flex
                     items-center

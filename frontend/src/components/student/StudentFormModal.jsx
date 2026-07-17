@@ -140,7 +140,7 @@ const StudentFormModal = ({
                                 text-2xl
                                 sm:text-3xl
                                 font-bold
-                                text-[#9b4c00]
+                                text-black
                             "
                         >
                             {student ? "Edit Student" : "Add Student"}
@@ -222,7 +222,7 @@ const StudentFormModal = ({
                                         py-3
                                         outline-none
                                         focus:ring-2
-                                        focus:ring-orange-400
+                                        focus:ring-blue-400
                                     "
                                 />
                             </div>
@@ -246,7 +246,7 @@ const StudentFormModal = ({
                                         py-3
                                         outline-none
                                         focus:ring-2
-                                        focus:ring-orange-400
+                                        focus:ring-blue-400
                                     "
                                 />
                             </div>
@@ -269,7 +269,7 @@ const StudentFormModal = ({
                                         py-3
                                         outline-none
                                         focus:ring-2
-                                        focus:ring-orange-400
+                                        focus:ring-blue-400
                                     "
                                 >
                                     <option value="Male">Male</option>
@@ -296,7 +296,7 @@ const StudentFormModal = ({
                                         py-3
                                         outline-none
                                         focus:ring-2
-                                        focus:ring-orange-400
+                                        focus:ring-blue-400
                                     "
                                 />
                             </div>
@@ -319,7 +319,7 @@ const StudentFormModal = ({
                                         py-3
                                         outline-none
                                         focus:ring-2
-                                        focus:ring-orange-400
+                                        focus:ring-blue-400
                                     "
                                 >
                                     <option value="">
@@ -358,7 +358,7 @@ const StudentFormModal = ({
                                     resize-none
                                     outline-none
                                     focus:ring-2
-                                    focus:ring-orange-400
+                                    focus:ring-blue-400
                                 "
                             />
                         </div>
@@ -407,10 +407,11 @@ const StudentFormModal = ({
                                 px-8
                                 py-3
                                 rounded-xl
-                                bg-[#9b4c00]
-                                text-white
+                                bg-blue-300
+                                text-black
                                 font-semibold
-                                hover:bg-[#7a3b00]
+                                hover:bg-blue-400
+                                border
                                 disabled:opacity-60
                                 disabled:cursor-not-allowed
                                 transition-all

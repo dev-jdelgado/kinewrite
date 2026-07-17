@@ -15,7 +15,7 @@ const StudentRecordsRow = ({
         <tr
             className="
                 border-b
-                hover:bg-orange-50
+                hover:bg-blue-50
                 transition-colors
             "
         >
@@ -89,12 +89,12 @@ const StudentRecordsRow = ({
                         items-center
                         justify-center
                         rounded-xl
-                        bg-[#9b4c00]
+                        bg-blue-400
                         p-3
                         text-white
                         shadow-md
                         transition-all
-                        hover:bg-[#7a3b00]
+                        hover:bg-blue-500
                     "
                 >
                     <Eye size={20} />

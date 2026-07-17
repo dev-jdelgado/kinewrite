@@ -9,6 +9,7 @@ const Input = ({
     required = false,
     disabled = false,
     icon = null,
+    rightIcon = null,
 }) => {
 
     return (
@@ -73,6 +74,7 @@ const Input = ({
                         duration-200
 
                         ${icon ? "pl-12" : ""}
+                        ${rightIcon ? "pr-12" : ""}
 
                         ${
                             error
@@ -87,6 +89,20 @@ const Input = ({
                         }
                     `}
                 />
+                {rightIcon && (
+                    <div
+                        className="
+                            absolute
+                            right-4
+                            top-1/2
+                            -translate-y-1/2
+                            text-slate-400
+                            cursor-pointer
+                        "
+                    >
+                        {rightIcon}
+                    </div>
+                )}
 
             </div>
 

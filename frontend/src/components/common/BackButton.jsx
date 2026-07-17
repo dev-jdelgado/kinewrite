@@ -19,12 +19,12 @@ const BackButton = ({
                 bg-white
                 px-5
                 py-3
-                text-[#9b4c00]
+                text-[#000000]
                 font-semibold
                 shadow-md
                 border
-                border-orange-200
-                hover:bg-orange-50
+                border-blue-200
+                hover:bg-blue-100   
                 hover:shadow-lg
                 transition-all
                 duration-200

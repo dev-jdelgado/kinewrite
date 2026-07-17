@@ -129,12 +129,11 @@ const StudentSelection = () => {
                     relative
                     min-h-screen
                     overflow-hidden
-                    bg-[#F58200]
                 "
             >
 
                 {/* Watermark */}
-                <div
+                {/* <div
                     className="
                         absolute
                         inset-0
@@ -156,7 +155,7 @@ const StudentSelection = () => {
                             pointer-events-none
                         "
                     />
-                </div>
+                </div> */}
 
                 <div className="flex sm:flex-row flex-col-reverse justify-between sm:items-center items-start sm:gap-0 gap-12 py-2 md:px-12 px-6">
                     <BackButton />
@@ -185,7 +184,8 @@ const StudentSelection = () => {
                             md:text-5xl
                             text-3xl
                             font-extrabold
-                            text-white
+                            text-slate-700
+                            dark:text-white
                             drop-shadow-lg
                             text-center
                         "
@@ -198,7 +198,8 @@ const StudentSelection = () => {
                             lg:text-2xl
                             md:text-xl
                             text-lg
-                            text-white
+                            text-slate-700
+                            dark:text-white
                             text-center
                         "
                     >
@@ -298,12 +299,13 @@ const StudentSelection = () => {
                                                             sm:text-2xl
                                                             text-lg
                                                             font-bold
-                                                            text-white
+                                                            text-slate-700
+                                                            dark:text-white
                                                         "
                                                     >
                                                         {student.student_fname}
                                                     </h2>
-                                                    <p className="text-white/90 text-sm mt-1">
+                                                    <p className="text-slate-700 dark:text-white text-sm mt-1">
                                                         {
                                                             student.student_assessment_status ===
                                                             "Completed"
@@ -320,125 +322,162 @@ const StudentSelection = () => {
                     }
 
                     {/* Bottom Card */}
+                    <div className="relative mt-24 mb-10 w-full max-w-6xl">
+                        <img
+                            src={cloud}
+                            alt=""
+                            className="
+                                absolute
 
-                    <div
-                        className="
-                            mt-24
-                            mb-10
-                            w-full
-                            max-w-6xl
-                            rounded-[40px]
-                            bg-[#8C4B09]/80
-                            backdrop-blur-md
-                            sm:px-14
-                            px-5
-                            sm:py-10
-                            py-5
-                        "
-                    >
+                                -bottom-[60px]
+                                sm:-bottom-[100px]
+                                md:-bottom-[80px]
+                                lg:-bottom-[130px]
+
+                                -left-[110px]
+                                sm:-left-[100px]
+                                md:-left-[180px]
+                                lg:-left-[350px]
+
+                                w-[75vw]
+                                sm:w-[60vw]
+                                md:w-[50vw]
+                                lg:w-[45vw]
+
+                                pointer-events-none
+                                select-none
+                                z-20
+                            "
+                        />
+                        <img
+                            src={cloud}
+                            alt=""
+                            className="
+                                absolute
+
+                                -bottom-[40px]
+                                sm:-bottom-[100px]
+                                md:-bottom-[70px]
+                                lg:-bottom-[90px]
+
+                                right-[5%]
+                                sm:right-[10%]
+                                md:right-[25%]
+                                lg:right-[320px]
+
+                                w-[70vw]
+                                sm:w-[55vw]
+                                md:w-[45vw]
+                                lg:w-[35vw]
+
+                                pointer-events-none
+                                select-none
+                                z-20
+                            "
+                        />
+                        <img
+                            src={cloud}
+                            alt=""
+                            className="
+                                absolute
+
+                                -bottom-[70px]
+                                sm:-bottom-[120px]
+                                md:-bottom-[100px]
+                                lg:-bottom-[10vw]
+
+                                -right-[100px]
+                                sm:-right-[50px]
+                                md:-right-[80px]
+                                lg:-right-[10vw]
+
+                                w-[85vw]
+                                sm:w-[70vw]
+                                md:w-[55vw]
+                                lg:w-[50vw]
+
+                                pointer-events-none
+                                select-none
+                                z-20
+                            "
+                        />
                         <div
                             className="
-                                grid
-                                grid-cols-2
-                                md:grid-cols-4
-                                sm:gap-10
-                                gap-5
-                                text-center
+                                mt-24
+                                mb-10
+                                w-full
+                                max-w-6xl
+                                rounded-[40px]
+                                bg-[#8C4B09]/80
+                                backdrop-blur-md
+                                sm:px-14
+                                px-5
+                                sm:py-10
+                                py-5
                             "
                         >
-                            <div>
-                                <div className="sm:text-6xl text-5xl">
-                                    🎮
+                            <div
+                                className="
+                                    grid
+                                    grid-cols-2
+                                    md:grid-cols-4
+                                    sm:gap-10
+                                    gap-5
+                                    text-center
+                                "
+                            >
+                                <div>
+                                    <div className="sm:text-6xl text-5xl">
+                                        🎮
+                                    </div>
+                                    <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
+                                        Learn
+                                    </h3>
+                                    <p className="text-white/90">
+                                        Through Play
+                                    </p>
                                 </div>
-                                <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
-                                    Learn
-                                </h3>
-                                <p className="text-white/90">
-                                    Through Play
-                                </p>
-                            </div>
 
-                            <div>
-                                <div className="sm:text-6xl text-5xl">
-                                    ⭐
+                                <div>
+                                    <div className="sm:text-6xl text-5xl">
+                                        ⭐
+                                    </div>
+                                    <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
+                                        Earn
+                                    </h3>
+                                    <p className="text-white/90">
+                                        Badges & Rewards
+                                    </p>
                                 </div>
-                                <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
-                                    Earn
-                                </h3>
-                                <p className="text-white/90">
-                                    Badges & Rewards
-                                </p>
-                            </div>
 
-                            <div>
-                                <div className="sm:text-6xl text-5xl">
-                                    🎯
+                                <div>
+                                    <div className="sm:text-6xl text-5xl">
+                                        🎯
+                                    </div>
+                                    <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
+                                        Track
+                                    </h3>
+                                    <p className="text-white/90">
+                                        Your Progress
+                                    </p>
                                 </div>
-                                <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
-                                    Track
-                                </h3>
-                                <p className="text-white/90">
-                                    Your Progress
-                                </p>
-                            </div>
 
-                            <div>
-                                <div className="sm:text-6xl text-5xl">
-                                    ❤️
+                                <div>
+                                    <div className="sm:text-6xl text-5xl">
+                                        ❤️
+                                    </div>
+                                    <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
+                                        Feel
+                                    </h3>
+                                    <p className="text-white/90">
+                                        Confident
+                                    </p>
                                 </div>
-                                <h3 className="mt-3 text-white sm:text-2xl text-lg font-bold">
-                                    Feel
-                                </h3>
-                                <p className="text-white/90">
-                                    Confident
-                                </p>
                             </div>
                         </div>
                     </div>
+                    
                 </div>
-                <img
-                    src={cloud}
-                    alt=""
-                    className="
-                        absolute
-                        -bottom-[10vw]
-                        -left-[10%]
-                        sm:w-[50vw]
-                        w-[65vw]
-                        pointer-events-none
-                        select-none
-                        z-30
-                    "
-                />
-                <img
-                    src={cloud}
-                    alt=""
-                    className="
-                        absolute
-                        -bottom-[10vw]
-                        left-[30vw]
-                        w-[45vw]
-                        pointer-events-none
-                        select-none
-                        z-30
-                        sm:block
-                        hidden
-                    "
-                />
-                <img
-                    src={cloud}
-                    alt=""
-                    className="
-                        absolute
-                        -bottom-[10vw]
-                        -right-[10vw]
-                        sm:w-[50vw]
-                        w-[65vw]
-                        pointer-events-none
-                        select-none
-                        z-20
-                    "
-                />
             </div>
         </DashboardLayout>
     );
