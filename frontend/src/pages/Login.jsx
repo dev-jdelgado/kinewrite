@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { FaPenNib, FaUser, FaLock } from "react-icons/fa";
+import { FaPenNib, FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+
 
 import AuthLayout from "../layouts/AuthLayout";
 
@@ -11,12 +12,13 @@ import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 
 import { useAuth } from "../contexts/AuthContext";
-import KinewriteLogo from "../assets/logo.png";
+import KinewriteLogo from "../assets/Kinewritelogo.png";
 import Balloon from "../assets/login/Balloonlogin.png";
 import SunRays from '../assets/login/sun-rays.png';
 import SunCenter from '../assets/login/sun-center.png';
 import Star from '../assets/login/star.png';
 import Star1 from '../assets/login/star1.png';
+import People from '../assets/Kinewritelogin.png';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -27,7 +29,7 @@ const Login = () => {
     });
 
     const [loading, setLoading] = useState(false);
-
+    const [showPassword, setShowPassword] = useState(false);
     const handleChange = (e) => {
         setCredentials({
             ...credentials,
@@ -84,9 +86,9 @@ const Login = () => {
                 <img src={Star} alt="Sun" className="absolute w-20 md:top-20 top-12 sm:right-70 right-[25%] animate-spin-slow"/>
                 <img src={Star1} alt="Sun" className="absolute w-20 md:bottom-60 bottom-36 sm:left-20 left-12 animate-spin-slow"/>
                 <img src={Balloon} alt="Balloon" className="absolute md:w-60 w-32 top-30 right-1 animate-swing"/>
-                
+                <img src={People} alt="{eople" className="absolute lg:w-80 md:w-50 w-45 sm:-top-10 -top-5" />
                 <div className="bg-white rounded-3xl shadow-xl w-full relative sm:px-12 px-6 py-10">
-                    <img src={KinewriteLogo} alt="Kinewritelogo" className="absolute sm:max-w-70 max-w-[60%] sm:bottom-72 bottom-[295px] sm:left-[23%] left-[17.6vw]" />
+                    <img src={KinewriteLogo} alt="Kinewritelogo" className="absolute sm:max-w-100 max-w-[70%] sm:bottom-55 bottom-[270px] sm:left-[10%] left-[12.6vw]" />
                     <form
                         className="space-y-6"
                         onSubmit={handleSubmit}
@@ -102,11 +104,21 @@ const Login = () => {
                         <Input
                             label="Password"
                             name="password"
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             value={credentials.password}
                             onChange={handleChange}
                             placeholder="Enter password"
                             icon={<FaLock />}
+                            rightIcon={
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="text-slate-400 hover:text-blue-600 transition-colors"
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </button>
+                            }
                         />
                         <Button
                             type="submit"

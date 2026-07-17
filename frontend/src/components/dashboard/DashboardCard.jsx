@@ -43,10 +43,10 @@ const DashboardCard = ({
                 className="
                     absolute
                     inset-0
-                    bg-[#9b4c00]/45
+                    bg-[#7ec8ff]/45
                     transition-all
                     duration-300
-                    group-hover:bg-[#9b4c00]/70
+                    group-hover:bg-[#43a7f3]/55
                 "
             />
 
@@ -63,7 +63,7 @@ const DashboardCard = ({
             >
                 <div
                     className="
-                        bg-[#F7E4C0]
+                        bg-[#7ec8ff]
                         rounded-3xl
                         xl:p-8 sm:p-6 p-5
                         shadow-xl

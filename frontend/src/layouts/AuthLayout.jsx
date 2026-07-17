@@ -1,6 +1,6 @@
 import PageContainer from "../components/common/PageContainer";
 import DashboardLayout from "./DashboardLayout";
-import BgLogin from '../assets/login/Loginbg.png'
+import BgLogin from '../assets/login/blueLogin.png'
 
 const AuthLayout = ({ children }) => {
     return (

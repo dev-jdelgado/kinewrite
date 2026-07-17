@@ -1,7 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const authController = require("../controllers/authController");
 
+const authController = require("../controllers/authController");
+const upload = require("../middleware/upload");
+
+// Login
 router.post("/login", authController.login);
-router.put("/profile", authController.updateProfile);
+
+// Update Profile
+router.put(
+    "/profile",
+    upload.single("image"),
+    authController.updateProfile
+);
+
+// Change Password
+router.put(
+    "/change-password",
+    authController.changePassword
+);
+
 module.exports = router;

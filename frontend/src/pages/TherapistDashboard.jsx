@@ -10,9 +10,9 @@ import managementBG from "../assets/dashboard/student-management.jpg";
 import recordsBG from "../assets/dashboard/student-records.jpg";
 import exerciseBG from "../assets/dashboard/start-exercises.jpg";
 
-import managementIcon from "../assets/icons/student-management.png";
+import managementIcon from "../assets/icons/student-management1.png";
 import recordsIcon from "../assets/icons/student-records.png";
-import exerciseIcon from "../assets/icons/start-exercise.png";
+import exerciseIcon from "../assets/icons/start-exercises1.png";
 import Star from '../assets/login/star.png';
 import Star1 from '../assets/login/star1.png';
 
