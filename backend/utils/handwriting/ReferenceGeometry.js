@@ -5,42 +5,46 @@
 // Central reference geometry for KineWrite handwriting
 // assessment activities.
 //
+// All geometry is normalized to worksheet dimensions.
+//
+// X:
+// 0.0 = left
+// 1.0 = right
+//
+// Y:
+// 0.0 = top
+// 1.0 = bottom
+//
 // IMPORTANT:
-// These values are normalized to the worksheet dimensions.
-// They are NOT dependent on the student's writing.
+// Uppercase and lowercase letters do NOT use identical
+// vertical geometry.
 //
-// Normalized coordinate system:
+// Uppercase:
+// - reaches cap-height
 //
-// X: 0.0 = left side of worksheet
-//    1.0 = right side of worksheet
+// Lowercase:
+// - x-height for a, c, e
+// - ascender height for b, d
 //
-// Y: 0.0 = top of worksheet
-//    1.0 = bottom of worksheet
-//
-// This allows the geometry to work across different
-// screen sizes and worksheet resolutions.
+// Both share the same writing baseline.
 // ==========================================================
 
 
 class ReferenceGeometry {
 
     // ======================================================
-    // Alignment Reference
+    // Shared Vertical Reference
     // ======================================================
-    //
-    // Alignment activities:
-    //
-    // 1. A a
-    // 2. B b
-    // 3. C c
-    // 4. D d
-    // 5. E e
-    //
-    // The reference is intentionally based on normalized
-    // worksheet coordinates.
-    //
-    // The actual worksheet guide establishes the main
-    // baseline and writing area.
+
+    static CAP_TOP = 0.20;
+
+    static X_HEIGHT_TOP = 0.40;
+
+    static BASELINE = 0.796;
+
+
+    // ======================================================
+    // Alignment Reference
     // ======================================================
 
     static alignment = {
@@ -61,13 +65,12 @@ class ReferenceGeometry {
 
                 centerX: 0.32,
 
-                centerY: 0.50,
-
                 top: 0.20,
 
-                bottom: 0.80,
+                bottom: 0.796,
 
-                height: 0.60,
+                height:
+                    0.796 - 0.20,
 
             },
 
@@ -77,13 +80,12 @@ class ReferenceGeometry {
 
                 centerX: 0.68,
 
-                centerY: 0.50,
+                top: 0.40,
 
-                top: 0.20,
+                bottom: 0.796,
 
-                bottom: 0.80,
-
-                height: 0.60,
+                height:
+                    0.796 - 0.40,
 
             },
 
@@ -108,13 +110,12 @@ class ReferenceGeometry {
 
                 centerX: 0.32,
 
-                centerY: 0.50,
-
                 top: 0.20,
 
-                bottom: 0.80,
+                bottom: 0.796,
 
-                height: 0.60,
+                height:
+                    0.796 - 0.20,
 
             },
 
@@ -124,13 +125,12 @@ class ReferenceGeometry {
 
                 centerX: 0.68,
 
-                centerY: 0.50,
-
                 top: 0.20,
 
-                bottom: 0.80,
+                bottom: 0.796,
 
-                height: 0.60,
+                height:
+                    0.796 - 0.20,
 
             },
 
@@ -155,13 +155,12 @@ class ReferenceGeometry {
 
                 centerX: 0.32,
 
-                centerY: 0.50,
-
                 top: 0.20,
 
-                bottom: 0.80,
+                bottom: 0.796,
 
-                height: 0.60,
+                height:
+                    0.796 - 0.20,
 
             },
 
@@ -171,13 +170,12 @@ class ReferenceGeometry {
 
                 centerX: 0.68,
 
-                centerY: 0.50,
+                top: 0.40,
 
-                top: 0.20,
+                bottom: 0.796,
 
-                bottom: 0.80,
-
-                height: 0.60,
+                height:
+                    0.796 - 0.40,
 
             },
 
@@ -202,13 +200,12 @@ class ReferenceGeometry {
 
                 centerX: 0.32,
 
-                centerY: 0.50,
-
                 top: 0.20,
 
-                bottom: 0.80,
+                bottom: 0.796,
 
-                height: 0.60,
+                height:
+                    0.796 - 0.20,
 
             },
 
@@ -218,13 +215,12 @@ class ReferenceGeometry {
 
                 centerX: 0.68,
 
-                centerY: 0.50,
-
                 top: 0.20,
 
-                bottom: 0.80,
+                bottom: 0.796,
 
-                height: 0.60,
+                height:
+                    0.796 - 0.20,
 
             },
 
@@ -249,13 +245,12 @@ class ReferenceGeometry {
 
                 centerX: 0.32,
 
-                centerY: 0.50,
-
                 top: 0.20,
 
-                bottom: 0.80,
+                bottom: 0.796,
 
-                height: 0.60,
+                height:
+                    0.796 - 0.20,
 
             },
 
@@ -265,13 +260,12 @@ class ReferenceGeometry {
 
                 centerX: 0.68,
 
-                centerY: 0.50,
+                top: 0.40,
 
-                top: 0.20,
+                bottom: 0.796,
 
-                bottom: 0.80,
-
-                height: 0.60,
+                height:
+                    0.796 - 0.40,
 
             },
 
@@ -285,44 +279,34 @@ class ReferenceGeometry {
     // ======================================================
     // Alignment Tolerances
     // ======================================================
-    //
-    // These values determine how much deviation is allowed
-    // before the student's writing starts losing points.
-    //
-    // They are normalized values.
-    // ======================================================
 
     static alignmentTolerance = {
 
-        // Baseline tolerance
-        //
-        // Approximately 3% of worksheet height.
+        // Baseline:
+        // ~3% of worksheet height.
 
         baseline: 0.03,
 
 
-        // Center X tolerance
-        //
-        // Approximately 5% of worksheet width.
+        // Horizontal position:
+        // ~5% of worksheet width.
 
         centerX: 0.05,
 
 
-        // Center Y tolerance
-        //
-        // Approximately 5% of worksheet height.
+        // Vertical position:
+        // ~5% of worksheet height.
 
         centerY: 0.05,
 
 
-        // Height tolerance
-        //
-        // Approximately 10% difference from reference height.
+        // Letter height:
+        // ~10% of worksheet height.
 
         height: 0.10,
 
 
-        // Severe deviation thresholds.
+        // Severe deviations.
 
         severeBaseline: 0.15,
 
@@ -387,27 +371,21 @@ class ReferenceGeometry {
             );
 
 
-        if (
-            !reference
-        ) {
+        if (!reference) {
 
             return null;
 
         }
 
 
-        if (
-            index === 0
-        ) {
+        if (index === 0) {
 
             return reference.left;
 
         }
 
 
-        if (
-            index === 1
-        ) {
+        if (index === 1) {
 
             return reference.right;
 
@@ -420,7 +398,7 @@ class ReferenceGeometry {
 
 
     // ======================================================
-    // Convert Normalized X to Worksheet Pixel
+    // Normalized X → Pixel
     // ======================================================
 
     static normalizedXToPixel(
@@ -457,7 +435,7 @@ class ReferenceGeometry {
 
 
     // ======================================================
-    // Convert Normalized Y to Worksheet Pixel
+    // Normalized Y → Pixel
     // ======================================================
 
     static normalizedYToPixel(
@@ -494,11 +472,7 @@ class ReferenceGeometry {
 
 
     // ======================================================
-    // Get Pixel Reference
-    // ======================================================
-    //
-    // Converts the normalized reference into the actual
-    // worksheet coordinate system.
+    // Pixel Alignment Reference
     // ======================================================
 
     static getPixelAlignmentReference(
@@ -518,9 +492,7 @@ class ReferenceGeometry {
             );
 
 
-        if (
-            !reference
-        ) {
+        if (!reference) {
 
             return null;
 
@@ -543,7 +515,10 @@ class ReferenceGeometry {
 
                 this.normalizedYToPixel(
 
-                    reference.left.centerY,
+                    (
+                        reference.left.top +
+                        reference.left.bottom
+                    ) / 2,
 
                     worksheetHeight
 
@@ -593,7 +568,10 @@ class ReferenceGeometry {
 
                 this.normalizedYToPixel(
 
-                    reference.right.centerY,
+                    (
+                        reference.right.top +
+                        reference.right.bottom
+                    ) / 2,
 
                     worksheetHeight
 
@@ -655,7 +633,7 @@ class ReferenceGeometry {
 
 
     // ======================================================
-    // Get Tolerance
+    // Get Alignment Tolerance
     // ======================================================
 
     static getAlignmentTolerance(
@@ -665,6 +643,37 @@ class ReferenceGeometry {
         worksheetHeight
 
     ) {
+
+        if (
+
+            typeof worksheetWidth !== "number" ||
+
+            typeof worksheetHeight !== "number"
+
+        ) {
+
+            return {
+
+                baseline: 18,
+
+                centerX: 40,
+
+                centerY: 30,
+
+                height: 40,
+
+                severeBaseline: 90,
+
+                severeCenterX: 150,
+
+                severeCenterY: 120,
+
+                severeHeight: 180,
+
+            };
+
+        }
+
 
         return {
 
@@ -749,4 +758,5 @@ class ReferenceGeometry {
 // Export
 // ==========================================================
 
-module.exports = ReferenceGeometry;
+module.exports =
+    ReferenceGeometry;

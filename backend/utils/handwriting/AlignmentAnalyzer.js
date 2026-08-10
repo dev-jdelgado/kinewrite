@@ -11,10 +11,10 @@ const ReferenceGeometry =
 class AlignmentAnalyzer {
 
     // ==========================================================
-    // Alignment Analyzer V6
+    // KineWrite Alignment Analyzer
     // ==========================================================
     //
-    // Activities:
+    // Alignment activities:
     //
     // 1. A a
     // 2. B b
@@ -22,21 +22,28 @@ class AlignmentAnalyzer {
     // 4. D d
     // 5. E e
     //
-    // Scoring:
+    // The analyzer evaluates:
     //
-    // Baseline            40%
-    // Letter Position     25%
-    // Vertical Placement  15%
-    // Letter Height       10%
-    // Internal Consistency 10%
+    // 1. Reference fit
+    // 2. Baseline alignment
+    // 3. Horizontal placement
+    // 4. Vertical placement
+    // 5. Letter height
+    // 6. Internal consistency
     //
-    // ReferenceGeometry supplies expected normalized
-    // letter positions.
+    // IMPORTANT:
     //
-    // The actual worksheet guide supplies the real
-    // baseline and writing bounds.
+    // ReferenceGeometry represents the intended LOCATION
+    // of the writing, not an exact handwriting shape.
+    //
+    // Therefore, natural variation in handwriting must not
+    // receive an unnecessarily large penalty.
     // ==========================================================
 
+
+    // ==========================================================
+    // Analyze
+    // ==========================================================
 
     static analyze(data) {
 
@@ -44,10 +51,6 @@ class AlignmentAnalyzer {
             samples = [],
         } = data || {};
 
-
-        // ======================================================
-        // Validate Samples
-        // ======================================================
 
         if (
             !Array.isArray(samples) ||
@@ -63,7 +66,7 @@ class AlignmentAnalyzer {
 
 
         // ======================================================
-        // Analyze Each Sample
+        // Analyze Every Sample
         // ======================================================
 
         samples.forEach((sample, index) => {
@@ -74,7 +77,7 @@ class AlignmentAnalyzer {
 
 
             // ==================================================
-            // Get Raw Strokes
+            // Get Stroke Data
             // ==================================================
 
             let rawStrokes =
@@ -124,7 +127,7 @@ class AlignmentAnalyzer {
 
 
             // ==================================================
-            // Normalize Student Strokes
+            // Normalize Strokes
             // ==================================================
 
             const normalizedStrokes =
@@ -195,18 +198,19 @@ class AlignmentAnalyzer {
 
 
             // ==================================================
-            // Sort Letters Left → Right
+            // Sort Left → Right
             // ==================================================
 
             const sortedLetters =
 
                 letters
 
-                    .filter(letter =>
+                    .filter(
 
-                        letter &&
+                        letter =>
 
-                        letter.boundingBox
+                            letter &&
+                            letter.boundingBox
 
                     )
 
@@ -251,7 +255,7 @@ class AlignmentAnalyzer {
 
 
             // ==================================================
-            // Guide Data
+            // Guide
             // ==================================================
 
             const guideData =
@@ -261,7 +265,7 @@ class AlignmentAnalyzer {
             const worksheetWidth =
                 this.getWorksheetWidth(
                     guideData
-                ) || 1000;
+                ) || 1278;
 
 
             const worksheetHeight =
@@ -283,12 +287,16 @@ class AlignmentAnalyzer {
 
 
             // ==================================================
-            // Determine Activity / Prompt
+            // Prompt
             // ==================================================
 
             const promptText =
                 this.getPromptText(sample);
 
+
+            // ==================================================
+            // Reference Geometry
+            // ==================================================
 
             const reference =
                 ReferenceGeometry.getPixelAlignmentReference(
@@ -343,7 +351,7 @@ class AlignmentAnalyzer {
 
 
             // ==================================================
-            // Average Student Metrics
+            // Basic Student Metrics
             // ==================================================
 
             const averageHeight =
@@ -371,18 +379,402 @@ class AlignmentAnalyzer {
 
 
             // ==================================================
-            // 1. BASELINE SCORE
+            // Reference Tolerances
             // ==================================================
 
-            let baselineScore = 100;
+            const referenceTolerance =
 
-            let baselineDeviation = 0;
+                ReferenceGeometry.getAlignmentTolerance(
 
-            let baselineTolerance =
-                Math.max(
-                    12,
-                    worksheetHeight * 0.025
+                    worksheetWidth,
+
+                    worksheetHeight
+
                 );
+
+
+            // ==================================================
+            // 1. REFERENCE FIT
+            // ==================================================
+            //
+            // This is the most important addition.
+            //
+            // Reference fit evaluates whether the two detected
+            // letters occupy the expected areas of the worksheet.
+            //
+            // It intentionally uses generous tolerances because
+            // children will naturally vary in letter size and
+            // position.
+            // ==========================================================
+
+            let referenceFitScore = 100;
+
+            let referenceFitAvailable = false;
+
+            let referenceLeftScore = 100;
+
+            let referenceRightScore = 100;
+
+            let referenceBaselineScore = 100;
+
+            let referenceVerticalScore = 100;
+
+
+            if (reference) {
+
+                referenceFitAvailable = true;
+
+
+                // ----------------------------------------------
+                // Reference center X
+                // ----------------------------------------------
+
+                const leftXError =
+
+                    Math.abs(
+
+                        left.centerX -
+                        reference.left.centerX
+
+                    );
+
+
+                const rightXError =
+
+                    Math.abs(
+
+                        right.centerX -
+                        reference.right.centerX
+
+                    );
+
+
+                const centerXTolerance =
+
+                    Math.max(
+
+                        referenceTolerance?.centerX || 50,
+
+                        worksheetWidth * 0.06
+
+                    );
+
+
+                const centerXSevere =
+
+                    Math.max(
+
+                        referenceTolerance?.severeCenterX || 200,
+
+                        worksheetWidth * 0.20
+
+                    );
+
+
+                const leftXScore =
+
+                    this.referenceDeviationScore(
+
+                        leftXError,
+
+                        centerXTolerance,
+
+                        centerXSevere
+
+                    );
+
+
+                const rightXScore =
+
+                    this.referenceDeviationScore(
+
+                        rightXError,
+
+                        centerXTolerance,
+
+                        centerXSevere
+
+                    );
+
+
+                // ----------------------------------------------
+                // Reference vertical placement
+                // ----------------------------------------------
+
+                const leftCenterYError =
+
+                    Math.abs(
+
+                        left.centerY -
+                        reference.left.centerY
+
+                    );
+
+
+                const rightCenterYError =
+
+                    Math.abs(
+
+                        right.centerY -
+                        reference.right.centerY
+
+                    );
+
+
+                const centerYTolerance =
+
+                    Math.max(
+
+                        referenceTolerance?.centerY || 30,
+
+                        worksheetHeight * 0.055
+
+                    );
+
+
+                const centerYSevere =
+
+                    Math.max(
+
+                        referenceTolerance?.severeCenterY || 120,
+
+                        worksheetHeight * 0.20
+
+                    );
+
+
+                const leftYScore =
+
+                    this.referenceDeviationScore(
+
+                        leftCenterYError,
+
+                        centerYTolerance,
+
+                        centerYSevere
+
+                    );
+
+
+                const rightYScore =
+
+                    this.referenceDeviationScore(
+
+                        rightCenterYError,
+
+                        centerYTolerance,
+
+                        centerYSevere
+
+                    );
+
+
+                referenceVerticalScore =
+
+                    (
+                        leftYScore +
+                        rightYScore
+                    ) / 2;
+
+
+                // ----------------------------------------------
+                // Reference baseline
+                // ----------------------------------------------
+
+                const referenceBaselineError =
+
+                    Math.abs(
+
+                        studentBaseline -
+                        reference.baseline
+
+                    );
+
+
+                const baselineReferenceTolerance =
+
+                    Math.max(
+
+                        referenceTolerance?.baseline || 18,
+
+                        worksheetHeight * 0.035
+
+                    );
+
+
+                const baselineReferenceSevere =
+
+                    Math.max(
+
+                        referenceTolerance?.severeBaseline || 90,
+
+                        worksheetHeight * 0.15
+
+                    );
+
+
+                referenceBaselineScore =
+
+                    this.referenceDeviationScore(
+
+                        referenceBaselineError,
+
+                        baselineReferenceTolerance,
+
+                        baselineReferenceSevere
+
+                    );
+
+
+                // ----------------------------------------------
+                // Reference height
+                //
+                // Height is intentionally LOW weight here.
+                // A child's handwriting does not have to exactly
+                // reproduce the template dimensions.
+                // ----------------------------------------------
+
+                const leftHeightError =
+
+                    Math.abs(
+
+                        left.height -
+                        reference.left.height
+
+                    );
+
+
+                const rightHeightError =
+
+                    Math.abs(
+
+                        right.height -
+                        reference.right.height
+
+                    );
+
+
+                const heightTolerance =
+
+                    Math.max(
+
+                        worksheetHeight * 0.08,
+
+                        30
+
+                    );
+
+
+                const heightSevere =
+
+                    Math.max(
+
+                        worksheetHeight * 0.30,
+
+                        120
+
+                    );
+
+
+                const leftHeightScore =
+
+                    this.referenceDeviationScore(
+
+                        leftHeightError,
+
+                        heightTolerance,
+
+                        heightSevere
+
+                    );
+
+
+                const rightHeightScore =
+
+                    this.referenceDeviationScore(
+
+                        rightHeightError,
+
+                        heightTolerance,
+
+                        heightSevere
+
+                    );
+
+
+                const referenceHeightScore =
+
+                    (
+                        leftHeightScore +
+                        rightHeightScore
+                    ) / 2;
+
+
+                // ----------------------------------------------
+                // Final reference fit
+                // ----------------------------------------------
+                //
+                // Position receives the largest share.
+                //
+                // X       45%
+                // Y       25%
+                // Baseline20%
+                // Height  10%
+                // ----------------------------------------------
+
+                const horizontalReferenceScore =
+
+                    (
+                        leftXScore +
+                        rightXScore
+                    ) / 2;
+
+
+                referenceFitScore =
+
+                    (
+                        horizontalReferenceScore *
+                        0.45
+                    ) +
+
+                    (
+                        referenceVerticalScore *
+                        0.25
+                    ) +
+
+                    (
+                        referenceBaselineScore *
+                        0.20
+                    ) +
+
+                    (
+                        referenceHeightScore *
+                        0.10
+                    );
+
+            }
+
+
+            // ==================================================
+            // 2. BASELINE SCORE
+            // ==================================================
+
+            const internalBaselineDifference =
+
+                Math.abs(
+
+                    left.baseline -
+                    right.baseline
+
+                );
+
+
+            let baselineDeviation =
+
+                internalBaselineDifference;
+
+
+            let baselineScore = 100;
 
 
             if (
@@ -399,51 +791,139 @@ class AlignmentAnalyzer {
                     );
 
 
-                baselineScore =
+                const baselineTolerance =
 
-                    this.deviationScore(
+                    Math.max(
+
+                        referenceTolerance?.baseline || 18,
+
+                        worksheetHeight * 0.035
+
+                    );
+
+
+                const baselineSevereRange =
+
+                    Math.max(
+
+                        referenceTolerance?.severeBaseline || 90,
+
+                        worksheetHeight * 0.15
+
+                    );
+
+
+                const guideBaselineScore =
+
+                    this.referenceDeviationScore(
 
                         baselineDeviation,
 
                         baselineTolerance,
 
-                        worksheetHeight * 0.16
-
-                    );
-
-            } else {
-
-                // If no guide baseline exists,
-                // compare the two letters.
-
-                const internalBaselineDifference =
-
-                    Math.abs(
-
-                        left.baseline -
-                        right.baseline
+                        baselineSevereRange
 
                     );
 
 
-                baselineDeviation =
-                    internalBaselineDifference;
+                const internalBaselineScore =
 
-
-                baselineScore =
-
-                    this.deviationScore(
+                    this.referenceDeviationScore(
 
                         internalBaselineDifference,
 
                         Math.max(
-                            10,
-                            averageHeight * 0.08
+                            12,
+                            averageHeight * 0.10
                         ),
 
                         Math.max(
                             60,
-                            averageHeight * 0.45
+                            averageHeight * 0.40
+                        )
+
+                    );
+
+
+                    let referenceBaselineScore = 100;
+
+                    if (reference) {
+                    
+                        const referenceBaselineError =
+                            Math.abs(
+                                studentBaseline -
+                                reference.baseline
+                            );
+                    
+                        const referenceBaselineTolerance =
+                            Math.max(
+                                worksheetHeight * 0.05,
+                                25
+                            );
+                    
+                        const referenceBaselineSevere =
+                            Math.max(
+                                worksheetHeight * 0.18,
+                                100
+                            );
+                    
+                        referenceBaselineScore =
+                            this.referenceDeviationScore(
+                                referenceBaselineError,
+                                referenceBaselineTolerance,
+                                referenceBaselineSevere
+                            );
+                    }
+                    
+                    
+                    /*
+                     * CALIBRATED BASELINE SCORING
+                     *
+                     * Reference geometry is the primary authority.
+                     *
+                     * 70% = reference baseline
+                     * 20% = guide baseline
+                     * 10% = internal consistency
+                     *
+                     * This prevents a correctly positioned child-written
+                     * letter from being unnecessarily penalized because the
+                     * detected worksheet guide baseline differs slightly
+                     * from the reference geometry.
+                     */
+                    
+                    baselineScore =
+                    
+                        (
+                            referenceBaselineScore *
+                            0.70
+                        ) +
+                    
+                        (
+                            guideBaselineScore *
+                            0.20
+                        ) +
+                    
+                        (
+                            internalBaselineScore *
+                            0.10
+                        );
+
+            } else {
+
+                baselineScore =
+
+                    this.referenceDeviationScore(
+
+                        internalBaselineDifference,
+
+                        Math.max(
+                            12,
+                            averageHeight * 0.10
+                        ),
+
+                        Math.max(
+                            60,
+                            averageHeight * 0.40
                         )
 
                     );
@@ -452,7 +932,20 @@ class AlignmentAnalyzer {
 
 
             // ==================================================
-            // 2. LETTER POSITION SCORE
+            // 3. HORIZONTAL POSITION
+            // ==================================================
+            //
+            // IMPORTANT CALIBRATION:
+            //
+            // The previous analyzer made horizontal placement
+            // too strict.
+            //
+            // Reference fit now handles the overall positional
+            // relationship.
+            //
+            // Horizontal score therefore measures whether the
+            // letters are sensibly positioned relative to the
+            // reference, with a wider natural tolerance.
             // ==================================================
 
             let horizontalScore = 100;
@@ -463,10 +956,12 @@ class AlignmentAnalyzer {
 
             let expectedRightX = null;
 
+            let leftHorizontalScore = 100;
 
-            if (
-                reference
-            ) {
+            let rightHorizontalScore = 100;
+
+
+            if (reference) {
 
                 expectedLeftX =
                     reference.left.centerX;
@@ -503,48 +998,91 @@ class AlignmentAnalyzer {
                     ) / 2;
 
 
+                // Wider tolerance than V7.
+                //
+                // A child does not need to place the letter
+                // exactly at the reference center.
+
                 const horizontalTolerance =
 
                     Math.max(
 
-                        25,
+                        worksheetWidth * 0.075,
 
-                        worksheetWidth * 0.035
+                        referenceTolerance?.centerX || 60
+
+                    );
+
+
+                const horizontalSevereRange =
+
+                    Math.max(
+
+                        worksheetWidth * 0.22,
+
+                        referenceTolerance?.severeCenterX || 220
+
+                    );
+
+
+                leftHorizontalScore =
+
+                    this.referenceDeviationScore(
+
+                        leftDeviation,
+
+                        horizontalTolerance,
+
+                        horizontalSevereRange
+
+                    );
+
+
+                rightHorizontalScore =
+
+                    this.referenceDeviationScore(
+
+                        rightDeviation,
+
+                        horizontalTolerance,
+
+                        horizontalSevereRange
 
                     );
 
 
                 horizontalScore =
 
-                    this.deviationScore(
+                    (
+                        (
+                            leftHorizontalScore +
+                            rightHorizontalScore
+                        ) / 2
+                    ) * 0.65 +
 
-                        horizontalDeviation,
+                    (
+                        Math.min(
 
-                        horizontalTolerance,
+                            leftHorizontalScore,
+                            rightHorizontalScore
 
-                        worksheetWidth * 0.18
-
-                    );
+                        )
+                    ) * 0.35;
 
             } else if (
                 guideBounds
             ) {
 
-                // Fallback when the prompt cannot be
-                // identified in ReferenceGeometry.
-
-                const guideWidth =
-                    guideBounds.width;
-
-
                 const expectedLeft =
+
                     guideBounds.left +
-                    guideWidth * 0.25;
+                    guideBounds.width * 0.25;
 
 
                 const expectedRight =
+
                     guideBounds.left +
-                    guideWidth * 0.75;
+                    guideBounds.width * 0.75;
 
 
                 const leftDeviation =
@@ -575,38 +1113,221 @@ class AlignmentAnalyzer {
                     ) / 2;
 
 
-                horizontalScore =
+                const horizontalTolerance =
 
-                    this.deviationScore(
+                    Math.max(
 
-                        horizontalDeviation,
-
-                        Math.max(
-                            25,
-                            guideWidth * 0.04
-                        ),
-
-                        guideWidth * 0.18
+                        30,
+                        guideBounds.width * 0.075
 
                     );
+
+
+                const horizontalSevereRange =
+
+                    Math.max(
+
+                        120,
+                        guideBounds.width * 0.22
+
+                    );
+
+
+                leftHorizontalScore =
+
+                    this.referenceDeviationScore(
+
+                        leftDeviation,
+                        horizontalTolerance,
+                        horizontalSevereRange
+
+                    );
+
+
+                rightHorizontalScore =
+
+                    this.referenceDeviationScore(
+
+                        rightDeviation,
+                        horizontalTolerance,
+                        horizontalSevereRange
+
+                    );
+
+
+                horizontalScore =
+
+                    (
+                        (
+                            leftHorizontalScore +
+                            rightHorizontalScore
+                        ) / 2
+                    ) * 0.65 +
+
+                    (
+                        Math.min(
+
+                            leftHorizontalScore,
+                            rightHorizontalScore
+
+                        )
+                    ) * 0.35;
 
             }
 
 
             // ==================================================
-            // 3. VERTICAL PLACEMENT SCORE
-            // ==================================================
-            //
-            // The actual guide bounds are preferred over
-            // hard-coded ReferenceGeometry vertical values.
+            // 4. VERTICAL PLACEMENT
             // ==================================================
 
             let verticalScore = 100;
 
             let verticalDeviation = 0;
 
+            let leftVerticalScore = 100;
 
-            if (
+            let rightVerticalScore = 100;
+
+
+            if (reference) {
+
+                const leftTopDeviation =
+
+                    Math.abs(
+
+                        left.minY -
+                        reference.left.top
+
+                    );
+
+
+                const leftBottomDeviation =
+
+                    Math.abs(
+
+                        left.maxY -
+                        reference.left.bottom
+
+                    );
+
+
+                const rightTopDeviation =
+
+                    Math.abs(
+
+                        right.minY -
+                        reference.right.top
+
+                    );
+
+
+                const rightBottomDeviation =
+
+                    Math.abs(
+
+                        right.maxY -
+                        reference.right.bottom
+
+                    );
+
+
+                verticalDeviation =
+
+                    (
+                        leftTopDeviation +
+                        leftBottomDeviation +
+                        rightTopDeviation +
+                        rightBottomDeviation
+                    ) / 4;
+
+
+                const verticalTolerance =
+
+                    Math.max(
+
+                        worksheetHeight * 0.055,
+
+                        referenceTolerance?.centerY || 30
+
+                    );
+
+
+                const verticalSevereRange =
+
+                    Math.max(
+
+                        worksheetHeight * 0.20,
+
+                        referenceTolerance?.severeCenterY || 120
+
+                    );
+
+
+                leftVerticalScore =
+
+                    (
+                        this.referenceDeviationScore(
+
+                            leftTopDeviation,
+                            verticalTolerance,
+                            verticalSevereRange
+
+                        ) * 0.50
+                    ) +
+
+                    (
+                        this.referenceDeviationScore(
+
+                            leftBottomDeviation,
+                            verticalTolerance,
+                            verticalSevereRange
+
+                        ) * 0.50
+                    );
+
+
+                rightVerticalScore =
+
+                    (
+                        this.referenceDeviationScore(
+
+                            rightTopDeviation,
+                            verticalTolerance,
+                            verticalSevereRange
+
+                        ) * 0.50
+                    ) +
+
+                    (
+                        this.referenceDeviationScore(
+
+                            rightBottomDeviation,
+                            verticalTolerance,
+                            verticalSevereRange
+
+                        ) * 0.50
+                    );
+
+
+                verticalScore =
+
+                    (
+                        (
+                            leftVerticalScore +
+                            rightVerticalScore
+                        ) / 2
+                    ) * 0.65 +
+
+                    (
+                        Math.min(
+
+                            leftVerticalScore,
+                            rightVerticalScore
+
+                        )
+                    ) * 0.35;
+
+            } else if (
                 guideBounds
             ) {
 
@@ -618,83 +1339,99 @@ class AlignmentAnalyzer {
                     ) / 2;
 
 
-                verticalDeviation =
+                const leftDeviation =
 
                     Math.abs(
 
-                        studentCenterY -
+                        left.centerY -
                         guideCenterY
 
                     );
+
+
+                const rightDeviation =
+
+                    Math.abs(
+
+                        right.centerY -
+                        guideCenterY
+
+                    );
+
+
+                verticalDeviation =
+
+                    (
+                        leftDeviation +
+                        rightDeviation
+                    ) / 2;
 
 
                 const verticalTolerance =
 
                     Math.max(
 
-                        18,
-
+                        30,
                         guideBounds.height * 0.055
 
                     );
 
 
-                verticalScore =
+                const verticalSevereRange =
 
-                    this.deviationScore(
+                    Math.max(
 
-                        verticalDeviation,
-
-                        verticalTolerance,
-
-                        guideBounds.height * 0.30
+                        120,
+                        guideBounds.height * 0.20
 
                     );
 
-            } else if (
-                reference
-            ) {
 
-                const expectedCenterY =
+                leftVerticalScore =
+
+                    this.referenceDeviationScore(
+
+                        leftDeviation,
+                        verticalTolerance,
+                        verticalSevereRange
+
+                    );
+
+
+                rightVerticalScore =
+
+                    this.referenceDeviationScore(
+
+                        rightDeviation,
+                        verticalTolerance,
+                        verticalSevereRange
+
+                    );
+
+
+                verticalScore =
 
                     (
-                        reference.left.centerY +
-                        reference.right.centerY
-                    ) / 2;
+                        (
+                            leftVerticalScore +
+                            rightVerticalScore
+                        ) / 2
+                    ) * 0.65 +
 
+                    (
+                        Math.min(
 
-                verticalDeviation =
+                            leftVerticalScore,
+                            rightVerticalScore
 
-                    Math.abs(
-
-                        studentCenterY -
-                        expectedCenterY
-
-                    );
-
-
-                verticalScore =
-
-                    this.deviationScore(
-
-                        verticalDeviation,
-
-                        worksheetHeight * 0.04,
-
-                        worksheetHeight * 0.25
-
-                    );
+                        )
+                    ) * 0.35;
 
             }
 
 
             // ==================================================
-            // 4. LETTER HEIGHT SCORE
-            // ==================================================
-            //
-            // Compare the student's two letters against each
-            // other and against the expected reference height
-            // when available.
+            // 5. HEIGHT
             // ==================================================
 
             const heightDifference =
@@ -717,15 +1454,15 @@ class AlignmentAnalyzer {
                     : 1;
 
 
-            let heightConsistencyScore =
+            const heightConsistencyScore =
 
                 this.ratioScore(
 
                     relativeHeightDifference,
 
-                    0.08,
+                    0.10,
 
-                    0.30
+                    0.35
 
                 );
 
@@ -733,39 +1470,76 @@ class AlignmentAnalyzer {
             let referenceHeightScore = 100;
 
 
-            if (
-                reference
-            ) {
+            if (reference) {
 
-                const expectedHeight =
-
-                    (
-                        reference.left.height +
-                        reference.right.height
-                    ) / 2;
-
-
-                const heightDeviation =
+                const leftHeightError =
 
                     Math.abs(
 
-                        averageHeight -
-                        expectedHeight
+                        left.height -
+                        reference.left.height
+
+                    );
+
+
+                const rightHeightError =
+
+                    Math.abs(
+
+                        right.height -
+                        reference.right.height
+
+                    );
+
+
+                const heightTolerance =
+
+                    Math.max(
+
+                        worksheetHeight * 0.08,
+                        30
+
+                    );
+
+
+                const heightSevereRange =
+
+                    Math.max(
+
+                        worksheetHeight * 0.30,
+                        120
+
+                    );
+
+
+                const leftReferenceHeightScore =
+
+                    this.referenceDeviationScore(
+
+                        leftHeightError,
+                        heightTolerance,
+                        heightSevereRange
+
+                    );
+
+
+                const rightReferenceHeightScore =
+
+                    this.referenceDeviationScore(
+
+                        rightHeightError,
+                        heightTolerance,
+                        heightSevereRange
 
                     );
 
 
                 referenceHeightScore =
 
-                    this.deviationScore(
-
-                        heightDeviation,
-
-                        worksheetHeight * 0.04,
-
-                        worksheetHeight * 0.25
-
-                    );
+                    (
+                        leftReferenceHeightScore +
+                        rightReferenceHeightScore
+                    ) / 2;
 
             }
 
@@ -773,16 +1547,18 @@ class AlignmentAnalyzer {
             const heightScore =
 
                 (
-                    heightConsistencyScore * 0.50
+                    heightConsistencyScore *
+                    0.45
                 ) +
 
                 (
-                    referenceHeightScore * 0.50
+                    referenceHeightScore *
+                    0.55
                 );
 
 
             // ==================================================
-            // 5. INTERNAL CONSISTENCY
+            // 6. INTERNAL CONSISTENCY
             // ==================================================
 
             const centerYDifference =
@@ -797,47 +1573,37 @@ class AlignmentAnalyzer {
 
             const centerYConsistencyScore =
 
-                this.deviationScore(
+                this.referenceDeviationScore(
 
                     centerYDifference,
 
                     Math.max(
-                        10,
-                        averageHeight * 0.08
+                        14,
+                        averageHeight * 0.10
                     ),
 
                     Math.max(
-                        60,
-                        averageHeight * 0.40
+                        70,
+                        averageHeight * 0.45
                     )
-
-                );
-
-
-            const internalBaselineDifference =
-
-                Math.abs(
-
-                    left.baseline -
-                    right.baseline
 
                 );
 
 
             const baselineConsistencyScore =
 
-                this.deviationScore(
+                this.referenceDeviationScore(
 
                     internalBaselineDifference,
 
                     Math.max(
-                        10,
-                        averageHeight * 0.08
+                        14,
+                        averageHeight * 0.10
                     ),
 
                     Math.max(
-                        60,
-                        averageHeight * 0.40
+                        70,
+                        averageHeight * 0.45
                     )
 
                 );
@@ -857,26 +1623,37 @@ class AlignmentAnalyzer {
 
 
             // ==================================================
-            // FINAL SCORE
+            // 7. FINAL SCORE
             // ==================================================
             //
-            // Baseline             40%
-            // Position             25%
-            // Vertical placement   15%
-            // Height               10%
-            // Consistency          10%
+            // Reference Fit        30%
+            // Baseline              25%
+            // Horizontal            20%
+            // Vertical              15%
+            // Height                5%
+            // Consistency           5%
+            //
+            // This is intentionally different from V7.
+            //
+            // The reference is now the main positional anchor.
+            // Horizontal raw deviation cannot dominate the score.
             // ==================================================
 
-            let exerciseScore =
+            const weightedScore =
+
+                (
+                    referenceFitScore *
+                    0.35
+                ) +
 
                 (
                     baselineScore *
-                    0.40
+                    0.20
                 ) +
 
                 (
                     horizontalScore *
-                    0.25
+                    0.20
                 ) +
 
                 (
@@ -886,13 +1663,92 @@ class AlignmentAnalyzer {
 
                 (
                     heightScore *
-                    0.10
+                    0.05
                 ) +
 
                 (
                     internalConsistencyScore *
+                    0.05
+                );
+
+
+            // ==================================================
+            // Weakest Component Guard
+            // ==================================================
+            //
+            // We still want genuinely poor alignment to matter,
+            // but we do NOT let a single moderately low component
+            // destroy an otherwise good sample.
+            // ==================================================
+
+            const weakestCoreComponent =
+
+                Math.min(
+
+                    referenceFitScore,
+                    baselineScore,
+                    horizontalScore,
+                    verticalScore
+
+                );
+
+
+            let exerciseScore =
+
+                (
+                    weightedScore *
+                    0.90
+                ) +
+
+                (
+                    weakestCoreComponent *
                     0.10
                 );
+
+
+            // ==================================================
+            // Severe Failure Guards
+            // ==================================================
+            //
+            // These are only activated when the handwriting is
+            // clearly outside the expected area.
+            // ==================================================
+
+            if (
+
+                referenceFitScore < 30 ||
+                baselineScore < 30 ||
+                verticalScore < 30
+
+            ) {
+
+                exerciseScore =
+
+                    Math.min(
+
+                        exerciseScore,
+                        49
+
+                    );
+
+            } else if (
+
+                referenceFitScore < 45 ||
+                baselineScore < 45 ||
+                verticalScore < 45
+
+            ) {
+
+                exerciseScore =
+
+                    Math.min(
+
+                        exerciseScore,
+                        59
+
+                    );
+
+            }
 
 
             exerciseScore =
@@ -916,10 +1772,21 @@ class AlignmentAnalyzer {
             // Alignment Flags
             // ==================================================
 
+            const baselineToleranceForFlag =
+
+                Math.max(
+
+                    referenceTolerance?.baseline || 18,
+
+                    worksheetHeight * 0.035
+
+                );
+
+
             const baselineAligned =
 
                 baselineDeviation <=
-                baselineTolerance;
+                baselineToleranceForFlag;
 
 
             const goodHorizontalAlignment =
@@ -935,9 +1802,7 @@ class AlignmentAnalyzer {
             const aligned =
 
                 baselineAligned &&
-
                 goodHorizontalAlignment &&
-
                 goodVerticalAlignment;
 
 
@@ -955,7 +1820,6 @@ class AlignmentAnalyzer {
 
                 score:
                     exerciseScore,
-
 
                 promptText,
 
@@ -999,6 +1863,20 @@ class AlignmentAnalyzer {
                 // Reference geometry
                 // ------------------------------------------
 
+                referenceFitAvailable,
+
+                referenceBaselineScore,
+
+                referenceFitScore,
+
+                referenceLeftScore,
+
+                referenceRightScore,
+
+                referenceBaselineScore,
+
+                referenceVerticalScore,
+
                 expectedLeftX,
 
                 expectedRightX,
@@ -1006,11 +1884,13 @@ class AlignmentAnalyzer {
                 guideBaseline,
 
                 guideTop:
+
                     guideBounds
                         ? guideBounds.top
                         : null,
 
                 guideBottom:
+
                     guideBounds
                         ? guideBounds.bottom
                         : null,
@@ -1021,8 +1901,6 @@ class AlignmentAnalyzer {
                 // ------------------------------------------
 
                 baselineDeviation,
-
-                baselineTolerance,
 
                 baselineScore,
 
@@ -1035,6 +1913,10 @@ class AlignmentAnalyzer {
 
                 horizontalScore,
 
+                leftHorizontalScore,
+
+                rightHorizontalScore,
+
 
                 // ------------------------------------------
                 // Vertical
@@ -1043,6 +1925,10 @@ class AlignmentAnalyzer {
                 verticalDeviation,
 
                 verticalScore,
+
+                leftVerticalScore,
+
+                rightVerticalScore,
 
 
                 // ------------------------------------------
@@ -1130,7 +2016,7 @@ class AlignmentAnalyzer {
 
 
         // ======================================================
-        // Final Category Score
+        // Category Score
         // ======================================================
 
         const score =
@@ -1150,6 +2036,20 @@ class AlignmentAnalyzer {
         // ======================================================
         // Component Scores
         // ======================================================
+
+        const referenceFitComponent =
+
+            this.average(
+
+                validAttempts.map(
+
+                    result =>
+                        result.referenceFitScore
+
+                )
+
+            );
+
 
         const baselineComponent =
 
@@ -1241,7 +2141,6 @@ class AlignmentAnalyzer {
                     value =>
 
                         typeof value === "number" &&
-
                         Number.isFinite(value)
 
                 );
@@ -1253,7 +2152,10 @@ class AlignmentAnalyzer {
 
         const sortedBaselines =
             [...baselines].sort(
-                (a, b) => a - b
+
+                (a, b) =>
+                    a - b
+
             );
 
 
@@ -1267,7 +2169,9 @@ class AlignmentAnalyzer {
             const middle =
 
                 Math.floor(
+
                     sortedBaselines.length / 2
+
                 );
 
 
@@ -1278,6 +2182,7 @@ class AlignmentAnalyzer {
                     ? sortedBaselines[middle]
 
                     : (
+
                         sortedBaselines[
                             middle - 1
                         ] +
@@ -1285,6 +2190,7 @@ class AlignmentAnalyzer {
                         sortedBaselines[
                             middle
                         ]
+
                     ) / 2;
 
         }
@@ -1308,6 +2214,7 @@ class AlignmentAnalyzer {
                     (sum, value) =>
 
                         sum +
+
                         Math.pow(
 
                             value -
@@ -1334,29 +2241,72 @@ class AlignmentAnalyzer {
 
 
         // ======================================================
-        // Consistency Percentage
+        // Consistency
+        // ======================================================
+        //
+        // IMPORTANT:
+        //
+        // One actual attempt should NOT be reported as 0%
+        // consistency just because there are no repeated
+        // attempts.
+        //
+        // When there is only one valid attempt, consistency
+        // reflects that attempt's internal consistency score.
         // ======================================================
 
-        const alignedCount =
-
-            validAttempts.filter(
-
-                result =>
-                    result.aligned
-
-            ).length;
+        let consistency;
 
 
-        const consistency =
+        if (
+            validAttempts.length === 1
+        ) {
 
-            (
-                alignedCount /
-                validAttempts.length
-            ) * 100;
+            consistency =
+
+                Number(
+
+                    validAttempts[0]
+                        .internalConsistencyScore
+
+                );
+
+        } else {
+
+            const alignedCount =
+
+                validAttempts.filter(
+
+                    result =>
+                        result.aligned
+
+                ).length;
+
+
+            const attemptAlignmentPercentage =
+
+                (
+                    alignedCount /
+                    validAttempts.length
+                ) * 100;
+
+
+            consistency =
+
+                (
+                    attemptAlignmentPercentage *
+                    0.70
+                ) +
+
+                (
+                    consistencyComponent *
+                    0.30
+                );
+
+        }
 
 
         // ======================================================
-        // Guide Difference
+        // Guide Statistics
         // ======================================================
 
         const guideDifferences =
@@ -1432,32 +2382,47 @@ class AlignmentAnalyzer {
         return {
 
             score:
+
                 Number(
+
                     score.toFixed(2)
+
                 ),
 
 
             averageBaseline:
+
                 Number(
+
                     averageBaseline.toFixed(2)
+
                 ),
 
 
             medianBaseline:
+
                 Number(
+
                     medianBaseline.toFixed(2)
+
                 ),
 
 
             baselineDeviation:
+
                 Number(
+
                     baselineDeviation.toFixed(2)
+
                 ),
 
 
             consistency:
+
                 Number(
+
                     consistency.toFixed(2)
+
                 ),
 
 
@@ -1507,7 +2472,10 @@ class AlignmentAnalyzer {
                 guideAverageDifference !== null
 
                     ? Number(
-                        guideAverageDifference.toFixed(2)
+
+                        guideAverageDifference
+                            .toFixed(2)
+
                     )
 
                     : null,
@@ -1518,37 +2486,73 @@ class AlignmentAnalyzer {
                 guideAverageScore !== null
 
                     ? Number(
-                        guideAverageScore.toFixed(2)
+
+                        guideAverageScore
+                            .toFixed(2)
+
                     )
 
                     : null,
 
 
+            // ==================================================
+            // Component Scores
+            // ==================================================
+
             componentScores: {
 
-                baseline:
+                referenceFit:
+
                     Number(
-                        baselineComponent.toFixed(2)
+
+                        referenceFitComponent
+                            .toFixed(2)
+
+                    ),
+
+                baseline:
+
+                    Number(
+
+                        baselineComponent
+                            .toFixed(2)
+
                     ),
 
                 horizontal:
+
                     Number(
-                        horizontalComponent.toFixed(2)
+
+                        horizontalComponent
+                            .toFixed(2)
+
                     ),
 
                 vertical:
+
                     Number(
-                        verticalComponent.toFixed(2)
+
+                        verticalComponent
+                            .toFixed(2)
+
                     ),
 
                 height:
+
                     Number(
-                        heightComponent.toFixed(2)
+
+                        heightComponent
+                            .toFixed(2)
+
                     ),
 
                 consistency:
+
                     Number(
-                        consistencyComponent.toFixed(2)
+
+                        consistencyComponent
+                            .toFixed(2)
+
                     ),
 
             },
@@ -1573,6 +2577,39 @@ class AlignmentAnalyzer {
                         score:
                             Number(
                                 result.score.toFixed(2)
+                            ),
+
+                        referenceFitAvailable:
+                            result.referenceFitAvailable,
+
+                        referenceFitScore:
+                            Number(
+                                result.referenceFitScore
+                                    .toFixed(2)
+                            ),
+
+                        referenceLeftScore:
+                            Number(
+                                result.referenceLeftScore
+                                    .toFixed(2)
+                            ),
+
+                        referenceRightScore:
+                            Number(
+                                result.referenceRightScore
+                                    .toFixed(2)
+                            ),
+
+                        referenceBaselineScore:
+                            Number(
+                                result.referenceBaselineScore
+                                    .toFixed(2)
+                            ),
+
+                        referenceVerticalScore:
+                            Number(
+                                result.referenceVerticalScore
+                                    .toFixed(2)
                             ),
 
                         leftCenterX:
@@ -1620,54 +2657,88 @@ class AlignmentAnalyzer {
                             result.guideBaseline !== null
 
                                 ? Number(
-                                    result.guideBaseline.toFixed(2)
+                                    result.guideBaseline
+                                        .toFixed(2)
                                 )
 
                                 : null,
 
                         baselineDeviation:
                             Number(
-                                result.baselineDeviation.toFixed(2)
+                                result.baselineDeviation
+                                    .toFixed(2)
                             ),
 
                         baselineScore:
                             Number(
-                                result.baselineScore.toFixed(2)
+                                result.baselineScore
+                                    .toFixed(2)
                             ),
 
                         horizontalDeviation:
                             Number(
-                                result.horizontalDeviation.toFixed(2)
+                                result.horizontalDeviation
+                                    .toFixed(2)
                             ),
 
                         horizontalScore:
                             Number(
-                                result.horizontalScore.toFixed(2)
+                                result.horizontalScore
+                                    .toFixed(2)
                             ),
 
                         verticalDeviation:
                             Number(
-                                result.verticalDeviation.toFixed(2)
+                                result.verticalDeviation
+                                    .toFixed(2)
                             ),
 
                         verticalScore:
                             Number(
-                                result.verticalScore.toFixed(2)
+                                result.verticalScore
+                                    .toFixed(2)
                             ),
 
                         heightDifference:
                             Number(
-                                result.heightDifference.toFixed(2)
+                                result.heightDifference
+                                    .toFixed(2)
                             ),
 
                         heightScore:
                             Number(
-                                result.heightScore.toFixed(2)
+                                result.heightScore
+                                    .toFixed(2)
                             ),
 
                         internalConsistencyScore:
                             Number(
-                                result.internalConsistencyScore.toFixed(2)
+                                result.internalConsistencyScore
+                                    .toFixed(2)
+                            ),
+
+                        leftHorizontalScore:
+                            Number(
+                                result.leftHorizontalScore
+                                    .toFixed(2)
+                            ),
+
+                        rightHorizontalScore:
+                            Number(
+                                result.rightHorizontalScore
+                                    .toFixed(2)
+                            ),
+
+                        leftVerticalScore:
+                            Number(
+                                result.leftVerticalScore
+                                    .toFixed(2)
+                            ),
+
+                        rightVerticalScore:
+                            Number(
+                                result.rightVerticalScore
+                                    .toFixed(2)
                             ),
 
                         aligned:
@@ -1678,6 +2749,360 @@ class AlignmentAnalyzer {
                 ),
 
         };
+
+    }
+
+
+    // ==========================================================
+    // Reference Deviation Score
+    // ==========================================================
+    //
+    // CALIBRATED FOR CHILD HANDWRITING
+    //
+    // 0 error
+    //      = 100
+    //
+    // within tolerance
+    //      = 100 → 90
+    //
+    // moderate deviation
+    //      = 90 → 35
+    //
+    // severe deviation
+    //      = 35 → 0
+    //
+    // This is intentionally more forgiving than the old V7
+    // horizontal scoring.
+    // ==========================================================
+
+    static referenceDeviationScore(
+
+        error,
+
+        tolerance,
+
+        severeRange
+
+    ) {
+
+        if (
+
+            typeof error !== "number" ||
+            !Number.isFinite(error)
+
+        ) {
+
+            return 0;
+
+        }
+
+
+        tolerance =
+
+            Math.max(
+
+                0.001,
+
+                Number(tolerance) || 1
+
+            );
+
+
+        severeRange =
+
+            Math.max(
+
+                tolerance * 2.5,
+
+                Number(severeRange) || tolerance * 3
+
+            );
+
+
+        if (
+            error <= 0
+        ) {
+
+            return 100;
+
+        }
+
+
+        if (
+            error <= tolerance
+        ) {
+
+            const ratio =
+
+                error /
+                tolerance;
+
+
+            return Math.max(
+
+                90,
+
+                100 -
+                (
+                    ratio *
+                    10
+                )
+
+            );
+
+        }
+
+
+        if (
+            error >= severeRange
+        ) {
+
+            return 0;
+
+        }
+
+
+        const normalized =
+
+            (
+                error -
+                tolerance
+            ) /
+            (
+                severeRange -
+                tolerance
+            );
+
+
+        const score =
+
+            90 *
+
+            (
+                1 -
+                Math.pow(
+                    normalized,
+                    1.25
+                )
+
+            );
+
+
+        return Math.max(
+
+            0,
+
+            Math.min(
+
+                90,
+
+                score
+
+            )
+
+        );
+
+    }
+
+
+    // ==========================================================
+    // Ratio Score
+    // ==========================================================
+
+    static ratioScore(
+
+        ratio,
+
+        tolerance,
+
+        severeRatio
+
+    ) {
+
+        if (
+
+            typeof ratio !== "number" ||
+            !Number.isFinite(ratio)
+
+        ) {
+
+            return 0;
+
+        }
+
+
+        tolerance =
+
+            Math.max(
+
+                0.0001,
+
+                Number(tolerance) || 0.01
+
+            );
+
+
+        severeRatio =
+
+            Math.max(
+
+                tolerance * 2.5,
+
+                Number(severeRatio) ||
+                tolerance * 3
+
+            );
+
+
+        if (
+            ratio <= 0
+        ) {
+
+            return 100;
+
+        }
+
+
+        if (
+            ratio >= severeRatio
+        ) {
+
+            return 0;
+
+        }
+
+
+        if (
+            ratio <= tolerance
+        ) {
+
+            const normalized =
+
+                ratio /
+                tolerance;
+
+
+            return Math.max(
+
+                90,
+
+                100 -
+                (
+                    normalized *
+                    10
+                )
+
+            );
+
+        }
+
+
+        const normalized =
+
+            (
+                ratio -
+                tolerance
+            ) /
+            (
+                severeRatio -
+                tolerance
+            );
+
+
+        return Math.max(
+
+            0,
+
+            Math.min(
+
+                90,
+
+                90 *
+                (
+                    1 -
+                    Math.pow(
+                        normalized,
+                        1.25
+                    )
+                )
+
+            )
+
+        );
+
+    }
+
+
+    // ==========================================================
+    // Average
+    // ==========================================================
+
+    static average(values) {
+
+        const validValues =
+
+            values.filter(
+
+                value =>
+
+                    typeof value === "number" &&
+                    Number.isFinite(value)
+
+            );
+
+
+        if (
+            validValues.length === 0
+        ) {
+
+            return 0;
+
+        }
+
+
+        return (
+
+            validValues.reduce(
+
+                (sum, value) =>
+                    sum + value,
+
+                0
+
+            ) /
+
+            validValues.length
+
+        );
+
+    }
+
+
+    // ==========================================================
+    // First Number
+    // ==========================================================
+
+    static firstNumber(...values) {
+
+        for (
+            const value of values
+        ) {
+
+            if (
+
+                typeof value === "number" &&
+                Number.isFinite(value)
+
+            ) {
+
+                return value;
+
+            }
+
+        }
+
+
+        return null;
 
     }
 
@@ -1721,8 +3146,10 @@ class AlignmentAnalyzer {
         ) {
 
             if (
+
                 typeof value === "string" &&
                 value.trim().length > 0
+
             ) {
 
                 return value
@@ -1773,8 +3200,10 @@ class AlignmentAnalyzer {
 
 
         if (
+
             !guide ||
             typeof guide !== "object"
+
         ) {
 
             guide =
@@ -1802,8 +3231,10 @@ class AlignmentAnalyzer {
 
 
         if (
+
             !guide ||
             typeof guide !== "object"
+
         ) {
 
             return null;
@@ -1828,8 +3259,10 @@ class AlignmentAnalyzer {
 
 
         if (
+
             guideData.worksheet &&
             typeof guideData.worksheet.width === "number"
+
         ) {
 
             return guideData.worksheet.width;
@@ -1838,7 +3271,9 @@ class AlignmentAnalyzer {
 
 
         if (
+
             typeof guideData.worksheetWidth === "number"
+
         ) {
 
             return guideData.worksheetWidth;
@@ -1847,7 +3282,9 @@ class AlignmentAnalyzer {
 
 
         if (
+
             typeof guideData.width === "number"
+
         ) {
 
             return guideData.width;
@@ -1872,8 +3309,10 @@ class AlignmentAnalyzer {
 
 
         if (
+
             guideData.worksheet &&
             typeof guideData.worksheet.height === "number"
+
         ) {
 
             return guideData.worksheet.height;
@@ -1882,7 +3321,9 @@ class AlignmentAnalyzer {
 
 
         if (
+
             typeof guideData.worksheetHeight === "number"
+
         ) {
 
             return guideData.worksheetHeight;
@@ -1891,7 +3332,9 @@ class AlignmentAnalyzer {
 
 
         if (
+
             typeof guideData.height === "number"
+
         ) {
 
             return guideData.height;
@@ -1926,6 +3369,7 @@ class AlignmentAnalyzer {
 
 
         const left =
+
             this.firstNumber(
 
                 guide.left,
@@ -1935,6 +3379,7 @@ class AlignmentAnalyzer {
 
 
         const right =
+
             this.firstNumber(
 
                 guide.right,
@@ -1944,6 +3389,7 @@ class AlignmentAnalyzer {
 
 
         const top =
+
             this.firstNumber(
 
                 guide.top,
@@ -1953,6 +3399,7 @@ class AlignmentAnalyzer {
 
 
         const bottom =
+
             this.firstNumber(
 
                 guide.bottom,
@@ -1976,8 +3423,10 @@ class AlignmentAnalyzer {
 
 
         if (
+
             right <= left ||
             bottom <= top
+
         ) {
 
             return null;
@@ -2027,7 +3476,6 @@ class AlignmentAnalyzer {
         if (
 
             typeof guide.baselineY === "number" &&
-
             Number.isFinite(
                 guide.baselineY
             )
@@ -2042,7 +3490,6 @@ class AlignmentAnalyzer {
         if (
 
             typeof guide.baseline === "number" &&
-
             Number.isFinite(
                 guide.baseline
             )
@@ -2057,9 +3504,7 @@ class AlignmentAnalyzer {
         if (
 
             typeof guide.normalizedBaselineY === "number" &&
-
             guideData.worksheet &&
-
             typeof guideData.worksheet.height === "number"
 
         ) {
@@ -2077,9 +3522,7 @@ class AlignmentAnalyzer {
         if (
 
             typeof guide.normalizedBaseline === "number" &&
-
             guideData.worksheet &&
-
             typeof guideData.worksheet.height === "number"
 
         ) {
@@ -2120,26 +3563,38 @@ class AlignmentAnalyzer {
 
 
         const minX =
+
             this.firstNumber(
+
                 boundingBox.minX
+
             );
 
 
         const maxX =
+
             this.firstNumber(
+
                 boundingBox.maxX
+
             );
 
 
         const minY =
+
             this.firstNumber(
+
                 boundingBox.minY
+
             );
 
 
         const maxY =
+
             this.firstNumber(
+
                 boundingBox.maxY
+
             );
 
 
@@ -2166,8 +3621,10 @@ class AlignmentAnalyzer {
 
 
         if (
+
             width <= 0 ||
             height <= 0
+
         ) {
 
             return null;
@@ -2182,8 +3639,10 @@ class AlignmentAnalyzer {
                 ? letter.centerX
 
                 : (
+
                     minX +
                     maxX
+
                 ) / 2;
 
 
@@ -2194,8 +3653,10 @@ class AlignmentAnalyzer {
                 ? letter.centerY
 
                 : (
+
                     minY +
                     maxY
+
                 ) / 2;
 
 
@@ -2235,6 +3696,7 @@ class AlignmentAnalyzer {
     static getCenterX(letter) {
 
         const metrics =
+
             this.getLetterMetrics(
                 letter
             );
@@ -2243,263 +3705,6 @@ class AlignmentAnalyzer {
         return metrics
             ? metrics.centerX
             : null;
-
-    }
-
-
-    // ==========================================================
-    // Deviation Score
-    // ==========================================================
-    //
-    // Important difference from the previous V5:
-    //
-    // A deviation inside tolerance is NOT automatically
-    // 80–100.
-    //
-    // 0 error       = 100
-    // tolerance     = 75
-    // 2× tolerance  = ~50
-    // severe range  = 0
-    //
-    // This makes a 70+ score much harder to obtain when
-    // the handwriting is visibly far from the guide.
-    // ==========================================================
-
-    static deviationScore(
-
-        error,
-
-        tolerance,
-
-        severeRange
-
-    ) {
-
-        if (
-
-            typeof error !== "number" ||
-            !Number.isFinite(error)
-
-        ) {
-
-            return 0;
-
-        }
-
-
-        tolerance =
-            Math.max(
-                0.001,
-                tolerance || 1
-            );
-
-
-        severeRange =
-            Math.max(
-                tolerance * 2,
-                severeRange || tolerance * 3
-            );
-
-
-        if (
-            error <= 0
-        ) {
-
-            return 100;
-
-        }
-
-
-        if (
-            error >= severeRange
-        ) {
-
-            return 0;
-
-        }
-
-
-        // Use a quadratic falloff.
-        //
-        // This deliberately becomes stricter as the
-        // deviation grows.
-
-        const normalized =
-            error /
-            severeRange;
-
-
-        const score =
-
-            100 *
-            (
-                1 -
-                Math.pow(
-                    normalized,
-                    1.65
-                )
-            );
-
-
-        return Math.max(
-
-            0,
-
-            Math.min(
-                100,
-                score
-            )
-
-        );
-
-    }
-
-
-    // ==========================================================
-    // Ratio Score
-    // ==========================================================
-
-    static ratioScore(
-
-        ratio,
-
-        tolerance,
-
-        severeRatio
-
-    ) {
-
-        if (
-
-            typeof ratio !== "number" ||
-            !Number.isFinite(ratio)
-
-        ) {
-
-            return 0;
-
-        }
-
-
-        if (
-            ratio <= 0
-        ) {
-
-            return 100;
-
-        }
-
-
-        if (
-            ratio >= severeRatio
-        ) {
-
-            return 0;
-
-        }
-
-
-        const normalized =
-            ratio /
-            severeRatio;
-
-
-        return Math.max(
-
-            0,
-
-            Math.min(
-
-                100,
-
-                100 *
-                (
-                    1 -
-                    Math.pow(
-                        normalized,
-                        1.65
-                    )
-                )
-
-            )
-
-        );
-
-    }
-
-
-    // ==========================================================
-    // Average
-    // ==========================================================
-
-    static average(values) {
-
-        const validValues =
-
-            values.filter(
-
-                value =>
-
-                    typeof value === "number" &&
-
-                    Number.isFinite(value)
-
-            );
-
-
-        if (
-            validValues.length === 0
-        ) {
-
-            return 0;
-
-        }
-
-
-        return (
-
-            validValues.reduce(
-
-                (sum, value) =>
-                    sum + value,
-
-                0
-
-            ) /
-
-            validValues.length
-
-        );
-
-    }
-
-
-    // ==========================================================
-    // First Number
-    // ==========================================================
-
-    static firstNumber(...values) {
-
-        for (
-            const value of values
-        ) {
-
-            if (
-
-                typeof value === "number" &&
-
-                Number.isFinite(value)
-
-            ) {
-
-                return value;
-
-            }
-
-        }
-
-
-        return null;
 
     }
 
@@ -2533,6 +3738,8 @@ class AlignmentAnalyzer {
             guideAverageScore: null,
 
             componentScores: {
+
+                referenceFit: 0,
 
                 baseline: 0,
 
