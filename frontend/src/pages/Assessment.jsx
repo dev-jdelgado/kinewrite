@@ -7,19 +7,19 @@ import {
     useSearchParams,
 } from "react-router-dom";
 
-import StudentService from "./services/StudentService";
-import AssessmentService from "./services/AssessmentService";
+import StudentService from "../services/StudentService";
+import AssessmentService from "../services/AssessmentService";
 
-import AssessmentLayout from "./components/assessment/utils/AssessmentLayout";
-import AssessmentRouter from "./components/assessment/utils/AssessmentRouter";
+import AssessmentLayout from "../components/assessment/utils/AssessmentLayout";
+import AssessmentRouter from "../components/assessment/utils/AssessmentRouter";
 
 import {
     AssessmentProvider,
     useAssessment,
-} from "./components/assessment/utils/AssessmentContext";
+} from "../components/assessment/utils/AssessmentContext";
 
-import preAssessmentActivities from "./components/assessment/data/preAssessmentActivities";
-import postAssessmentActivities from "./components/assessment/data/postAssessmentActivities";
+import preAssessmentActivities from "../components/assessment/data/preAssessmentActivities";
+import postAssessmentActivities from "../components/assessment/data/postAssessmentActivities";
 
 
 const AssessmentContent = () => {
