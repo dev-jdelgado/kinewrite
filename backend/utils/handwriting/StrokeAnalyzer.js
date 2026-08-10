@@ -1,4 +1,3 @@
-const FeatureExtractor = require("./FeatureExtractor");
 const Geometry = require("./Geometry");
 
 class StrokeAnalyzer {
@@ -7,10 +6,23 @@ class StrokeAnalyzer {
     // Analyze Stroke Quality
     // ==========================================
 
-    static analyze(strokes) {
+    static analyze(data) {
 
-        const features =
-            FeatureExtractor.extract(strokes);
+        const {
+    
+            attempts,
+    
+            samples,
+    
+            strokes,
+    
+            features,
+    
+            clusters,
+    
+            letters,
+    
+        } = data;
 
         const items =
             features.strokeFeatures;

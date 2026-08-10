@@ -79,6 +79,10 @@ class AssessmentController {
 
                 activityCategory,
 
+                activityName,
+
+                activityType,
+
                 promptText,
 
                 promptType,
@@ -93,6 +97,12 @@ class AssessmentController {
 
                 strokes,
 
+                // ======================================
+                // Alignment / Worksheet Guide Metrics
+                // ======================================
+
+                guide,
+
             } = req.body;
 
             const attemptId =
@@ -103,6 +113,10 @@ class AssessmentController {
                     activityNo,
 
                     activityCategory,
+
+                    activityName,
+
+                    activityType,
 
                     promptText,
 
@@ -117,6 +131,12 @@ class AssessmentController {
                     image,
 
                     strokes,
+
+                    // ======================================
+                    // Pass Guide To Assessment Service
+                    // ======================================
+
+                    guide,
 
                 });
 

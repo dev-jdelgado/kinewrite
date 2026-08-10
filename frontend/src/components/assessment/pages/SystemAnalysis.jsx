@@ -15,19 +15,14 @@ import {
 } from "../utils/AssessmentContext";
 
 const steps = [
-
     "Collecting handwriting samples...",
-
-    "Analyzing spacing...",
-
-    "Analyzing alignment...",
-
-    "Analyzing stroke quality...",
-
-    "Generating assessment...",
-
+    "Processing 17 handwriting activities...",
+    "Analyzing letter alignment...",
+    "Analyzing word spacing...",
+    "Analyzing stroke patterns...",
+    "Calculating handwriting metrics...",
+    "Generating assessment report...",
     "Preparing results..."
-
 ];
 
 const SystemAnalysis = () => {
@@ -99,6 +94,8 @@ const SystemAnalysis = () => {
                         assessmentId
 
                     );
+
+                    console.log("API Response:", response.data);
 
                 if (
 

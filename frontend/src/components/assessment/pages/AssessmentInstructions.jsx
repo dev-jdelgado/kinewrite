@@ -3,6 +3,7 @@ import {
     PencilLine,
     Timer,
     TriangleAlert,
+    Layers3,
 } from "lucide-react";
 
 import AssessmentHeader from "../components/AssessmentHeader";
@@ -22,6 +23,7 @@ const AssessmentInstructions = () => {
             className="
                 max-w-5xl
                 mx-auto
+                lg:0 sm:px-10 px-6
             "
         >
 
@@ -29,7 +31,7 @@ const AssessmentInstructions = () => {
 
                 title="Assessment Instructions"
 
-                subtitle="Please read the instructions carefully before starting."
+                subtitle="Please read the instructions carefully before starting your handwriting assessment."
 
             />
 
@@ -77,19 +79,25 @@ const AssessmentInstructions = () => {
                     <InstructionItem
                         icon={<PencilLine />}
                         title="Use the Stylus"
-                        description="Use the provided stylus whenever possible for the best handwriting assessment."
+                        description="Use the provided stylus whenever possible for the most accurate handwriting assessment."
                     />
 
                     <InstructionItem
                         icon={<Timer />}
                         title="Write Naturally"
-                        description="Write comfortably using your normal handwriting style. There is no need to rush."
+                        description="Write comfortably using your normal handwriting style. Focus on neatness rather than speed."
+                    />
+
+                    <InstructionItem
+                        icon={<Layers3 />}
+                        title="Complete All 17 Activities"
+                        description="The assessment contains 17 handwriting activities divided into Alignment, Spacing, and Stroke exercises. Complete each activity before proceeding."
                     />
 
                     <InstructionItem
                         icon={<TriangleAlert />}
-                        title="Complete All Activities"
-                        description="Finish every handwriting activity before submitting the assessment."
+                        title="Do Your Best"
+                        description="There are no right or wrong answers. Simply complete each activity to the best of your ability."
                     />
 
                 </div>

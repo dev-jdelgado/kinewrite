@@ -161,6 +161,21 @@ class LetterSegmenter {
             left.centerY =
                 merged.averageCenterY;
 
+                left.width =
+                merged.averageWidth;
+            
+            left.height =
+                merged.averageHeight;
+            
+            left.baseline =
+                merged.averageBaseline;
+            
+            left.totalStrokeLength =
+                merged.totalStrokeLength;
+            
+            left.pointCount =
+                merged.totalPoints;
+
             result.splice(bestIndex, 1);
 
         }

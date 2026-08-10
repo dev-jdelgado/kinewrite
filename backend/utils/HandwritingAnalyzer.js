@@ -19,35 +19,90 @@ const AlignmentAnalyzer =
 const StrokeAnalyzer =
     require("./handwriting/StrokeAnalyzer");
 
-const ScoreCalculator =
-    require("./handwriting/ScoreCalculator");
 
 class HandwritingAnalyzer {
 
     // ==========================================
-    // Analyze Handwriting
+    // Analyze Category
     // ==========================================
 
-    static analyze(strokes, options = {}) {
+    static analyze(
+
+        categoryData,
+
+        options = {}
+
+    ) {
+
+        const {
+
+            attempts = [],
+
+            samples = [],
+
+            strokes = [],
+
+        } = categoryData;
+
+        // ==========================================
+        // Validate
+        // ==========================================
 
         if (
+
             !Array.isArray(strokes) ||
+
             strokes.length === 0
+
         ) {
 
             throw new Error(
+
                 "No handwriting strokes found."
+
             );
 
         }
 
         const {
 
-            expectedLetters = null,
-
-            prompt = null,
+            category,
 
         } = options;
+
+        const normalizedCategory =
+
+            String(category || "")
+
+                .trim()
+
+                .toLowerCase();
+
+        if (
+
+            ![
+
+                "alignment",
+
+                "spacing",
+
+                "stroke",
+
+            ].includes(
+
+                normalizedCategory
+
+            )
+
+        ) {
+
+            throw new Error(
+
+                `Unknown analysis category: ${category}`
+
+            );
+
+        }
 
         // ==========================================
         // Step 1
@@ -55,24 +110,38 @@ class HandwritingAnalyzer {
         // ==========================================
 
         const normalizedStrokes =
-            StrokeNormalizer.normalize(strokes);
 
-        if (normalizedStrokes.length === 0) {
+            StrokeNormalizer.normalize(
+
+                strokes
+
+            );
+
+        if (
+
+            normalizedStrokes.length === 0
+
+        ) {
 
             throw new Error(
+
                 "No valid handwriting strokes found."
+
             );
 
         }
 
         // ==========================================
         // Step 2
-        // Extract Global Features
+        // Extract Features
         // ==========================================
 
         const features =
+
             FeatureExtractor.extract(
+
                 normalizedStrokes
+
             );
 
         // ==========================================
@@ -81,8 +150,11 @@ class HandwritingAnalyzer {
         // ==========================================
 
         const clusters =
+
             StrokeCluster.cluster(
+
                 normalizedStrokes
+
             );
 
         // ==========================================
@@ -90,7 +162,14 @@ class HandwritingAnalyzer {
         // Segment Letters
         // ==========================================
 
+        const expectedLetters =
+
+            options.expectedLetters ??
+
+            null;
+
         const letters =
+
             LetterSegmenter.segment(
 
                 normalizedStrokes,
@@ -101,45 +180,71 @@ class HandwritingAnalyzer {
 
         // ==========================================
         // Step 5
-        // Analyze
+        // Analyze Category
         // ==========================================
 
-        // For now the analyzers still use
-        // normalized strokes.
+        const analyzerData = {
 
-        // Later they can be upgraded
-        // to consume letters.
+            attempts,
 
-        const spacing =
-            SpacingAnalyzer.analyze(
-                normalizedStrokes
-            );
+            samples,
 
-        const alignment =
-            AlignmentAnalyzer.analyze(
-                normalizedStrokes
-            );
+            strokes:
+                normalizedStrokes,
 
-        const stroke =
-            StrokeAnalyzer.analyze(
-                normalizedStrokes
-            );
+            features,
 
-        // ==========================================
-        // Step 6
-        // Overall Score
-        // ==========================================
+            clusters,
 
-        const finalResult =
-            ScoreCalculator.calculate({
+            letters,
 
-                spacing,
+        };
 
-                alignment,
+        let metrics;
 
-                stroke,
+        switch (
 
-            });
+            normalizedCategory
+
+        ) {
+
+            case "alignment":
+
+                metrics =
+
+                    AlignmentAnalyzer.analyze(
+
+                        analyzerData
+
+                    );
+
+                break;
+
+            case "spacing":
+
+                metrics =
+
+                    SpacingAnalyzer.analyze(
+
+                        analyzerData
+
+                    );
+
+                break;
+
+            case "stroke":
+
+                metrics =
+
+                    StrokeAnalyzer.analyze(
+
+                        analyzerData
+
+                    );
+
+                break;
+
+        }
 
         // ==========================================
         // Return
@@ -147,7 +252,12 @@ class HandwritingAnalyzer {
 
         return {
 
-            prompt,
+            category:
+                normalizedCategory,
+
+            attempts,
+
+            samples,
 
             expectedLetters,
 
@@ -166,18 +276,16 @@ class HandwritingAnalyzer {
 
             letters,
 
-            spacing,
+            score:
+                metrics?.score ?? 0,
 
-            alignment,
-
-            stroke,
-
-            ...finalResult,
+            metrics,
 
         };
 
     }
 
 }
+
 
 module.exports = HandwritingAnalyzer;

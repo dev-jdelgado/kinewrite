@@ -14,6 +14,8 @@ class HandwritingSample {
 
         strokeJson,
 
+        guideJson,
+
     }) {
 
         const [result] = await pool.query(
@@ -25,11 +27,13 @@ class HandwritingSample {
 
                 image_path,
 
-                stroke_json
+                stroke_json,
+
+                guide_json
 
             )
 
-            VALUES (?, ?, ?)
+            VALUES (?, ?, ?, ?)
             `,
 
             [
@@ -39,6 +43,10 @@ class HandwritingSample {
                 imagePath,
 
                 JSON.stringify(strokeJson),
+
+                guideJson
+                    ? JSON.stringify(guideJson)
+                    : null,
 
             ]
 
@@ -86,11 +94,33 @@ class HandwritingSample {
 
             ...rows[0],
 
-            stroke_json: rows[0].stroke_json
+            // ======================================
+            // Parse Stroke JSON
+            // ======================================
 
-                ? JSON.parse(rows[0].stroke_json)
+            stroke_json:
 
-                : [],
+                rows[0].stroke_json
+
+                    ? JSON.parse(
+                        rows[0].stroke_json
+                    )
+
+                    : [],
+
+            // ======================================
+            // Parse Guide JSON
+            // ======================================
+
+            guide:
+
+                rows[0].guide_json
+
+                    ? JSON.parse(
+                        rows[0].guide_json
+                    )
+
+                    : null,
 
         };
 

@@ -6,6 +6,9 @@ const AssessmentAnalysis = require("../models/AssessmentAnalysis");
 const HandwritingAnalyzer =
     require("../utils/HandwritingAnalyzer");
 
+const ScoreCalculator =
+    require("../utils/handwriting/ScoreCalculator");
+
 const Student =
     require("../models/Student");
 
@@ -43,59 +46,226 @@ class AssessmentService {
     static async saveActivity({
 
         assessmentId,
-
         activityNo,
-
         activityCategory,
-
+        activityName,
+        activityType,
         promptText,
-
         promptType,
-
         completionTime,
-
         penLifts,
-
         strokeCount,
-
         image,
-
         strokes,
-
+        guide,
+    
     }) {
 
         const attemptId =
-            await AssessmentAttempt.create({
-
-                assessmentId,
-
-                activityNo,
-
-                activityCategory,
-
-                promptText,
-
-                promptType,
-
-                completionTime,
-
-                penLifts,
-
-                strokeCount,
-
-            });
+        await AssessmentAttempt.create({
+    
+            assessmentId,
+            activityNo,
+            activityCategory,
+            activityName,
+            activityType,
+            promptText,
+            promptType,
+            completionTime,
+            penLifts,
+            strokeCount,
+        });
 
         await HandwritingSample.create({
 
             attemptId,
-
+        
             imagePath: image,
-
+        
             strokeJson: strokes,
-
+        
+            guideJson: guide,
+        
         });
 
         return attemptId;
+
+    }
+
+    // ==========================================
+    // Load Assessment Attempts
+    // ==========================================
+
+    static async loadAssessmentAttempts(
+
+        assessmentId
+
+    ) {
+
+        return await AssessmentAttempt.findByAssessment(
+
+            assessmentId
+
+        );
+
+    }
+
+    // ==========================================
+    // Load Samples
+    // ==========================================
+
+    static async loadHandwritingSamples(
+
+        attempts
+
+    ) {
+
+        const samples = await Promise.all(
+
+            attempts.map(async attempt => {
+
+                const sample =
+
+                    await HandwritingSample.findByAttempt(
+
+                        attempt.attempt_id
+
+                    );
+
+                return {
+
+                    attempt,
+
+                    sample,
+
+                };
+
+            })
+
+        );
+
+        return samples;
+
+    }
+
+
+    // ==========================================
+    // Categorize Activities
+    // ==========================================
+
+    static categorizeActivities(
+
+        samples
+
+    ) {
+
+        const categories = {
+
+            alignment: {
+
+                attempts: [],
+            
+                samples: [],
+            
+                strokes: [],
+            
+            },
+
+            spacing: {
+
+                attempts: [],
+            
+                samples: [],
+            
+                strokes: [],
+
+            },
+
+            stroke: {
+
+                attempts: [],
+            
+                samples: [],
+            
+                strokes: [],
+
+            },
+
+        };
+
+        for (const item of samples) {
+
+            const {
+
+                attempt,
+
+                sample,
+
+            } = item;
+
+            const category =
+                attempt.activity_category
+                    ?.trim()
+                    .toLowerCase();
+            
+            console.log("================================");
+            console.log("Category:", category);
+            console.log("Attempt ID:", attempt.attempt_id);
+            console.log("Sample:", sample);
+            console.log("Stroke JSON:", sample?.stroke_json);
+            console.log("Is Array:", Array.isArray(sample?.stroke_json));
+            
+            if (
+                !categories[category]
+            ) {
+                continue;
+            }
+
+            categories[category]
+
+                .attempts
+
+                .push(attempt);
+
+            categories[category]
+
+                .samples
+                
+                .push(sample);
+
+            if (
+
+                sample &&
+
+                Array.isArray(
+
+                    sample.stroke_json
+
+                )
+
+            ) {
+
+                categories[category]
+
+                    .strokes
+
+                    .push(
+
+                        ...sample.stroke_json
+
+                    );
+
+            }
+
+        }
+
+        
+        console.log("===== CATEGORY TOTALS =====");
+        console.log("Alignment:", categories.alignment.strokes.length);
+        console.log("Spacing:", categories.spacing.strokes.length);
+        console.log("Stroke:", categories.stroke.strokes.length);
+        
+        return categories;
 
     }
 
@@ -110,91 +280,196 @@ class AssessmentService {
     ) {
 
         const attempts =
-            await AssessmentAttempt.findByAssessment(
-
+            await this.loadAssessmentAttempts(
+        
                 assessmentId
-
+        
             );
-
-        let allStrokes = [];
-
-        for (const attempt of attempts) {
-
-            const sample =
-                await HandwritingSample.findByAttempt(
-
-                    attempt.attempt_id
-
-                );
-
-            if (
-
-                sample &&
-
-                sample.stroke_json
-
-            ) {
-
-                allStrokes.push(
-
-                    ...sample.stroke_json
-
-                );
-
-            }
-
-        }
-
-        if (!allStrokes.length) {
-
+        
+        if (
+        
+            attempts.length === 0
+        
+        ) {
+        
             throw new Error(
-
-                "No handwriting samples found."
-
+        
+                "No assessment attempts found."
+        
             );
-
+        
         }
-
-        const analysis =
-            HandwritingAnalyzer.analyze(
-
-                allStrokes
-
+        
+        // ==========================================
+        // Load Handwriting Samples
+        // ==========================================
+        
+        const samples =
+            await this.loadHandwritingSamples(
+        
+                attempts
+        
             );
+
+        // ==========================================
+        // Categorize Activities
+        // ==========================================
+        
+        const categories =
+            this.categorizeActivities(
+        
+                samples
+        
+            );
+        
+        // ==========================================
+        // Validate Categories
+        // ==========================================
+        
+        const hasAlignment =
+        
+            categories.alignment.strokes.length > 0;
+        
+        const hasSpacing =
+        
+            categories.spacing.strokes.length > 0;
+        
+        const hasStroke =
+        
+            categories.stroke.strokes.length > 0;
+        
+        if (
+        
+            !hasAlignment &&
+        
+            !hasSpacing &&
+        
+            !hasStroke
+        
+        ) {
+    
+        throw new Error(
+    
+            "No handwriting samples were found."
+    
+        );
+    
+    }
+
+        // ==========================================
+        // Analyze Alignment
+        // ==========================================
+
+        const alignmentAnalysis =
+
+            hasAlignment
+
+                ? HandwritingAnalyzer.analyze(
+
+                    categories.alignment,
+
+                    {
+
+                        category: "alignment",
+
+                    }
+
+                )
+
+                : null;
+
+        // ==========================================
+        // Analyze Spacing
+        // ==========================================
+
+        const spacingAnalysis =
+
+            hasSpacing
+
+                ? HandwritingAnalyzer.analyze(
+
+                    categories.spacing,
+
+                    {
+
+                        category: "spacing",
+
+                    }
+
+                )
+
+                : null;
+
+        // ==========================================
+        // Analyze Stroke
+        // ==========================================
+
+        const strokeAnalysis =
+
+            hasStroke
+
+                ? HandwritingAnalyzer.analyze(
+
+                    categories.stroke,
+
+                    {
+
+                        category: "stroke",
+
+                    }
+
+                )
+
+                : null;
+
+
+        // ==========================================
+        // Calculate Overall Assessment
+        // ==========================================
+
+        const analysis = ScoreCalculator.calculate({
+
+            alignment: alignmentAnalysis,
+
+            spacing: spacingAnalysis,
+
+            stroke: strokeAnalysis,
+
+        });
 
         await AssessmentAnalysis.create({
 
             assessmentId,
-            
-            spacingScore:
-                analysis.spacing.score,
-            
+        
             alignmentScore:
-                analysis.alignment.score,
-            
+                analysis.breakdown.alignment?.score ?? 0,
+        
+            spacingScore:
+                analysis.breakdown.spacing?.score ?? 0,
+        
             strokeScore:
-                analysis.stroke.score,
-            
+                analysis.breakdown.stroke?.score ?? 0,
+        
             overallScore:
                 analysis.overallScore,
-            
+        
             classification:
                 analysis.classification,
-            
+        
         });
 
         await Assessment.updateScores({
 
             assessmentId,
         
-            spacingScore:
-                analysis.spacing.score,
-        
             alignmentScore:
-                analysis.alignment.score,
-        
+                analysis.breakdown.alignment?.score ?? 0,
+            
+            spacingScore:
+                analysis.breakdown.spacing?.score ?? 0,
+            
             strokeScore:
-                analysis.stroke.score,
+                analysis.breakdown.stroke?.score ?? 0,
         
             overallScore:
                 analysis.overallScore,
@@ -327,6 +602,7 @@ class AssessmentService {
         );
 
     }
+    
 
 }
 

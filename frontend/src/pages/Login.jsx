@@ -86,9 +86,9 @@ const Login = () => {
                 <img src={Star} alt="Sun" className="absolute w-20 md:top-20 top-12 sm:right-70 right-[25%] animate-spin-slow"/>
                 <img src={Star1} alt="Sun" className="absolute w-20 md:bottom-60 bottom-36 sm:left-20 left-12 animate-spin-slow"/>
                 <img src={Balloon} alt="Balloon" className="absolute md:w-60 w-32 top-30 right-1 animate-swing"/>
-                <img src={People} alt="{eople" className="absolute lg:w-80 md:w-50 w-45 sm:-top-10 -top-5" />
                 <div className="bg-white rounded-3xl shadow-xl w-full relative sm:px-12 px-6 py-10">
-                    <img src={KinewriteLogo} alt="Kinewritelogo" className="absolute sm:max-w-100 max-w-[70%] sm:bottom-55 bottom-[270px] sm:left-[10%] left-[12.6vw]" />
+                    <img src={People} alt="people" className="absolute sm:w-80 w-[70%] sm:bottom-72 bottom-[270px] sm:left-[20%] left-[12.6vw]" />
+                    <img src={KinewriteLogo} alt="Kinewritelogo" className="absolute sm:max-w-100 max-w-[70%] sm:bottom-55 bottom-[250px] sm:left-[10%] left-[12.6vw]" />
                     <form
                         className="space-y-6"
                         onSubmit={handleSubmit}

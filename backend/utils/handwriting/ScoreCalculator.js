@@ -1,124 +1,165 @@
 class ScoreCalculator {
 
     // ==========================================
-    // Calculate Overall Assessment
+    // Configurable Category Weights
     // ==========================================
 
-    static calculate(result) {
+    static WEIGHTS = {
 
-        const spacing =
-            result.spacing?.score ?? 0;
+        alignment: 0.40,
 
-        const alignment =
-            result.alignment?.score ?? 0;
+        spacing: 0.35,
 
-        const stroke =
-            result.stroke?.score ?? 0;
+        stroke: 0.25,
 
-        // ==========================================
-        // Weighted Score
-        // ==========================================
+    };
 
-        const WEIGHTS = {
+    // ==========================================
+    // Classification Thresholds
+    // ==========================================
 
-            spacing: 0.35,
+    static LEVELS = [
 
-            alignment: 0.35,
+        {
+            min: 90,
+            classification: "Excellent",
+            therapyLevel: 1,
+            remarks:
+                "Excellent handwriting performance.",
+        },
 
-            stroke: 0.30,
+        {
+            min: 80,
+            classification: "Good",
+            therapyLevel: 1,
+            remarks:
+                "Good handwriting with minor inconsistencies.",
+        },
 
-        };
+        {
+            min: 70,
+            classification: "Fair",
+            therapyLevel: 2,
+            remarks:
+                "Moderate handwriting inconsistencies detected.",
+        },
 
-        const overallScore =
+        {
+            min: 60,
+            classification: "Needs Improvement",
+            therapyLevel: 3,
+            remarks:
+                "Noticeable handwriting difficulties detected.",
+        },
 
-            (spacing * WEIGHTS.spacing) +
+        {
+            min: 0,
+            classification: "Poor",
+            therapyLevel: 4,
+            remarks:
+                "Significant handwriting intervention recommended.",
+        },
 
-            (alignment * WEIGHTS.alignment) +
+    ];
 
-            (stroke * WEIGHTS.stroke);
+    // ==========================================
+    // Calculate Weighted Score
+    // ==========================================
 
-        // ==========================================
-        // Classification
-        // ==========================================
+    static calculateOverall({
 
-        let classification;
-        let therapyLevel;
-        let remarks;
+        alignment,
 
-        if (overallScore >= 90) {
+        spacing,
 
-            classification = "Excellent";
+        stroke,
 
-            therapyLevel = 1;
+    }) {
 
-            remarks =
-                "Excellent handwriting performance.";
+        const alignmentScore =
+            alignment?.score ?? 0;
 
-        }
+        const spacingScore =
+            spacing?.score ?? 0;
 
-        else if (overallScore >= 80) {
+        const strokeScore =
+            stroke?.score ?? 0;
 
-            classification = "Good";
+        const overall =
 
-            therapyLevel = 1;
+            (alignmentScore * this.WEIGHTS.alignment) +
 
-            remarks =
-                "Good handwriting with minor inconsistencies.";
+            (spacingScore * this.WEIGHTS.spacing) +
 
-        }
+            (strokeScore * this.WEIGHTS.stroke);
 
-        else if (overallScore >= 70) {
+        return Number(
 
-            classification = "Fair";
+            overall.toFixed(2)
 
-            therapyLevel = 2;
+        );
 
-            remarks =
-                "Moderate handwriting inconsistencies detected.";
+    }
 
-        }
+    // ==========================================
+    // Classification
+    // ==========================================
 
-        else if (overallScore >= 60) {
+    static classify(
 
-            classification = "Needs Improvement";
+        overallScore
 
-            therapyLevel = 3;
+    ) {
 
-            remarks =
-                "Noticeable handwriting difficulties detected.";
+        return (
 
-        }
+            this.LEVELS.find(
 
-        else {
+                level =>
 
-            classification = "Poor";
+                    overallScore >= level.min
 
-            therapyLevel = 4;
+            ) ||
 
-            remarks =
-                "Significant handwriting intervention recommended.";
+            this.LEVELS.at(-1)
 
-        }
+        );
 
-        // ==========================================
-        // Weakest Skill
-        // ==========================================
+    }
+
+    // ==========================================
+    // Weakest Skill
+    // ==========================================
+
+    static findWeakestSkill({
+
+        alignment,
+
+        spacing,
+
+        stroke,
+
+    }) {
 
         const metrics = [
 
             {
 
-                name: "Spacing",
+                name: "Alignment",
 
-                score: spacing,
+                score:
+
+                    alignment?.score ?? 0,
 
             },
 
             {
 
-                name: "Alignment",
+                name: "Spacing",
 
-                score: alignment,
+                score:
+
+                    spacing?.score ?? 0,
 
             },
 
@@ -126,31 +167,83 @@ class ScoreCalculator {
 
                 name: "Stroke",
 
-                score: stroke,
+                score:
+
+                    stroke?.score ?? 0,
 
             },
 
         ];
 
-        metrics.sort(
+        return metrics.reduce(
 
-            (a, b) => a.score - b.score
+            (lowest, current) =>
+
+                current.score < lowest.score
+
+                    ? current
+
+                    : lowest
+
+        ).name;
+
+    }
+
+    // ==========================================
+    // Main Calculator
+    // ==========================================
+
+    static calculate({
+
+        alignment,
+
+        spacing,
+
+        stroke,
+
+    }) {
+
+        const overallScore =
+
+            this.calculateOverall({
+
+                alignment,
+
+                spacing,
+
+                stroke,
+
+            });
+
+        const {
+
+            classification,
+
+            therapyLevel,
+
+            remarks,
+
+        } = this.classify(
+
+            overallScore
 
         );
 
-        const weakestSkill = metrics[0].name;
+        const weakestSkill =
 
-        // ==========================================
-        // Return
-        // ==========================================
+            this.findWeakestSkill({
+
+                alignment,
+
+                spacing,
+
+                stroke,
+
+            });
 
         return {
 
-            overallScore: Number(
-
-                overallScore.toFixed(2)
-
-            ),
+            overallScore,
 
             classification,
 
@@ -162,9 +255,9 @@ class ScoreCalculator {
 
             breakdown: {
 
-                spacing,
-
                 alignment,
+
+                spacing,
 
                 stroke,
 

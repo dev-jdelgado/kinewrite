@@ -14,6 +14,10 @@ class AssessmentAttempt {
 
         activityCategory,
 
+        activityName,
+
+        activityType,
+
         promptText,
 
         promptType,
@@ -39,6 +43,10 @@ class AssessmentAttempt {
 
                 activity_category,
 
+                activity_name,
+
+                activity_type,
+
                 prompt_text,
 
                 prompt_type,
@@ -53,7 +61,7 @@ class AssessmentAttempt {
 
             )
 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `,
 
             [
@@ -63,6 +71,10 @@ class AssessmentAttempt {
                 activityNo,
 
                 activityCategory,
+
+                activityName,
+
+                activityType,
 
                 promptText,
 

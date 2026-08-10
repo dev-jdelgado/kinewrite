@@ -3,10 +3,6 @@ import {
 } from "react";
 
 import {
-    ArrowLeft,
-} from "lucide-react";
-
-import {
     useAssessment,
 } from "../utils/AssessmentContext";
 
@@ -17,27 +13,8 @@ import BackButton from "../../common/BackButton";
 import HandwritingWorksheet from "../handwriting/HandwritingWorksheet";
 import HandwritingToolbar from "../handwriting/HandwritingToolbar";
 
-import SkyBackground from "../../../assets/assessment/sky-background.png";
 import Cloud from "../../../assets/assessment/cloud.png";
 import Logo from "../../../assets/assessment/KineWrite-logo.png";
-
-import Star from "../../../assets/assessment/star.png";
-
-import Cat from "../../../assets/assessment/cat.png";
-import Dog from "../../../assets/assessment/dog.png";
-import Pen from "../../../assets/assessment/pen.png";
-import Sun from "../../../assets/assessment/sun.png";
-import Book from "../../../assets/assessment/book.png";
-
-const illustrationMap = {
-
-    cat: Cat,
-    dog: Dog,
-    pen: Pen,
-    sun: Sun,
-    books: Book,
-
-};
 
 const AssessmentActivity = () => {
 
@@ -46,17 +23,17 @@ const AssessmentActivity = () => {
     const {
 
         assessmentId,
-    
+
         activities,
-    
+
         currentActivity,
-    
+
         currentActivityIndex,
-    
+
         nextActivity,
-    
+
         goToPage,
-    
+
     } = useAssessment();
 
     if (!currentActivity) {
@@ -65,12 +42,8 @@ const AssessmentActivity = () => {
 
     }
 
-    const illustration =
-        illustrationMap[
-            currentActivity.illustration
-        ];
-
-    const canCheck = canvasRef.current?.hasWriting?.() ?? false;
+    const canCheck =
+        canvasRef.current?.hasWriting?.() ?? false;
 
     return (
 
@@ -124,12 +97,9 @@ const AssessmentActivity = () => {
 
                     <BackButton />
 
-                    
-
                     <img
                         src={Logo}
                         alt="KineWrite"
-
                         className="
                             w-48
                             object-contain
@@ -137,37 +107,40 @@ const AssessmentActivity = () => {
                     />
 
                 </div>
+
+                {/* Activity Header */}
+
                 <div
+                    className="
+                        flex-1
+                        text-center
+                        px-10
+                    "
+                >
+
+                    <h1
                         className="
-                            flex-1
-                            text-center
-                            px-10
+                            text-4xl
+                            font-black
+                            tracking-wide
+                            uppercase
+                            text-sky-500
                         "
                     >
+                        {currentActivity.title}
+                    </h1>
 
-                        <h1
-                            className="
-                                text-4xl
-                                font-black
-                                tracking-wide
-                                uppercase
-                                text-sky-500
-                            "
-                        >
-                            {currentActivity.title}
-                        </h1>
+                    <p
+                        className="
+                            text-2xl
+                            font-semibold
+                            text-sky-700
+                        "
+                    >
+                        {currentActivity.instruction}
+                    </p>
 
-                        <p
-                            className="
-                                text-2xl
-                                font-semibold
-                                text-sky-700
-                            "
-                        >
-                            {currentActivity.instruction}
-                        </p>
-
-                    </div>
+                </div>
 
                 {/* Word Card */}
 
@@ -184,12 +157,9 @@ const AssessmentActivity = () => {
                             bg-white
                             rounded-[40px]
                             shadow-2xl
-
                             border-[5px]
                             border-sky-400
-
                             px-24
-
                             max-w-[850px]
                             w-full
                             text-center
@@ -198,19 +168,18 @@ const AssessmentActivity = () => {
 
                         <h2
                             className="
-                                lg:text-[90px] text-[60px]
+                                lg:text-[90px]
+                                text-[60px]
                                 font-light
                                 tracking-[0.35em]
                             "
                         >
-                            {currentActivity.word}
+                            {currentActivity.promptText}
                         </h2>
 
                     </div>
 
                 </div>
-
-                
 
                 {/* ========================================== */}
                 {/* Worksheet Section */}
@@ -229,6 +198,7 @@ const AssessmentActivity = () => {
                         mx-auto
                     "
                 >
+
                     {/* Progress */}
 
                     <div
@@ -244,63 +214,28 @@ const AssessmentActivity = () => {
                         <div
                             className="
                                 bg-sky-200
-
                                 border-[4px]
                                 border-sky-500
-
                                 rounded-full
-
                                 px-12
                                 py-2
-
                                 text-4xl
                                 font-black
                                 text-sky-700
                             "
                         >
 
-                            {currentActivity.progress}
+                            {currentActivityIndex + 1}
 
                             {" / "}
 
-                            {currentActivity.total}
+                            {activities.length}
 
                         </div>
 
                     </div>
 
-                    {/* Illustration */}
-
-                    <div
-                        className="
-                            flex
-                            justify-center
-                            items-start
-                            self-start
-                            pt-6
-                            absolute
-                            z-1
-                            lg:bottom-[80%] bottom-[80%]
-                            -left-10
-                        "
-                    >
-
-                        <img
-                            src={illustration}
-                            alt={currentActivity.word}
-                            className="
-                                lg:w-80
-                                object-contain
-                                select-none
-                                pointer-events-none
-                            "
-                        />
-
-                    </div>
-
-                    {/* ====================================== */}
                     {/* Worksheet Card */}
-                    {/* ====================================== */}
 
                     <div
                         className="
@@ -308,37 +243,18 @@ const AssessmentActivity = () => {
                             flex-1
                             h-full
                             max-h-[700px]
-
                             rounded-[40px]
-
                             bg-white
-
-
                             shadow-2xl
-
                             overflow-hidden
                         "
                     >
 
-                        {/* Worksheet */}
-
-                        <div
-                            className="
-                                inset-0
-                            "
-                        >
-
-                            <HandwritingWorksheet
-
-                                key={currentActivityIndex}
-
-                                ref={canvasRef}
-
-                                word={currentActivity.word}
-
-                            />
-
-                        </div>
+                        <HandwritingWorksheet
+                            key={currentActivityIndex}
+                            ref={canvasRef}
+                            activity={currentActivity}
+                        />
 
                     </div>
 
@@ -357,13 +273,9 @@ const AssessmentActivity = () => {
                 >
 
                     <HandwritingToolbar
-
                         onClear={handleClear}
-
                         onCheck={handleCheck}
-
-                        disabled={!canCheck}
-
+                        disableCheck={!canCheck}
                     />
 
                 </div>
@@ -380,7 +292,7 @@ const AssessmentActivity = () => {
 
     function handleClear() {
 
-        canvasRef.current?.clear();
+        canvasRef.current?.clear?.();
 
     }
 
@@ -390,86 +302,148 @@ const AssessmentActivity = () => {
 
     async function handleCheck() {
 
+        // ======================================
+        // Capture Student Writing
+        // ======================================
+
         const image =
-        canvasRef.current?.exportImage?.();
-    
+            canvasRef.current?.exportImage?.();
+
         const strokes =
             canvasRef.current?.getStrokes?.() || [];
-        
+
+        // ======================================
+        // Capture Actual Guide Position
+        // ======================================
+
+        const guide =
+            canvasRef.current?.getGuideMetrics?.();
+
         // ======================================
         // Validation
         // ======================================
-        
+
         const hasWriting =
 
             strokes.some(
-        
+
                 stroke =>
-        
+
+                    Array.isArray(stroke) &&
                     stroke.length > 1
-        
+
             );
-        
+
         if (!hasWriting) {
-        
+
             alert(
-        
-                "Please write the word before checking."
-        
+                "Please complete the activity before checking."
             );
-        
+
             return;
-        
+
         }
-    
-        await AssessmentService.saveActivity(
-    
-            assessmentId,
-    
+
+        // ======================================
+        // Debug
+        // ======================================
+
+        console.log(
+            "Assessment Activity:",
             {
-    
-                activityNo: currentActivityIndex + 1,
-    
-                activityCategory: currentActivity.category,
-    
-                promptText: currentActivity.word,
-    
-                promptType: "Word",
-    
-                completionTime: 0,
-    
-                penLifts: strokes.length,
-    
-                strokeCount: strokes.length,
-    
-                image,
-    
+                activityNo:
+                    currentActivityIndex + 1,
+
+                activityCategory:
+                    currentActivity.category,
+
+                activityType:
+                    currentActivity.activityType,
+
+                promptText:
+                    currentActivity.promptText,
+
+                guide,
+
                 strokes,
-    
+
             }
-    
         );
-    
-        canvasRef.current.clear();
-    
+
+        // ======================================
+        // Save Activity
+        // ======================================
+
+        await AssessmentService.saveActivity(
+
+            assessmentId,
+
+            {
+
+                activityNo:
+                    currentActivityIndex + 1,
+
+                activityCategory:
+                    currentActivity.category,
+
+                activityName:
+                    currentActivity.activityName,
+
+                activityType:
+                    currentActivity.activityType,
+
+                promptText:
+                    currentActivity.promptText,
+
+                promptType:
+                    currentActivity.promptType,
+
+                completionTime:
+                    0,
+
+                penLifts:
+                    strokes.length,
+
+                strokeCount:
+                    strokes.length,
+
+                image,
+
+                strokes,
+
+                guide,
+
+            }
+
+        );
+
+        // ======================================
+        // Clear Current Activity
+        // ======================================
+
+        canvasRef.current?.clear?.();
+
+        // ======================================
+        // Next Activity / Analysis
+        // ======================================
+
         if (
-    
+
             currentActivityIndex ===
-    
             activities.length - 1
-    
+
         ) {
-    
+
             goToPage("analysis");
-    
+
         }
-    
+
         else {
-    
+
             nextActivity();
-    
+
         }
-    
+
     }
 
 };

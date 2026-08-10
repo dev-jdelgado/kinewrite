@@ -1,18 +1,18 @@
-@import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 @font-face {
+    font-family: "KGPrimaryDots";
 
-  font-family: "KGPrimaryDots";
+    src: url("./assets/fonts/KGPrimaryDots.ttf")
+        format("truetype");
 
-  src: url("./assets/fonts/KGPrimaryDots.ttf")
-      format("truetype");
+    font-weight: normal;
 
-  font-weight: normal;
-
-  font-style: normal;
-
+    font-style: normal;
 }
 
 html,
@@ -39,41 +39,54 @@ select {
 }
 
 @keyframes spin-slow {
+
     from {
         transform: rotate(0deg);
     }
-    to{
+
+    to {
         transform: rotate(360deg);
     }
+
 }
+
 .animate-spin-slow {
-  animation: spin-slow 10s linear infinite;
+    animation: spin-slow 10s linear infinite;
 }
 
 @keyframes swing {
-  0% {
-    transform: rotate(-8deg);
-  }
 
-  50% {
-    transform: rotate(8deg);
-  }
+    0% {
+        transform: rotate(-8deg);
+    }
 
-  100% {
-    transform: rotate(-8deg);
-  }
+    50% {
+        transform: rotate(8deg);
+    }
+
+    100% {
+        transform: rotate(-8deg);
+    }
+
 }
 
 .animate-swing {
-  animation: swing 5s ease-in-out infinite;
-  transform-origin: top center;
+    animation: swing 5s ease-in-out infinite;
+    transform-origin: top center;
 }
 
 .assessment-writing,
 .assessment-writing * {
-
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
+}
 
+/* ==========================================
+   KineWrite Handwriting Guide
+   ========================================== */
+
+.kinewrite-handwriting-guide {
+    font-family: "Poppins", Arial, Helvetica, sans-serif;
+    font-weight: 300;
 }

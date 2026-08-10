@@ -174,21 +174,24 @@ const AssessmentResults = () => {
             >
 
                 <ScoreCard
-                    icon={<AlignHorizontalSpaceAround size={34} />}
                     title="Spacing"
-                    score={analysis.spacing?.score ?? 0}
+                    score={Number(
+                        analysis.breakdown?.spacing?.score ?? 0
+                    ).toFixed(1)}
                 />
 
                 <ScoreCard
-                    icon={<MoveVertical size={34} />}
                     title="Alignment"
-                    score={analysis.alignment?.score ?? 0}
+                    score={Number(
+                        analysis.breakdown?.alignment?.score ?? 0
+                    ).toFixed(1)}
                 />
 
                 <ScoreCard
-                    icon={<PenTool size={34} />}
                     title="Stroke"
-                    score={analysis.stroke?.score ?? 0}
+                    score={Number(
+                        analysis.breakdown?.stroke?.score ?? 0
+                    ).toFixed(1)}
                 />
 
             </div>
