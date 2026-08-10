@@ -46,47 +46,102 @@ class AssessmentService {
     static async saveActivity({
 
         assessmentId,
+
         activityNo,
+
         activityCategory,
+
         activityName,
+
         activityType,
+
         promptText,
+
         promptType,
+
         completionTime,
+
         penLifts,
+
         strokeCount,
+
         image,
+
         strokes,
-        guide,
-    
+
     }) {
 
+        // ==========================================
+        // Validate Assessment ID
+        // ==========================================
+
+        const numericAssessmentId =
+            Number(
+                assessmentId
+            );
+
+
+        if (
+            !Number.isInteger(
+                numericAssessmentId
+            ) ||
+            numericAssessmentId <= 0
+        ) {
+
+            throw new Error(
+                "Invalid assessment ID."
+            );
+
+        }
+
+
+        // ==========================================
+        // Create Assessment Attempt
+        // ==========================================
+
         const attemptId =
-        await AssessmentAttempt.create({
-    
-            assessmentId,
-            activityNo,
-            activityCategory,
-            activityName,
-            activityType,
-            promptText,
-            promptType,
-            completionTime,
-            penLifts,
-            strokeCount,
-        });
+            await AssessmentAttempt.create({
+
+                assessmentId:
+                    numericAssessmentId,
+
+                activityNo,
+
+                activityCategory,
+
+                activityName,
+
+                activityType,
+
+                promptText,
+
+                promptType,
+
+                completionTime,
+
+                penLifts,
+
+                strokeCount,
+
+            });
+
+
+        // ==========================================
+        // Save Handwriting Sample
+        // ==========================================
 
         await HandwritingSample.create({
 
             attemptId,
-        
-            imagePath: image,
-        
-            strokeJson: strokes,
-        
-            guideJson: guide,
-        
+
+            imagePath:
+                image,
+
+            strokeJson:
+                strokes,
+
         });
+
 
         return attemptId;
 
