@@ -76,21 +76,68 @@ class AssessmentService {
         // ==========================================
 
         const numericAssessmentId =
-            Number(
-                assessmentId
-            );
+            Number(assessmentId);
 
 
         if (
-            !Number.isInteger(
-                numericAssessmentId
-            ) ||
+            !Number.isInteger(numericAssessmentId) ||
             numericAssessmentId <= 0
         ) {
 
             throw new Error(
                 "Invalid assessment ID."
             );
+
+        }
+
+
+        // ==========================================
+        // Normalize Activity Category
+        // ==========================================
+
+        const normalizedCategory =
+
+            String(
+                activityCategory || ""
+            )
+                .trim()
+                .toLowerCase();
+
+
+        let databaseCategory;
+
+
+        switch (normalizedCategory) {
+
+            case "spacing":
+
+                databaseCategory =
+                    "Spacing";
+
+                break;
+
+
+            case "alignment":
+
+                databaseCategory =
+                    "Alignment";
+
+                break;
+
+
+            case "stroke":
+
+                databaseCategory =
+                    "Stroke";
+
+                break;
+
+
+            default:
+
+                throw new Error(
+                    `Invalid activity category: ${activityCategory}`
+                );
 
         }
 
@@ -107,7 +154,8 @@ class AssessmentService {
 
                 activityNo,
 
-                activityCategory,
+                activityCategory:
+                    databaseCategory,
 
                 activityName,
 
