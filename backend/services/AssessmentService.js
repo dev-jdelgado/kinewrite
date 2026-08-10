@@ -208,13 +208,6 @@ class AssessmentService {
                     ?.trim()
                     .toLowerCase();
             
-            console.log("================================");
-            console.log("Category:", category);
-            console.log("Attempt ID:", attempt.attempt_id);
-            console.log("Sample:", sample);
-            console.log("Stroke JSON:", sample?.stroke_json);
-            console.log("Is Array:", Array.isArray(sample?.stroke_json));
-            
             if (
                 !categories[category]
             ) {
