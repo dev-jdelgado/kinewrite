@@ -1,6 +1,6 @@
 import React from "react";
 import BgLogin from '../assets/login/Loginbg.png'
-import BgLoginDark from "../assets/login/Darkmodemoon.png";
+import BgLoginDark from "../assets/login/Darkmodemoon1.png";
 import { useTheme } from "../contexts/ThemeContext";
 import BlueLogin from "../assets/login/Lightbg.png";
 

@@ -142,8 +142,13 @@ export default function ProfileSection() {
                 {/* !!!REMOVED CONTENT for Profile Image and Name!!! */}
                 <div className="flex items-center gap-4 mb-6">
                     <div
-                        className="relative w-28 h-28 cursor-pointer"
-                        onClick={() => fileInputRef.current.click()}
+                        className={`relative w-28 h-28 ${isEditing ? "cursor-pointer" : "cursor-default"
+                            }`}
+                        onClick={() => {
+                            if (isEditing) {
+                                fileInputRef.current.click();
+                            }
+                        }}
                     >
                         {image || admin?.profile_image ? (
                             <img
@@ -159,9 +164,11 @@ export default function ProfileSection() {
                             <FaUserCircle className="w-28 h-28 text-gray-400" />
                         )}
 
-                        <div className="absolute bottom-0 right-0 bg-blue-400 p-2 rounded-full text-white">
-                            <FaCamera />
-                        </div>
+                        {isEditing && (
+                            <div className="absolute bottom-0 right-0 bg-blue-500 p-2 rounded-full text-white shadow-lg">
+                                <FaCamera />
+                            </div>
+                        )}
 
                         <input
                             type="file"
