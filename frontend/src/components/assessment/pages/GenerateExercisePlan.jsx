@@ -75,6 +75,7 @@ const GenerateExercisePlan = () => {
 
         <div
             className="
+                py-10
                 max-w-6xl
                 mx-auto
             "
