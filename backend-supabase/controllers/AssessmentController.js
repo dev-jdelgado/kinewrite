@@ -174,7 +174,7 @@ class AssessmentController {
 
 
             const numericAssessmentId =
-                this.getValidAssessmentId(
+                AssessmentController.getValidAssessmentId(
                     assessmentId
                 );
 
@@ -308,7 +308,7 @@ class AssessmentController {
 
 
             const numericAssessmentId =
-                this.getValidAssessmentId(
+                AssessmentController.getValidAssessmentId(
                     assessmentId
                 );
 
@@ -389,7 +389,7 @@ class AssessmentController {
 
 
             const numericAssessmentId =
-                this.getValidAssessmentId(
+                AssessmentController.getValidAssessmentId(
                     assessmentId
                 );
 
