@@ -302,26 +302,17 @@ const AssessmentActivity = () => {
 
     async function handleCheck() {
 
-        // ======================================
-        // Capture Student Writing
-        // ======================================
-
         const image =
             canvasRef.current?.exportImage?.();
-
+        
+        const referenceImage =
+            await canvasRef.current?.exportReferenceImage?.();
+        
         const strokes =
             canvasRef.current?.getStrokes?.() || [];
-
-        // ======================================
-        // Capture Actual Guide Position
-        // ======================================
-
+        
         const guide =
             canvasRef.current?.getGuideMetrics?.();
-
-        // ======================================
-        // Validation
-        // ======================================
 
         const hasWriting =
 
@@ -348,73 +339,70 @@ const AssessmentActivity = () => {
         // Debug
         // ======================================
 
-        console.log(
-            "Assessment Activity:",
-            {
-                activityNo:
-                    currentActivityIndex + 1,
+        // console.log(
+        //     "Assessment Activity:",
+        //     {
+        //         activityNo:
+        //             currentActivityIndex + 1,
 
-                activityCategory:
-                    currentActivity.category,
+        //         activityCategory:
+        //             currentActivity.category,
 
-                activityType:
-                    currentActivity.activityType,
+        //         activityType:
+        //             currentActivity.activityType,
 
-                promptText:
-                    currentActivity.promptText,
+        //         promptText:
+        //             currentActivity.promptText,
 
-                guide,
+        //         guide,
 
-                strokes,
+        //         strokes,
 
-            }
-        );
+        //     }
+        // );
 
         // ======================================
         // Save Activity
         // ======================================
 
         await AssessmentService.saveActivity(
-
             assessmentId,
-
             {
-
                 activityNo:
                     currentActivityIndex + 1,
-
+        
                 activityCategory:
                     currentActivity.category,
-
+        
                 activityName:
                     currentActivity.activityName,
-
+        
                 activityType:
                     currentActivity.activityType,
-
+        
                 promptText:
                     currentActivity.promptText,
-
+        
                 promptType:
                     currentActivity.promptType,
-
+        
                 completionTime:
                     0,
-
+        
                 penLifts:
                     strokes.length,
-
+        
                 strokeCount:
                     strokes.length,
-
+        
                 image,
-
+        
+                referenceImage,
+        
                 strokes,
-
+        
                 guide,
-
             }
-
         );
 
         // ======================================

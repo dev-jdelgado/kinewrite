@@ -3,6 +3,9 @@ const AssessmentAttempt = require("../models/AssessmentAttempt");
 const HandwritingSample = require("../models/HandwritingSample");
 const AssessmentAnalysis = require("../models/AssessmentAnalysis");
 
+const ReferenceFitAnalyzer =
+    require("../utils/handwriting/ReferenceFitAnalyzer");
+
 const HandwritingAnalyzer =
     require("../utils/HandwritingAnalyzer");
 
@@ -14,6 +17,7 @@ const Student =
 
 const pool =
     require("../config/db");
+
 
 class AssessmentService {
 
@@ -39,6 +43,7 @@ class AssessmentService {
 
     }
 
+
     // ==========================================
     // Save Activity
     // ==========================================
@@ -46,51 +51,87 @@ class AssessmentService {
     static async saveActivity({
 
         assessmentId,
+
         activityNo,
+
         activityCategory,
+
         activityName,
+
         activityType,
+
         promptText,
+
         promptType,
+
         completionTime,
+
         penLifts,
+
         strokeCount,
+
         image,
+
+        referenceImage,
+
         strokes,
+
         guide,
-    
+
     }) {
 
         const attemptId =
-        await AssessmentAttempt.create({
-    
-            assessmentId,
-            activityNo,
-            activityCategory,
-            activityName,
-            activityType,
-            promptText,
-            promptType,
-            completionTime,
-            penLifts,
-            strokeCount,
-        });
+            await AssessmentAttempt.create({
+
+                assessmentId,
+
+                activityNo,
+
+                activityCategory,
+
+                activityName,
+
+                activityType,
+
+                promptText,
+
+                promptType,
+
+                completionTime,
+
+                penLifts,
+
+                strokeCount,
+
+            });
+
 
         await HandwritingSample.create({
 
             attemptId,
-        
-            imagePath: image,
-        
-            strokeJson: strokes,
-        
-            guideJson: guide,
-        
+
+            imagePath:
+                image,
+
+            strokeJson:
+                strokes,
+
+            guideJson: {
+
+                referenceImage,
+
+                metrics:
+                    guide,
+
+            },
+
         });
+
 
         return attemptId;
 
     }
+
 
     // ==========================================
     // Load Assessment Attempts
@@ -110,6 +151,7 @@ class AssessmentService {
 
     }
 
+
     // ==========================================
     // Load Samples
     // ==========================================
@@ -120,29 +162,33 @@ class AssessmentService {
 
     ) {
 
-        const samples = await Promise.all(
+        const samples =
+            await Promise.all(
 
-            attempts.map(async attempt => {
+                attempts.map(
+                    async attempt => {
 
-                const sample =
+                        const sample =
+                            await HandwritingSample.findByAttempt(
 
-                    await HandwritingSample.findByAttempt(
+                                attempt.attempt_id
 
-                        attempt.attempt_id
+                            );
 
-                    );
 
-                return {
+                        return {
 
-                    attempt,
+                            attempt,
 
-                    sample,
+                            sample,
 
-                };
+                        };
 
-            })
+                    }
+                )
 
-        );
+            );
+
 
         return samples;
 
@@ -164,19 +210,19 @@ class AssessmentService {
             alignment: {
 
                 attempts: [],
-            
+
                 samples: [],
-            
+
                 strokes: [],
-            
+
             },
 
             spacing: {
 
                 attempts: [],
-            
+
                 samples: [],
-            
+
                 strokes: [],
 
             },
@@ -184,16 +230,19 @@ class AssessmentService {
             stroke: {
 
                 attempts: [],
-            
+
                 samples: [],
-            
+
                 strokes: [],
 
             },
 
         };
 
-        for (const item of samples) {
+
+        for (
+            const item of samples
+        ) {
 
             const {
 
@@ -203,64 +252,146 @@ class AssessmentService {
 
             } = item;
 
+
             const category =
                 attempt.activity_category
                     ?.trim()
                     .toLowerCase();
-            
+
+
             if (
                 !categories[category]
             ) {
+
                 continue;
+
             }
 
-            categories[category]
-
-                .attempts
-
-                .push(attempt);
-
-            categories[category]
-
-                .samples
-                
-                .push(sample);
 
             if (
+                !sample
+            ) {
 
-                sample &&
+                continue;
 
+            }
+
+
+            categories[category]
+                .attempts
+                .push(
+                    attempt
+                );
+
+
+            categories[category]
+                .samples
+                .push(
+                    sample
+                );
+
+
+            if (
                 Array.isArray(
-
                     sample.stroke_json
-
                 )
-
             ) {
 
                 categories[category]
-
                     .strokes
-
                     .push(
-
                         ...sample.stroke_json
-
                     );
 
             }
 
         }
 
-        
-        console.log("===== CATEGORY TOTALS =====");
-        console.log("Alignment:", categories.alignment.strokes.length);
-        console.log("Spacing:", categories.spacing.strokes.length);
-        console.log("Stroke:", categories.stroke.strokes.length);
-        
+
         return categories;
 
     }
+
+
+    // ==========================================
+    // Check Reference-Fit Samples
+    // ==========================================
+
+    static hasReferenceFitSamples(
+
+        categoryData
+
+    ) {
+
+        if (
+            !categoryData ||
+            !Array.isArray(
+                categoryData.samples
+            )
+        ) {
+
+            return false;
+
+        }
+
+
+        return categoryData.samples.some(
+
+            sample => {
+
+                if (
+                    !sample
+                ) {
+
+                    return false;
+
+                }
+
+
+                const studentImage =
+                    sample.image_path;
+
+
+                let guideData =
+                    sample.guide_json;
+
+
+                if (
+                    typeof guideData === "string"
+                ) {
+
+                    try {
+
+                        guideData =
+                            JSON.parse(
+                                guideData
+                            );
+
+                    } catch (error) {
+
+                        guideData =
+                            null;
+
+                    }
+
+                }
+
+
+                const referenceImage =
+                    guideData?.referenceImage;
+
+
+                return Boolean(
+                    studentImage &&
+                    referenceImage
+                );
+
+            }
+
+        );
+
+    }
+
 
     // ==========================================
     // Analyze Assessment
@@ -272,132 +403,236 @@ class AssessmentService {
 
     ) {
 
+        // ==========================================
+        // Load Attempts
+        // ==========================================
+
         const attempts =
             await this.loadAssessmentAttempts(
-        
+
                 assessmentId
-        
-            );
-        
-        if (
-        
-            attempts.length === 0
-        
-        ) {
-        
-            throw new Error(
-        
-                "No assessment attempts found."
-        
-            );
-        
-        }
-        
-        // ==========================================
-        // Load Handwriting Samples
-        // ==========================================
-        
-        const samples =
-            await this.loadHandwritingSamples(
-        
-                attempts
-        
+
             );
 
+
+        if (
+            attempts.length === 0
+        ) {
+
+            throw new Error(
+                "No assessment attempts found."
+            );
+
+        }
+
+
         // ==========================================
-        // Categorize Activities
+        // Load Samples
         // ==========================================
-        
+
+        const samples =
+            await this.loadHandwritingSamples(
+
+                attempts
+
+            );
+
+
+        // ==========================================
+        // Categorize
+        // ==========================================
+
         const categories =
             this.categorizeActivities(
-        
+
                 samples
-        
+
+            );
+
+
+        // ==========================================
+        // Determine Available Categories
+        // ==========================================
+
+        const hasAlignment =
+            categories.alignment.strokes.length > 0;
+
+        const hasSpacing =
+            categories.spacing.strokes.length > 0;
+
+        const hasStroke =
+            categories.stroke.strokes.length > 0;
+
+        const hasAlignmentReference =
+            this.hasReferenceFitSamples(
+                categories.alignment
             );
         
+        const hasSpacingReference =
+            this.hasReferenceFitSamples(
+                categories.spacing
+            );
+
+
         // ==========================================
         // Validate Categories
         // ==========================================
-        
-        const hasAlignment =
-        
-            categories.alignment.strokes.length > 0;
-        
-        const hasSpacing =
-        
-            categories.spacing.strokes.length > 0;
-        
-        const hasStroke =
-        
-            categories.stroke.strokes.length > 0;
-        
+
         if (
-        
             !hasAlignment &&
-        
             !hasSpacing &&
-        
             !hasStroke
-        
         ) {
-    
-        throw new Error(
-    
-            "No handwriting samples were found."
-    
-        );
-    
-    }
+
+            throw new Error(
+                "No handwriting samples were found."
+            );
+
+        }
+
 
         // ==========================================
         // Analyze Alignment
+        //
+        // DO NOT CHANGE CURRENT ALIGNMENT BEHAVIOR
         // ==========================================
 
         const alignmentAnalysis =
 
-            hasAlignment
+            hasAlignmentReference
 
-                ? HandwritingAnalyzer.analyze(
+                ? ReferenceFitAnalyzer.analyze({
 
-                    categories.alignment,
+                    samples:
+                        categories.alignment.samples,
 
-                    {
+                    options: {
 
-                        category: "alignment",
+                        preservePosition:
+                            false,
 
-                    }
+                        toleranceRadius:
+                            8,
 
-                )
+                        maxDistance:
+                            20,
+
+                    },
+
+                })
 
                 : null;
 
+
         // ==========================================
         // Analyze Spacing
+        //
+        // Saved student image + saved guide image
+        // remain PRIMARY.
+        //
+        // Geometry remains SECONDARY.
         // ==========================================
 
-        const spacingAnalysis =
+        const spacingGeometry =
 
-            hasSpacing
+            categories.spacing.attempts.length > 0
 
                 ? HandwritingAnalyzer.analyze(
 
                     categories.spacing,
 
                     {
-
                         category: "spacing",
-
                     }
 
                 )
 
                 : null;
 
+
+        const spacingReference =
+
+            hasSpacingReference
+            
+                ? ReferenceFitAnalyzer.analyze({
+            
+                    samples:
+                        categories.spacing.samples,
+            
+                    options: {
+            
+                        preservePosition:
+                            true,
+            
+                        toleranceRadius:
+                            12,
+            
+                        maxDistance:
+                            30,
+            
+                        referenceThreshold:
+                            245,
+            
+                    },
+            
+                })
+            
+                : null;
+
+
+        const spacingAnalysis =
+
+            spacingReference
+
+                ? {
+
+                    ...(spacingGeometry || {}),
+
+                    category:
+                        "spacing",
+
+                    score:
+                        Number(
+
+                            (
+
+                                (
+                                    spacingReference.score *
+                                    0.80
+                                )
+
+                                +
+
+                                (
+                                    (
+                                        spacingGeometry?.score ??
+                                        0
+                                    )
+
+                                    *
+                                    0.20
+                                )
+
+                            ).toFixed(2)
+
+                        ),
+
+                    referenceFit:
+                        spacingReference,
+
+                    spacingMetrics:
+                        spacingGeometry,
+
+                }
+
+                : spacingGeometry;
+
+
         // ==========================================
         // Analyze Stroke
         // ==========================================
 
-        const strokeAnalysis =
+        const strokeGeometry =
 
             hasStroke
 
@@ -406,12 +641,94 @@ class AssessmentService {
                     categories.stroke,
 
                     {
-
                         category: "stroke",
-
                     }
 
                 )
+
+                : null;
+
+
+        const strokeReference =
+
+            hasStroke
+            
+                ? ReferenceFitAnalyzer.analyze({
+            
+                    samples:
+                        categories.stroke.samples,
+            
+                    options: {
+            
+                        preservePosition:
+                            true,
+            
+                        toleranceRadius:
+                            10,
+            
+                        maxDistance:
+                            24,
+            
+                        referenceThreshold:
+                            245,
+            
+                    },
+            
+                })
+            
+                : null;
+
+
+        // ==========================================
+        // Stroke Final Score
+        //
+        // Reference = PRIMARY
+        // Geometry = SECONDARY
+        // ==========================================
+
+        const strokeAnalysis =
+
+            strokeGeometry
+
+                ? {
+
+                    ...strokeGeometry,
+
+                    category:
+                        "stroke",
+
+                    score:
+                        Number(
+
+                            (
+
+                                (
+                                    (
+                                        strokeReference?.valid
+                                            ? strokeReference.score
+                                            : strokeGeometry.score
+                                    ) *
+                                    0.85
+                                )
+
+                                +
+
+                                (
+                                    strokeGeometry.score *
+                                    0.15
+                                )
+
+                            ).toFixed(2)
+
+                        ),
+
+                    referenceFit:
+                        strokeReference,
+
+                    strokeMetrics:
+                        strokeGeometry,
+
+                }
 
                 : null;
 
@@ -420,120 +737,173 @@ class AssessmentService {
         // Calculate Overall Assessment
         // ==========================================
 
-        const analysis = ScoreCalculator.calculate({
+        const analysis =
+            ScoreCalculator.calculate({
 
-            alignment: alignmentAnalysis,
+                alignment:
+                    alignmentAnalysis,
 
-            spacing: spacingAnalysis,
+                spacing:
+                    spacingAnalysis,
 
-            stroke: strokeAnalysis,
+                stroke:
+                    strokeAnalysis,
 
-        });
+            });
+
+
+        // ==========================================
+        // Save Assessment Analysis
+        // ==========================================
 
         await AssessmentAnalysis.create({
 
             assessmentId,
-        
+
             alignmentScore:
                 analysis.breakdown.alignment?.score ?? 0,
-        
+
             spacingScore:
                 analysis.breakdown.spacing?.score ?? 0,
-        
+
             strokeScore:
                 analysis.breakdown.stroke?.score ?? 0,
-        
+
             overallScore:
                 analysis.overallScore,
-        
+
             classification:
                 analysis.classification,
-        
+
         });
+
+
+        // ==========================================
+        // Update Assessment
+        // ==========================================
 
         await Assessment.updateScores({
 
             assessmentId,
-        
+
             alignmentScore:
                 analysis.breakdown.alignment?.score ?? 0,
-            
+
             spacingScore:
                 analysis.breakdown.spacing?.score ?? 0,
-            
+
             strokeScore:
                 analysis.breakdown.stroke?.score ?? 0,
-        
+
             overallScore:
                 analysis.overallScore,
-        
+
             classification:
                 analysis.classification,
-        
+
             recommendedLevel:
                 analysis.therapyLevel,
-        
+
             remarks:
                 analysis.remarks,
-        
+
         });
 
+
         // ==========================================
-        // Update Student
+        // Update Student Progress
         // ==========================================
 
         const assessment =
-
             await Assessment.findById(
 
                 assessmentId
 
             );
 
-        const connection = await pool.getConnection();
 
-            try {
-            
-                await connection.beginTransaction();
-            
-                await Student.initializeProgress(connection, {
-                    studentId: assessment.student_id,
-                    currentLevel: analysis.therapyLevel,
-                    classification: analysis.classification,
-                });
-                
-                await Student.completeAssessment(connection, {
-                    studentId: assessment.student_id,
+        const connection =
+            await pool.getConnection();
+
+
+        try {
+
+            await connection.beginTransaction();
+
+
+            await Student.initializeProgress(
+                connection,
+                {
+
+                    studentId:
+                        assessment.student_id,
+
+                    currentLevel:
+                        analysis.therapyLevel,
+
+                    classification:
+                        analysis.classification,
+
+                }
+            );
+
+
+            await Student.completeAssessment(
+                connection,
+                {
+
+                    studentId:
+                        assessment.student_id,
+
                     assessmentId,
-                    classification: analysis.classification,
-                    level: analysis.therapyLevel,
-                    accuracy: analysis.overallScore,
-                });
-            
-                await connection.commit();
-            
-            } catch (error) {
-            
-                await connection.rollback();
-                throw error;
-            
-            } finally {
-            
-                connection.release();
-            
-            }
+
+                    classification:
+                        analysis.classification,
+
+                    level:
+                        analysis.therapyLevel,
+
+                    accuracy:
+                        analysis.overallScore,
+
+                }
+            );
+
+
+            await connection.commit();
+
+
+        } catch (error) {
+
+            await connection.rollback();
+
+            throw error;
+
+        } finally {
+
+            connection.release();
+
+        }
+
 
         console.log(
+
             JSON.stringify(
+
                 analysis,
+
                 null,
                 2
+
             )
+
         );
+
 
         return analysis;
 
     }
+
 
     // ==========================================
     // Get Assessment
@@ -552,6 +922,7 @@ class AssessmentService {
 
             );
 
+
         const attempts =
             await AssessmentAttempt.findByAssessment(
 
@@ -559,12 +930,14 @@ class AssessmentService {
 
             );
 
+
         const analysis =
             await AssessmentAnalysis.findByAssessment(
 
                 assessmentId
 
             );
+
 
         return {
 
@@ -577,6 +950,7 @@ class AssessmentService {
         };
 
     }
+
 
     // ==========================================
     // Student Assessment History
@@ -595,8 +969,9 @@ class AssessmentService {
         );
 
     }
-    
 
 }
 
-module.exports = AssessmentService;
+
+module.exports =
+    AssessmentService;

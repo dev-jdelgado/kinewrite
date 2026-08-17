@@ -7,6 +7,7 @@ import {
 import HandwritingCanvas from "./HandwritingCanvas";
 import StrokeGuide from "./StrokeGuide";
 
+
 const HandwritingWorksheet = forwardRef(
     (
         {
@@ -16,8 +17,11 @@ const HandwritingWorksheet = forwardRef(
     ) => {
 
         const worksheetRef = useRef(null);
+
         const guideRef = useRef(null);
+
         const canvasRef = useRef(null);
+
 
         if (!activity) {
 
@@ -25,10 +29,12 @@ const HandwritingWorksheet = forwardRef(
 
         }
 
+
         const {
             activityType,
             promptText,
         } = activity;
+
 
         // ==========================================
         // Display Settings
@@ -42,9 +48,11 @@ const HandwritingWorksheet = forwardRef(
 
                     return "min(90cqh, 28cqw)";
 
+
                 case "word":
 
                     return "min(72cqh, 23cqw)";
+
 
                 default:
 
@@ -53,6 +61,7 @@ const HandwritingWorksheet = forwardRef(
             }
 
         };
+
 
         // ==========================================
         // Letter Spacing
@@ -66,9 +75,11 @@ const HandwritingWorksheet = forwardRef(
 
                     return "0.08em";
 
+
                 case "word":
 
                     return "0.20em";
+
 
                 default:
 
@@ -77,6 +88,7 @@ const HandwritingWorksheet = forwardRef(
             }
 
         };
+
 
         // ==========================================
         // Guide Opacity
@@ -87,17 +99,9 @@ const HandwritingWorksheet = forwardRef(
                 ? 0.55
                 : 0.70;
 
+
         // ==========================================
         // Calculate Actual Text Baseline
-        // ==========================================
-        //
-        // The bottom of the DOM text element is NOT
-        // necessarily the typographic baseline.
-        //
-        // We measure the same font used by the guide
-        // and determine where the baseline sits inside
-        // the rendered line box.
-        //
         // ==========================================
 
         const getTextBaseline = (
@@ -114,27 +118,30 @@ const HandwritingWorksheet = forwardRef(
 
             }
 
+
             const computedStyle =
                 window.getComputedStyle(
                     guideElement
                 );
+
 
             const fontSize =
                 parseFloat(
                     computedStyle.fontSize
                 );
 
+
             const fontFamily =
                 computedStyle.fontFamily;
+
 
             const fontWeight =
                 computedStyle.fontWeight;
 
+
             const fontStyle =
                 computedStyle.fontStyle;
 
-            const fontStretch =
-                computedStyle.fontStretch;
 
             if (
                 !fontSize ||
@@ -145,15 +152,18 @@ const HandwritingWorksheet = forwardRef(
 
             }
 
-            // --------------------------------------
-            // Create measurement canvas
-            // --------------------------------------
 
             const measurementCanvas =
-                document.createElement("canvas");
+                document.createElement(
+                    "canvas"
+                );
+
 
             const measurementContext =
-                measurementCanvas.getContext("2d");
+                measurementCanvas.getContext(
+                    "2d"
+                );
+
 
             if (!measurementContext) {
 
@@ -161,25 +171,16 @@ const HandwritingWorksheet = forwardRef(
 
             }
 
-            // --------------------------------------
-            // Match the worksheet guide font
-            // --------------------------------------
 
             measurementContext.font =
                 `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+
 
             const metrics =
                 measurementContext.measureText(
                     promptText || "Ag"
                 );
 
-            // --------------------------------------
-            // Prefer font bounding box metrics
-            //
-            // These represent the font's actual
-            // typographic ascent/descent rather
-            // than just the visible ink.
-            // --------------------------------------
 
             const fontAscent =
                 Number.isFinite(
@@ -188,12 +189,14 @@ const HandwritingWorksheet = forwardRef(
                     ? metrics.actualBoundingBoxAscent
                     : metrics.fontBoundingBoxAscent;
 
+
             const fontDescent =
                 Number.isFinite(
                     metrics.actualBoundingBoxDescent
                 )
                     ? metrics.actualBoundingBoxDescent
                     : metrics.fontBoundingBoxDescent;
+
 
             if (
                 !Number.isFinite(fontAscent) ||
@@ -204,13 +207,484 @@ const HandwritingWorksheet = forwardRef(
 
             }
 
-            const baselineY =
-                guideRect.top +
-                fontAscent;
 
-            return baselineY;
+            return (
+                guideRect.top +
+                fontAscent
+            );
 
         };
+
+
+        // ==========================================
+        // Get Guide Metrics
+        // ==========================================
+
+        const getGuideMetrics = () => {
+
+            const worksheetElement =
+                worksheetRef.current;
+
+
+            const guideElement =
+                guideRef.current;
+
+
+            if (
+                !worksheetElement ||
+                !guideElement
+            ) {
+
+                return null;
+
+            }
+
+
+            const worksheetRect =
+                worksheetElement.getBoundingClientRect();
+
+
+            const guideRect =
+                guideElement.getBoundingClientRect();
+
+
+            const worksheetWidth =
+                worksheetRect.width;
+
+
+            const worksheetHeight =
+                worksheetRect.height;
+
+
+            const guideLeft =
+                guideRect.left -
+                worksheetRect.left;
+
+
+            const guideTop =
+                guideRect.top -
+                worksheetRect.top;
+
+
+            const guideRight =
+                guideRect.right -
+                worksheetRect.left;
+
+
+            const guideBottom =
+                guideRect.bottom -
+                worksheetRect.top;
+
+
+            const guideWidth =
+                guideRect.width;
+
+
+            const guideHeight =
+                guideRect.height;
+
+
+            const guideCenterX =
+                guideLeft +
+                (
+                    guideWidth / 2
+                );
+
+
+            const guideCenterY =
+                guideTop +
+                (
+                    guideHeight / 2
+                );
+
+
+            const absoluteGuideBaselineY =
+                getTextBaseline(
+                    guideElement,
+                    guideRect
+                );
+
+
+            const guideBaselineY =
+                absoluteGuideBaselineY -
+                worksheetRect.top;
+
+
+            return {
+
+                worksheet: {
+
+                    width:
+                        Number(
+                            worksheetWidth.toFixed(2)
+                        ),
+
+                    height:
+                        Number(
+                            worksheetHeight.toFixed(2)
+                        ),
+
+                },
+
+                guide: {
+
+                    left:
+                        Number(
+                            guideLeft.toFixed(2)
+                        ),
+
+                    top:
+                        Number(
+                            guideTop.toFixed(2)
+                        ),
+
+                    right:
+                        Number(
+                            guideRight.toFixed(2)
+                        ),
+
+                    bottom:
+                        Number(
+                            guideBottom.toFixed(2)
+                        ),
+
+                    width:
+                        Number(
+                            guideWidth.toFixed(2)
+                        ),
+
+                    height:
+                        Number(
+                            guideHeight.toFixed(2)
+                        ),
+
+                    centerX:
+                        Number(
+                            guideCenterX.toFixed(2)
+                        ),
+
+                    centerY:
+                        Number(
+                            guideCenterY.toFixed(2)
+                        ),
+
+                    baselineY:
+                        Number(
+                            guideBaselineY.toFixed(2)
+                        ),
+
+                },
+
+            };
+
+        };
+
+
+        // ==========================================
+        // Export Reference Image
+        // ==========================================
+        //
+        // Creates a clean PNG containing ONLY
+        // the reference guide.
+        //
+        // Student handwriting is NOT included.
+        //
+        // This becomes the reference image used
+        // by ReferenceFitAnalyzer.
+        //
+        // ==========================================
+
+        const exportReferenceImage = () => {
+
+            const worksheetElement =
+                worksheetRef.current;
+
+
+            const guideElement =
+                guideRef.current;
+
+
+            if (
+                !worksheetElement ||
+                !guideElement
+            ) {
+
+                return null;
+
+            }
+
+
+            // --------------------------------------
+            // Stroke guides are handled separately
+            // later.
+            // --------------------------------------
+
+            if (
+                activityType === "stroke"
+            ) {
+
+                return null;
+
+            }
+
+
+            const worksheetRect =
+                worksheetElement.getBoundingClientRect();
+
+
+            const guideRect =
+                guideElement.getBoundingClientRect();
+
+
+            const width =
+                Math.max(
+                    1,
+                    Math.round(
+                        worksheetRect.width
+                    )
+                );
+
+
+            const height =
+                Math.max(
+                    1,
+                    Math.round(
+                        worksheetRect.height
+                    )
+                );
+
+
+            const canvas =
+                document.createElement(
+                    "canvas"
+                );
+
+
+            canvas.width =
+                width;
+
+
+            canvas.height =
+                height;
+
+
+            const context =
+                canvas.getContext(
+                    "2d"
+                );
+
+
+            if (!context) {
+
+                return null;
+
+            }
+
+
+            // --------------------------------------
+            // Transparent background
+            // --------------------------------------
+
+            context.clearRect(
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            const computedStyle =
+                window.getComputedStyle(
+                    guideElement
+                );
+
+
+            const fontSize =
+                parseFloat(
+                    computedStyle.fontSize
+                );
+
+
+            const fontFamily =
+                computedStyle.fontFamily ||
+                "sans-serif";
+
+
+            const fontWeight =
+                computedStyle.fontWeight ||
+                "300";
+
+
+            const fontStyle =
+                computedStyle.fontStyle ||
+                "normal";
+
+
+            const letterSpacingValue =
+                computedStyle.letterSpacing;
+
+
+            let letterSpacing = 0;
+
+
+            if (
+                letterSpacingValue &&
+                letterSpacingValue !== "normal"
+            ) {
+
+                letterSpacing =
+                    parseFloat(
+                        letterSpacingValue
+                    ) || 0;
+
+            }
+
+
+            // --------------------------------------
+            // Match guide font
+            // --------------------------------------
+
+            context.font =
+                `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+
+
+            context.textBaseline =
+                "alphabetic";
+
+
+            context.fillStyle =
+                "rgba(100, 116, 139, 1)";
+
+
+            // --------------------------------------
+            // Determine guide position
+            // --------------------------------------
+
+            const guideX =
+                guideRect.left -
+                worksheetRect.left;
+
+
+            const guideY =
+                getTextBaseline(
+                    guideElement,
+                    guideRect
+                ) -
+                worksheetRect.top;
+
+
+            const text =
+                String(
+                    promptText || ""
+                );
+
+
+            // --------------------------------------
+            // Centered text with letter spacing
+            // --------------------------------------
+
+            if (
+                text.length === 0
+            ) {
+
+                return null;
+
+            }
+
+
+            if (
+                text.length === 1 ||
+                letterSpacing === 0
+            ) {
+
+                context.fillText(
+                    text,
+                    guideX,
+                    guideY
+                );
+
+            } else {
+
+                const characterWidths =
+                    [];
+
+
+                let totalTextWidth = 0;
+
+
+                for (
+                    const character of text
+                ) {
+
+                    const characterWidth =
+                        context.measureText(
+                            character
+                        ).width;
+
+
+                    characterWidths.push(
+                        characterWidth
+                    );
+
+
+                    totalTextWidth +=
+                        characterWidth;
+
+                }
+
+
+                totalTextWidth +=
+                    letterSpacing *
+                    (
+                        text.length - 1
+                    );
+
+
+                const actualCenterX =
+                    (
+                        guideX +
+                        (
+                            guideRect.width / 2
+                        )
+                    );
+
+
+                let currentX =
+                    actualCenterX -
+                    (
+                        totalTextWidth / 2
+                    );
+
+
+                text.split("").forEach(
+                    (
+                        character,
+                        index
+                    ) => {
+
+                        context.fillText(
+                            character,
+                            currentX,
+                            guideY
+                        );
+
+
+                        currentX +=
+                            characterWidths[index] +
+                            letterSpacing;
+
+                    }
+                );
+
+            }
+
+
+            return canvas.toDataURL(
+                "image/png"
+            );
+
+        };
+
 
         // ==========================================
         // Expose Worksheet Methods
@@ -230,6 +704,7 @@ const HandwritingWorksheet = forwardRef(
 
                 },
 
+
                 getStrokes: () => {
 
                     return (
@@ -238,6 +713,7 @@ const HandwritingWorksheet = forwardRef(
                     );
 
                 },
+
 
                 hasWriting: () => {
 
@@ -248,6 +724,7 @@ const HandwritingWorksheet = forwardRef(
 
                 },
 
+
                 exportImage: () => {
 
                     return (
@@ -256,231 +733,151 @@ const HandwritingWorksheet = forwardRef(
 
                 },
 
+
+                // ----------------------------------
+                // NEW
+                // Reference Image
+                // ----------------------------------
+
+                exportReferenceImage: async () => {
+
+                    const worksheet = worksheetRef.current;
+                
+                    if (!worksheet) return null;
+                
+                    const rect =
+                        worksheet.getBoundingClientRect();
+                
+                    const width =
+                        Math.max(
+                            1,
+                            Math.round(rect.width)
+                        );
+                
+                    const height =
+                        Math.max(
+                            1,
+                            Math.round(rect.height)
+                        );
+                
+                    const canvas =
+                        document.createElement("canvas");
+                
+                    canvas.width = width;
+                    canvas.height = height;
+                
+                    const ctx =
+                        canvas.getContext("2d");
+                
+                    if (!ctx) return null;
+                
+                    if (activityType === "stroke") {
+                
+                        const svg =
+                            worksheet.querySelector("svg");
+                
+                        if (!svg) return null;
+                
+                        const clone =
+                            svg.cloneNode(true);
+                
+                        clone.setAttribute(
+                            "width",
+                            width
+                        );
+                
+                        clone.setAttribute(
+                            "height",
+                            height
+                        );
+                
+                        const blob =
+                            new Blob(
+                                [
+                                    new XMLSerializer()
+                                        .serializeToString(clone)
+                                ],
+                                {
+                                    type:
+                                        "image/svg+xml;charset=utf-8"
+                                }
+                            );
+                
+                        const url =
+                            URL.createObjectURL(blob);
+                
+                        try {
+                
+                            const image =
+                                new Image();
+                
+                            await new Promise(
+                                (
+                                    resolve,
+                                    reject
+                                ) => {
+                
+                                    image.onload =
+                                        resolve;
+                
+                                    image.onerror =
+                                        reject;
+                
+                                    image.src =
+                                        url;
+                
+                                }
+                            );
+                
+                            ctx.drawImage(
+                                image,
+                                0,
+                                0,
+                                width,
+                                height
+                            );
+                
+                        } finally {
+                
+                            URL.revokeObjectURL(
+                                url
+                            );
+                
+                        }
+                
+                        return canvas.toDataURL(
+                            "image/png"
+                        );
+                    }
+                
+                    // existing letter/word export...
+                },
+
+
                 // ----------------------------------
                 // Guide Metrics
                 // ----------------------------------
 
                 getGuideMetrics: () => {
 
-                    const worksheetElement =
-                        worksheetRef.current;
-
-                    const guideElement =
-                        guideRef.current;
-
-                    if (
-                        !worksheetElement ||
-                        !guideElement
-                    ) {
-
-                        return null;
-
-                    }
-
-                    const worksheetRect =
-                        worksheetElement.getBoundingClientRect();
-
-                    const guideRect =
-                        guideElement.getBoundingClientRect();
-
-                    const worksheetWidth =
-                        worksheetRect.width;
-
-                    const worksheetHeight =
-                        worksheetRect.height;
-
-                    // ----------------------------------
-                    // Guide position relative to
-                    // worksheet
-                    // ----------------------------------
-
-                    const guideLeft =
-                        guideRect.left -
-                        worksheetRect.left;
-
-                    const guideTop =
-                        guideRect.top -
-                        worksheetRect.top;
-
-                    const guideRight =
-                        guideRect.right -
-                        worksheetRect.left;
-
-                    const guideBottom =
-                        guideRect.bottom -
-                        worksheetRect.top;
-
-                    const guideWidth =
-                        guideRect.width;
-
-                    const guideHeight =
-                        guideRect.height;
-
-                    const guideCenterX =
-                        guideLeft +
-                        (guideWidth / 2);
-
-                    const guideCenterY =
-                        guideTop +
-                        (guideHeight / 2);
-
-                    // ----------------------------------
-                    // ACTUAL TYPOGRAPHIC BASELINE
-                    // ----------------------------------
-                    //
-                    // Do NOT use guideBottom.
-                    //
-                    // guideBottom represents the bottom
-                    // of the DOM text box, not the actual
-                    // baseline on which the student should
-                    // write.
-                    //
-                    // ----------------------------------
-
-                    const absoluteGuideBaselineY =
-                        getTextBaseline(
-                            guideElement,
-                            guideRect
-                        );
-
-                    const guideBaselineY =
-                        absoluteGuideBaselineY -
-                        worksheetRect.top;
-
-                    // ----------------------------------
-                    // Normalized values
-                    // ----------------------------------
-
-                    const normalizedGuideTop =
-                        worksheetHeight > 0
-                            ? guideTop / worksheetHeight
-                            : 0;
-
-                    const normalizedGuideBottom =
-                        worksheetHeight > 0
-                            ? guideBottom / worksheetHeight
-                            : 0;
-
-                    const normalizedGuideBaseline =
-                        worksheetHeight > 0
-                            ? guideBaselineY /
-                              worksheetHeight
-                            : 0;
-
-                    const normalizedGuideCenterY =
-                        worksheetHeight > 0
-                            ? guideCenterY /
-                              worksheetHeight
-                            : 0;
-
-                    return {
-
-                        worksheet: {
-
-                            width:
-                                Number(
-                                    worksheetWidth.toFixed(2)
-                                ),
-
-                            height:
-                                Number(
-                                    worksheetHeight.toFixed(2)
-                                ),
-
-                        },
-
-                        guide: {
-
-                            left:
-                                Number(
-                                    guideLeft.toFixed(2)
-                                ),
-
-                            top:
-                                Number(
-                                    guideTop.toFixed(2)
-                                ),
-
-                            right:
-                                Number(
-                                    guideRight.toFixed(2)
-                                ),
-
-                            bottom:
-                                Number(
-                                    guideBottom.toFixed(2)
-                                ),
-
-                            width:
-                                Number(
-                                    guideWidth.toFixed(2)
-                                ),
-
-                            height:
-                                Number(
-                                    guideHeight.toFixed(2)
-                                ),
-
-                            centerX:
-                                Number(
-                                    guideCenterX.toFixed(2)
-                                ),
-
-                            centerY:
-                                Number(
-                                    guideCenterY.toFixed(2)
-                                ),
-
-                            baselineY:
-                                Number(
-                                    guideBaselineY.toFixed(2)
-                                ),
-
-                        },
-
-                        normalized: {
-
-                            top:
-                                Number(
-                                    normalizedGuideTop.toFixed(6)
-                                ),
-
-                            bottom:
-                                Number(
-                                    normalizedGuideBottom.toFixed(6)
-                                ),
-
-                            baselineY:
-                                Number(
-                                    normalizedGuideBaseline.toFixed(6)
-                                ),
-
-                            centerY:
-                                Number(
-                                    normalizedGuideCenterY.toFixed(6)
-                                ),
-
-                        },
-
-                    };
+                    return getGuideMetrics();
 
                 },
 
             }),
+
             [
+                activityType,
                 promptText,
             ]
         );
+
 
         // ==========================================
         // Render Guide
         // ==========================================
 
         const renderGuide = () => {
-
-            // --------------------------------------
-            // Stroke Guides
-            // --------------------------------------
 
             if (
                 activityType === "stroke"
@@ -496,9 +893,6 @@ const HandwritingWorksheet = forwardRef(
 
             }
 
-            // --------------------------------------
-            // Letter / Word Guides
-            // --------------------------------------
 
             return (
 
@@ -534,6 +928,7 @@ const HandwritingWorksheet = forwardRef(
             );
 
         };
+
 
         return (
 
@@ -588,6 +983,7 @@ const HandwritingWorksheet = forwardRef(
 
                 </div>
 
+
                 {/* ====================================== */}
                 {/* Writing Canvas */}
                 {/* ====================================== */}
@@ -614,7 +1010,9 @@ const HandwritingWorksheet = forwardRef(
     }
 );
 
+
 HandwritingWorksheet.displayName =
     "HandwritingWorksheet";
+
 
 export default HandwritingWorksheet;

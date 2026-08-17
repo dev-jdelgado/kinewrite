@@ -42,7 +42,6 @@ const AssessmentContent = () => {
         setActivities,
         setLoading,
         setError,
-        resetAssessment,
         loading,
         error,
     } = useAssessment();
@@ -99,24 +98,162 @@ const AssessmentContent = () => {
 
 
                 // ==========================================
-                // Activities
+                // Load Activities
+                // ==========================================
+
+                const allActivities =
+                    requestedType === "post"
+                        ? postAssessmentActivities
+                        : preAssessmentActivities;
+
+
+                // ==========================================
+                // DEVELOPER TEST FILTER
+                //
+                // Examples:
+                //
+                // ?category=spacing
+                // ?category=stroke
+                //
+                // ?category=spacing&test=CAT
+                // ?category=stroke&test=Horizontal
+                //
+                // No parameters = normal 17-test assessment
+                // ==========================================
+
+                const testCategory =
+                    searchParams
+                        .get("category")
+                        ?.trim()
+                        .toLowerCase();
+
+
+                const testName =
+                    searchParams
+                        .get("test")
+                        ?.trim()
+                        .toLowerCase();
+
+
+                let activities =
+                    allActivities;
+
+
+                // Filter by category
+                if (
+                    testCategory
+                ) {
+
+                    activities =
+                        activities.filter(
+                            (activity) => {
+
+                                const category =
+                                    String(
+                                        activity.category ||
+                                        activity.type ||
+                                        ""
+                                    )
+                                        .trim()
+                                        .toLowerCase();
+
+
+                                return (
+                                    category ===
+                                    testCategory
+                                );
+
+                            }
+                        );
+
+                }
+
+
+                // Filter by specific test
+                if (
+                    testName
+                ) {
+
+                    activities =
+                        activities.filter(
+                            (activity) => {
+
+                                const possibleNames = [
+
+                                    activity.name,
+
+                                    activity.title,
+
+                                    activity.label,
+
+                                    activity.activityName,
+
+                                    activity.testName,
+
+                                    activity.id,
+
+                                ]
+                                    .filter(Boolean)
+                                    .map(
+                                        value =>
+                                            String(value)
+                                                .trim()
+                                                .toLowerCase()
+                                    );
+
+
+                                return possibleNames.some(
+                                    value =>
+                                        value === testName ||
+                                        value.includes(testName)
+                                );
+
+                            }
+                        );
+
+                }
+
+
+                // ==========================================
+                // Validate Developer Filter
                 // ==========================================
 
                 if (
-                    requestedType === "post"
+                    activities.length === 0
                 ) {
 
-                    setActivities(
-                        postAssessmentActivities
-                    );
-
-                } else {
-
-                    setActivities(
-                        preAssessmentActivities
+                    throw new Error(
+                        testCategory || testName
+                            ? `No assessment activity found for "${testName || testCategory}".`
+                            : "No assessment activities available."
                     );
 
                 }
+
+
+                console.log(
+                    "Assessment activities loaded:",
+                    {
+                        totalAvailable:
+                            allActivities.length,
+
+                        loaded:
+                            activities.length,
+
+                        category:
+                            testCategory || "ALL",
+
+                        test:
+                            testName || "ALL",
+
+                        activities,
+                    }
+                );
+
+
+                setActivities(
+                    activities
+                );
 
 
                 // ==========================================
@@ -165,6 +302,12 @@ const AssessmentContent = () => {
                     {
                         studentId,
                         assessmentType,
+                        category:
+                            testCategory || "ALL",
+                        test:
+                            testName || "ALL",
+                        activityCount:
+                            activities.length,
                     }
                 );
 
@@ -222,7 +365,7 @@ const AssessmentContent = () => {
 
 
                 // ==========================================
-                // CRITICAL VALIDATION
+                // Validate Assessment ID
                 // ==========================================
 
                 if (
@@ -253,7 +396,7 @@ const AssessmentContent = () => {
 
 
                 // ==========================================
-                // Store Valid Assessment ID
+                // Store Assessment ID
                 // ==========================================
 
                 setAssessmentId(
@@ -308,6 +451,12 @@ const AssessmentContent = () => {
     }, [
         studentId,
         searchParams,
+        setActivities,
+        setAssessmentId,
+        setAssessmentType,
+        setError,
+        setLoading,
+        setStudent,
     ]);
 
 

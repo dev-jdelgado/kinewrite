@@ -76,68 +76,64 @@ class AssessmentController {
             const {
 
                 activityNo,
-
+            
                 activityCategory,
-
+            
                 activityName,
-
+            
                 activityType,
-
+            
                 promptText,
-
+            
                 promptType,
-
+            
                 completionTime,
-
+            
                 penLifts,
-
+            
                 strokeCount,
-
+            
                 image,
-
+            
+                referenceImage,
+            
                 strokes,
-
-                // ======================================
-                // Alignment / Worksheet Guide Metrics
-                // ======================================
-
+            
                 guide,
-
+            
             } = req.body;
 
             const attemptId =
                 await AssessmentService.saveActivity({
 
                     assessmentId,
-
+                
                     activityNo,
-
+                
                     activityCategory,
-
+                
                     activityName,
-
+                
                     activityType,
-
+                
                     promptText,
-
+                
                     promptType,
-
+                
                     completionTime,
-
+                
                     penLifts,
-
+                
                     strokeCount,
-
+                
                     image,
-
+                
+                    referenceImage,
+                
                     strokes,
-
-                    // ======================================
-                    // Pass Guide To Assessment Service
-                    // ======================================
-
+                
                     guide,
-
+                
                 });
 
             return res.status(201).json({

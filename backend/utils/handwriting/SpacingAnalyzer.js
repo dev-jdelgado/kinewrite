@@ -1,222 +1,302 @@
 const StrokeNormalizer =
     require("./StrokeNormalizer");
 
-const LetterSegmenter =
-    require("./LetterSegmenter");
+const ReferenceFitAnalyzer =
+    require("./ReferenceFitAnalyzer");
 
 
 class SpacingAnalyzer {
 
-    // ==========================================
-    // Analyze Spacing V4
-    // ==========================================
-
-    static analyze(data) {
+    static analyze(data = {}) {
 
         const {
-
             attempts = [],
-
             samples = [],
+        } = data;
 
-        } = data || {};
-
-
-        // ==========================================
-        // No Samples
-        // ==========================================
-
-        if (
-            !Array.isArray(samples) ||
-            samples.length === 0
-        ) {
-
-            return {
-
-                score: 0,
-
-                averageSpacing: 0,
-
-                spacingVariance: 0,
-
-                spacingDeviation: 0,
-
-                wordScores: [],
-
-                spacingDistances: [],
-
-                attemptsAnalyzed: 0,
-
-            };
-
-        }
-
-
-        // ==========================================
-        // Analyze Each Word Separately
-        //
-        // CAT
-        // DOG
-        // PEN
-        // SUN
-        // BOOK
-        // ==========================================
-
-        const wordResults = [];
-
+        const results = [];
 
         samples.forEach((sample, index) => {
 
-            if (!sample) {
-                return;
-            }
-
-
-            // --------------------------------------
-            // Get Strokes
-            // --------------------------------------
+            if (!sample) return;
 
             let rawStrokes =
                 sample.stroke_json;
 
-
-            if (
-                typeof rawStrokes === "string"
-            ) {
-
+            if (typeof rawStrokes === "string") {
                 try {
-
                     rawStrokes =
                         JSON.parse(rawStrokes);
-
-                } catch (error) {
-
+                } catch {
                     rawStrokes = [];
-
                 }
-
             }
-
 
             if (
                 !Array.isArray(rawStrokes) ||
-                rawStrokes.length === 0
+                !rawStrokes.length
             ) {
-
                 return;
-
             }
 
-
-            // --------------------------------------
-            // Get Word
-            // --------------------------------------
-
             const attempt =
-                Array.isArray(attempts)
-                    ? attempts[index]
-                    : null;
-
+                attempts[index] || {};
 
             const word =
                 String(
-
-                    attempt?.prompt_text ||
-
-                    attempt?.activity_name ||
-
+                    attempt.prompt_text ||
+                    attempt.activity_name ||
                     ""
-
                 )
-                    .trim()
-                    .replace(
-                        /\s+/g,
-                        ""
-                    );
-
-
-            if (!word) {
-                return;
-            }
-
-
-            // --------------------------------------
-            // Expected Letter Count
-            // --------------------------------------
+                .trim()
+                .replace(/\s+/g, "");
 
             const expectedLetters =
                 word.length;
 
-
-            if (
-                expectedLetters < 2
-            ) {
-
+            if (expectedLetters < 2) {
                 return;
-
             }
 
-
-            // --------------------------------------
-            // Normalize Strokes
-            // --------------------------------------
-
-            const normalizedStrokes =
+            const strokes =
                 StrokeNormalizer.normalize(
                     rawStrokes
                 );
 
-
-            if (
-                normalizedStrokes.length === 0
-            ) {
-
+            if (!strokes.length) {
                 return;
-
             }
 
+            // ==================================================
+            // PRIMARY:
+            // ACTUAL STUDENT IMAGE vs ACTUAL GUIDE IMAGE
+            // ==================================================
 
-            // --------------------------------------
-            // Segment Into Letters
-            // --------------------------------------
+            const referenceFit =
+                ReferenceFitAnalyzer.analyze({
 
-            const letters =
-                LetterSegmenter.segment(
+                    samples: [sample],
 
-                    normalizedStrokes,
+                    options: {
 
-                    expectedLetters
+                        preserveCanvasPosition: true,
 
+                        studentThreshold: 120,
+
+                        referenceThreshold: 245,
+
+                        toleranceRadius: 16,
+
+                        maxDistance: 30,
+
+                    },
+
+                });
+
+            const referenceResult =
+                referenceFit
+                    ?.attemptDetails?.[0];
+
+            const referenceScore =
+                Number(
+                    referenceResult?.score || 0
                 );
 
 
-            // --------------------------------------
-            // Sort Left To Right
-            // --------------------------------------
+            // ==================================================
+            // SECONDARY:
+            // SPACING GEOMETRY
+            // ==================================================
 
-            const sortedLetters =
-                [...letters]
+            const guide =
+                this.getGuideMetrics(sample);
 
-                    .filter(letter =>
-                        letter &&
-                        letter.boundingBox
-                    )
-
-                    .sort(
-                        (a, b) =>
-                            a.centerX - b.centerX
-                    );
-
-
-            // --------------------------------------
-            // Not Enough Letters
-            // --------------------------------------
+            const guideBoxes =
+                Array.isArray(
+                    guide?.letterBoxes
+                )
+                    ? guide.letterBoxes
+                        .filter(
+                            box =>
+                                box &&
+                                Number.isFinite(
+                                    Number(
+                                        box.centerX
+                                    )
+                                )
+                        )
+                        .sort(
+                            (a, b) =>
+                                Number(a.centerX) -
+                                Number(b.centerX)
+                        )
+                        .slice(
+                            0,
+                            expectedLetters
+                        )
+                    : [];
 
             if (
-                sortedLetters.length < 2
+                guideBoxes.length <
+                expectedLetters
             ) {
 
-                wordResults.push({
+                results.push({
+
+                    attemptIndex: index,
+
+                    word,
+
+                    score:
+                        referenceScore,
+
+                    referenceScore,
+
+                    spacingScore:
+                        0,
+
+                    valid:
+                        referenceResult?.valid === true,
+
+                    reason:
+                        "Guide letter spacing metrics are missing.",
+
+                });
+
+                return;
+            }
+
+
+            // ==================================================
+            // Assign strokes to guide letters
+            // ==================================================
+
+            const assigned =
+                guideBoxes.map(
+                    () => []
+                );
+
+            strokes.forEach(stroke => {
+
+                if (!stroke.length) return;
+
+                const centerX =
+                    this.strokeCenterX(
+                        stroke
+                    );
+
+                let closest =
+                    0;
+
+                let distance =
+                    Infinity;
+
+                guideBoxes.forEach(
+                    (box, boxIndex) => {
+
+                        const d =
+                            Math.abs(
+                                centerX -
+                                Number(
+                                    box.centerX
+                                )
+                            );
+
+                        if (
+                            d < distance
+                        ) {
+
+                            distance = d;
+
+                            closest =
+                                boxIndex;
+
+                        }
+
+                    }
+                );
+
+                assigned[closest].push(
+                    stroke
+                );
+
+            });
+
+
+            const studentLetters =
+                assigned.map(
+                    (letterStrokes, letterIndex) => {
+
+                        const points =
+                            letterStrokes.flat();
+
+                        if (!points.length) {
+                            return null;
+                        }
+
+                        const xs =
+                            points.map(
+                                p => Number(p.x)
+                            );
+
+                        const ys =
+                            points.map(
+                                p => Number(p.y)
+                            );
+
+                        const minX =
+                            Math.min(...xs);
+
+                        const maxX =
+                            Math.max(...xs);
+
+                        const minY =
+                            Math.min(...ys);
+
+                        const maxY =
+                            Math.max(...ys);
+
+                        return {
+
+                            letterIndex,
+
+                            minX,
+
+                            maxX,
+
+                            minY,
+
+                            maxY,
+
+                            width:
+                                maxX - minX,
+
+                            height:
+                                maxY - minY,
+
+                            centerX:
+                                (
+                                    minX +
+                                    maxX
+                                ) / 2,
+
+                        };
+
+                    }
+                );
+
+
+            const detectedLetters =
+                studentLetters.filter(
+                    Boolean
+                ).length;
+
+
+            if (
+                detectedLetters < 2
+            ) {
+
+                results.push({
 
                     attemptIndex: index,
 
@@ -224,356 +304,211 @@ class SpacingAnalyzer {
 
                     expectedLetters,
 
-                    detectedLetters:
-                        sortedLetters.length,
+                    detectedLetters,
 
-                    score: 0,
+                    score:
+                        referenceScore * 0.75,
 
-                    gaps: [],
+                    referenceScore,
 
-                    normalizedGaps: [],
+                    spacingScore:
+                        0,
 
-                    averageGap: 0,
+                    valid:
+                        referenceResult?.valid === true,
 
-                    gapDeviation: 0,
-
-                    coefficientVariation: 1,
-
-                    overlapCount: 0,
-
-                    compressedCount: 0,
-
-                    valid: false,
+                    reason:
+                        "Not enough student letters detected.",
 
                 });
 
                 return;
-
             }
 
 
-            // --------------------------------------
-            // Compute Gaps
-            // --------------------------------------
+            // ==================================================
+            // Calculate student/reference gaps
+            // ==================================================
 
-            const gaps = [];
+            const studentGaps = [];
+
+            const referenceGaps = [];
+
+            const gapScores = [];
 
 
             for (
                 let i = 1;
-                i < sortedLetters.length;
+                i < expectedLetters;
                 i++
             ) {
 
-                const previous =
-                    sortedLetters[i - 1];
+                const previousStudent =
+                    studentLetters[i - 1];
 
-                const current =
-                    sortedLetters[i];
+                const currentStudent =
+                    studentLetters[i];
 
+                const previousGuide =
+                    guideBoxes[i - 1];
 
-                const previousMaxX =
-                    previous.boundingBox.maxX;
-
-
-                const currentMinX =
-                    current.boundingBox.minX;
+                const currentGuide =
+                    guideBoxes[i];
 
 
-                const gap =
-                    currentMinX -
-                    previousMaxX;
+                if (
+                    previousStudent &&
+                    currentStudent
+                ) {
+
+                    studentGaps.push(
+
+                        currentStudent.minX -
+                        previousStudent.maxX
+
+                    );
+
+                }
 
 
-                gaps.push(gap);
+                const guideGap =
 
-            }
-
-
-            if (gaps.length === 0) {
-                return;
-            }
-
-
-            // --------------------------------------
-            // Average Letter Width
-            // --------------------------------------
-
-            const widths =
-                sortedLetters
-
-                    .map(letter =>
-                        this.getWidth(letter)
-                    )
-
-                    .filter(
-                        width =>
-                            width > 0
+                    Number(
+                        currentGuide.left
+                    ) -
+                    Number(
+                        previousGuide.right
                     );
 
 
-            const averageWidth =
+                referenceGaps.push(
+                    guideGap
+                );
 
-                widths.length > 0
+            }
 
-                    ? widths.reduce(
-                        (sum, value) =>
-                            sum + value,
-                        0
+
+            for (
+                let i = 0;
+                i < studentGaps.length;
+                i++
+            ) {
+
+                const studentGap =
+                    studentGaps[i];
+
+                const referenceGap =
+                    referenceGaps[i];
+
+
+                const tolerance =
+
+                    Math.max(
+
+                        20,
+
+                        Math.abs(
+                            referenceGap
+                        ) * 0.35
+
+                    );
+
+
+                const error =
+
+                    Math.abs(
+                        studentGap -
+                        referenceGap
                     ) /
-                    widths.length
-
-                    : 100;
+                    tolerance;
 
 
-            // --------------------------------------
-            // Average Gap
-            // --------------------------------------
+                gapScores.push(
+
+                    this.errorScore(
+                        error,
+                        1,
+                        3
+                    )
+
+                );
+
+            }
+
 
             const averageGap =
-
-                gaps.reduce(
-                    (sum, value) =>
-                        sum + value,
-                    0
-                ) /
-                gaps.length;
-
-
-            // --------------------------------------
-            // Gap Variance
-            // --------------------------------------
-
-            const variance =
-
-                gaps.reduce(
-                    (sum, gap) => {
-
-                        return sum +
-
-                            Math.pow(
-                                gap -
-                                averageGap,
-                                2
-                            );
-
-                    },
-                    0
-                ) /
-                gaps.length;
+                this.average(
+                    studentGaps
+                );
 
 
             const gapDeviation =
-                Math.sqrt(variance);
-
-
-            // --------------------------------------
-            // Coefficient Of Variation
-            //
-            // This makes the scoring relative to
-            // the word rather than raw pixels.
-            // --------------------------------------
-
-            const positiveAverageGap =
-                Math.max(
-                    1,
-                    Math.abs(averageGap)
+                this.standardDeviation(
+                    studentGaps
                 );
 
 
             const coefficientVariation =
 
                 gapDeviation /
-                positiveAverageGap;
+                Math.max(
+                    20,
+                    Math.abs(
+                        averageGap
+                    )
+                );
 
 
-            // --------------------------------------
-            // Gap Consistency Score
-            //
-            // Perfectly even gaps approach 100.
-            // --------------------------------------
+            const gapAccuracy =
 
-            let consistencyScore =
+                gapScores.length
+                    ? this.average(
+                        gapScores
+                    )
+                    : 0;
 
-                100 *
-                Math.exp(
-                    -1.5 *
+
+            const consistency =
+
+                this.consistencyScore(
                     coefficientVariation
                 );
 
 
-            consistencyScore =
-                Math.max(
-                    0,
-                    Math.min(
-                        100,
-                        consistencyScore
-                    )
-                );
-
-
-            // --------------------------------------
-            // Overlap Detection
-            // --------------------------------------
-
-            const overlapCount =
-                gaps.filter(
-                    gap =>
-                        gap < 0
-                ).length;
-
-
-            // --------------------------------------
-            // Compressed Spacing
-            //
-            // A gap smaller than 5% of average
-            // letter width is considered too tight.
-            // --------------------------------------
-
-            const minimumReasonableGap =
-                Math.max(
-                    3,
-                    averageWidth * 0.05
-                );
-
-
-            const compressedCount =
-                gaps.filter(
-                    gap =>
-                        gap >= 0 &&
-                        gap < minimumReasonableGap
-                ).length;
-
-
-            // --------------------------------------
-            // Spacing Presence Score
-            // --------------------------------------
-
-            const totalGaps =
-                gaps.length;
-
-
-            const positiveGapCount =
-                gaps.filter(
-                    gap =>
-                        gap >= minimumReasonableGap
-                ).length;
-
-
-            let spacingPresenceScore =
+            const spacingScore =
 
                 (
-                    positiveGapCount /
-                    totalGaps
-                ) * 100;
-
-
-            // --------------------------------------
-            // Overlap Penalty
-            // --------------------------------------
-
-            if (
-                overlapCount > 0
-            ) {
-
-                const overlapRatio =
-                    overlapCount /
-                    totalGaps;
-
-
-                spacingPresenceScore *=
-
-                    Math.max(
-                        0,
-                        1 -
-                        (
-                            overlapRatio *
-                            0.75
-                        )
-                    );
-
-            }
-
-
-            // --------------------------------------
-            // Final Word Score
-            //
-            // 70% = consistency
-            // 30% = actual spacing
-            // --------------------------------------
-
-            let wordScore =
-
-                (
-                    consistencyScore *
+                    gapAccuracy *
                     0.70
                 ) +
 
                 (
-                    spacingPresenceScore *
+                    consistency *
                     0.30
                 );
 
 
-            // --------------------------------------
-            // Additional compression penalty
-            // --------------------------------------
+            // ==================================================
+            // FINAL
+            //
+            // IMAGE MATCH       75%
+            // SPACING ANALYSIS  25%
+            // ==================================================
 
-            if (
-                compressedCount > 0
-            ) {
+            const score =
 
-                const compressionRatio =
+                (
+                    referenceScore *
+                    0.75
+                ) +
 
-                    compressedCount /
-                    totalGaps;
-
-
-                wordScore *=
-
-                    Math.max(
-                        0.70,
-                        1 -
-                        (
-                            compressionRatio *
-                            0.30
-                        )
-                    );
-
-            }
-
-
-            // --------------------------------------
-            // Clamp
-            // --------------------------------------
-
-            wordScore =
-                Math.max(
-                    0,
-                    Math.min(
-                        100,
-                        wordScore
-                    )
+                (
+                    spacingScore *
+                    0.25
                 );
 
 
-            // --------------------------------------
-            // Normalized Gaps
-            // --------------------------------------
-
-            const normalizedGaps =
-                gaps.map(
-                    gap =>
-                        gap /
-                        averageWidth
-                );
-
-
-            // --------------------------------------
-            // Save Result
-            // --------------------------------------
-
-            wordResults.push({
+            results.push({
 
                 attemptIndex: index,
 
@@ -581,14 +516,20 @@ class SpacingAnalyzer {
 
                 expectedLetters,
 
-                detectedLetters:
-                    sortedLetters.length,
+                detectedLetters,
 
-                score: wordScore,
+                score:
+                    Number(
+                        score.toFixed(2)
+                    ),
 
-                gaps,
+                referenceScore,
 
-                normalizedGaps,
+                spacingScore,
+
+                gapAccuracy,
+
+                consistency,
 
                 averageGap,
 
@@ -596,308 +537,333 @@ class SpacingAnalyzer {
 
                 coefficientVariation,
 
-                averageLetterWidth:
-                    averageWidth,
+                gaps:
+                    studentGaps,
 
-                overlapCount,
+                referenceGaps,
 
-                compressedCount,
+                referenceFit,
 
-                valid: true,
+                valid:
+                    true,
 
             });
 
         });
 
 
-        // ==========================================
-        // Valid Words
-        // ==========================================
-
-        const validWords =
-            wordResults.filter(
+        const valid =
+            results.filter(
                 result =>
                     result.valid
             );
 
 
-        if (
-            validWords.length === 0
-        ) {
-
-            return {
-
-                score: 0,
-
-                averageSpacing: 0,
-
-                spacingVariance: 0,
-
-                spacingDeviation: 0,
-
-                wordScores: [],
-
-                spacingDistances: [],
-
-                attemptsAnalyzed: 0,
-
-            };
-
-        }
-
-
-        // ==========================================
-        // Word Scores
-        // ==========================================
-
-        const wordScores =
-            validWords.map(
-                result =>
-                    result.score
-            );
-
-
-        // ==========================================
-        // Final Spacing Score
-        // ==========================================
-
-        const finalScore =
-
-            wordScores.reduce(
-                (sum, value) =>
-                    sum + value,
-                0
-            ) /
-            wordScores.length;
-
-
-        // ==========================================
-        // All Gaps
-        // ==========================================
-
-        const allGaps = [];
-
-        validWords.forEach(result => {
-
-            allGaps.push(
-                ...result.gaps
-            );
-
-        });
-
-
-        // ==========================================
-        // Average Spacing
-        // ==========================================
-
-        const averageSpacing =
-
-            allGaps.length > 0
-
-                ? allGaps.reduce(
-                    (sum, value) =>
-                        sum + value,
-                    0
-                ) /
-                allGaps.length
-
+        const score =
+            valid.length
+                ? this.average(
+                    valid.map(
+                        result =>
+                            result.score
+                    )
+                )
                 : 0;
 
-
-        // ==========================================
-        // Overall Variance
-        // ==========================================
-
-        const spacingVariance =
-
-            allGaps.length > 0
-
-                ? allGaps.reduce(
-                    (sum, gap) => {
-
-                        return sum +
-
-                            Math.pow(
-                                gap -
-                                averageSpacing,
-                                2
-                            );
-
-                    },
-                    0
-                ) /
-                allGaps.length
-
-                : 0;
-
-
-        const spacingDeviation =
-            Math.sqrt(
-                spacingVariance
-            );
-
-
-        // ==========================================
-        // Return
-        // ==========================================
 
         return {
 
-            score: Number(
-                finalScore.toFixed(2)
-            ),
+            score:
+                Number(
+                    score.toFixed(2)
+                ),
 
-            averageSpacing: Number(
-                averageSpacing.toFixed(2)
-            ),
+            classification:
+                this.classify(score),
 
-            spacingVariance: Number(
-                spacingVariance.toFixed(2)
-            ),
+            attemptsAnalyzed:
+                valid.length,
 
-            spacingDeviation: Number(
-                spacingDeviation.toFixed(2)
-            ),
+            referenceScore:
+                Number(
+                    this.average(
+                        valid.map(
+                            result =>
+                                result.referenceScore
+                        )
+                    ).toFixed(2)
+                ),
+
+            spacingScore:
+                Number(
+                    this.average(
+                        valid.map(
+                            result =>
+                                result.spacingScore
+                        )
+                    ).toFixed(2)
+                ),
+
+            averageSpacing:
+                Number(
+                    this.average(
+                        valid.flatMap(
+                            result =>
+                                result.gaps || []
+                        )
+                    ).toFixed(2)
+                ),
+
+            spacingDeviation:
+                Number(
+                    this.average(
+                        valid.map(
+                            result =>
+                                result.gapDeviation || 0
+                        )
+                    ).toFixed(2)
+                ),
 
             spacingDistances:
-                allGaps.map(
-                    value =>
-                        Number(
-                            value.toFixed(2)
-                        )
+                valid.flatMap(
+                    result =>
+                        result.gaps || []
                 ),
 
             wordScores:
-                wordScores.map(
-                    value =>
+                valid.map(
+                    result =>
                         Number(
-                            value.toFixed(2)
+                            result.score.toFixed(2)
                         )
                 ),
 
-            attemptsAnalyzed:
-                validWords.length,
-
             wordDetails:
-                validWords.map(
-                    result => ({
+                results,
 
-                        attemptIndex:
-                            result.attemptIndex,
-
-                        word:
-                            result.word,
-
-                        expectedLetters:
-                            result.expectedLetters,
-
-                        detectedLetters:
-                            result.detectedLetters,
-
-                        score:
-                            Number(
-                                result.score.toFixed(2)
-                            ),
-
-                        averageGap:
-                            Number(
-                                result.averageGap.toFixed(2)
-                            ),
-
-                        gapDeviation:
-                            Number(
-                                result.gapDeviation.toFixed(2)
-                            ),
-
-                        coefficientVariation:
-                            Number(
-                                result.coefficientVariation.toFixed(4)
-                            ),
-
-                        averageLetterWidth:
-                            Number(
-                                result.averageLetterWidth.toFixed(2)
-                            ),
-
-                        overlapCount:
-                            result.overlapCount,
-
-                        compressedCount:
-                            result.compressedCount,
-
-                        gaps:
-                            result.gaps.map(
-                                value =>
-                                    Number(
-                                        value.toFixed(2)
-                                    )
-                            ),
-
-                        normalizedGaps:
-                            result.normalizedGaps.map(
-                                value =>
-                                    Number(
-                                        value.toFixed(4)
-                                    )
-                            ),
-
-                    })
-                ),
+            attemptDetails:
+                results,
 
         };
 
     }
 
 
-    // ==========================================
-    // Get Letter Width
-    // ==========================================
+    static getGuideMetrics(sample) {
 
-    static getWidth(letter) {
+        let guide =
+            sample?.guide_json;
 
         if (
-            letter &&
-            typeof letter.width === "number" &&
-            Number.isFinite(letter.width) &&
-            letter.width > 0
+            typeof guide === "string"
         ) {
 
-            return letter.width;
+            try {
+                guide =
+                    JSON.parse(guide);
+            } catch {
+                guide = null;
+            }
 
         }
 
+        return (
+            guide?.metrics ||
+            guide ||
+            null
+        );
+
+    }
+
+
+    static strokeCenterX(stroke) {
 
         if (
-            letter &&
-            letter.boundingBox &&
-            typeof letter.boundingBox.width === "number"
+            !Array.isArray(stroke) ||
+            !stroke.length
         ) {
-
-            return letter.boundingBox.width;
-
+            return 0;
         }
 
+        const xs =
+            stroke
+                .map(
+                    point =>
+                        Number(point?.x)
+                )
+                .filter(
+                    Number.isFinite
+                );
+
+        return xs.length
+            ? this.average(xs)
+            : 0;
+
+    }
+
+
+    static errorScore(
+        error,
+        good,
+        severe
+    ) {
 
         if (
-            letter &&
-            letter.boundingBox &&
-            typeof letter.boundingBox.minX === "number" &&
-            typeof letter.boundingBox.maxX === "number"
+            !Number.isFinite(error)
         ) {
+            return 0;
+        }
 
-            return (
-                letter.boundingBox.maxX -
-                letter.boundingBox.minX
+        if (
+            error <= good
+        ) {
+            return 100;
+        }
+
+        if (
+            error >= severe
+        ) {
+            return 0;
+        }
+
+        const ratio =
+
+            (
+                error -
+                good
+            ) /
+            (
+                severe -
+                good
             );
 
+        return Math.max(
+            0,
+            100 *
+            (
+                1 -
+                Math.pow(
+                    ratio,
+                    1.2
+                )
+            )
+        );
+
+    }
+
+
+    static consistencyScore(cv) {
+
+        if (
+            !Number.isFinite(cv)
+        ) {
+            return 0;
         }
 
+        if (
+            cv <= 0.12
+        ) {
+            return 100;
+        }
 
-        return 0;
+        if (
+            cv >= 1
+        ) {
+            return 20;
+        }
+
+        return Math.max(
+            20,
+            100 *
+            Math.exp(
+                -1.35 * cv
+            )
+        );
+
+    }
+
+
+    static standardDeviation(values) {
+
+        if (!values.length) {
+            return 0;
+        }
+
+        const avg =
+            this.average(values);
+
+        return Math.sqrt(
+
+            this.average(
+
+                values.map(
+                    value =>
+                        Math.pow(
+                            value - avg,
+                            2
+                        )
+                )
+
+            )
+
+        );
+
+    }
+
+
+    static average(values) {
+
+        if (
+            !Array.isArray(values) ||
+            !values.length
+        ) {
+            return 0;
+        }
+
+        return (
+
+            values.reduce(
+                (
+                    sum,
+                    value
+                ) =>
+                    sum +
+                    (
+                        Number(value) ||
+                        0
+                    ),
+                0
+            ) /
+            values.length
+
+        );
+
+    }
+
+
+    static classify(score) {
+
+        if (score >= 90) {
+            return "Excellent";
+        }
+
+        if (score >= 80) {
+            return "Good";
+        }
+
+        if (score >= 70) {
+            return "Fair";
+        }
+
+        if (score >= 60) {
+            return "Needs Improvement";
+        }
+
+        return "Poor";
 
     }
 
 }
 
 
-module.exports = SpacingAnalyzer;
+module.exports =
+    SpacingAnalyzer;

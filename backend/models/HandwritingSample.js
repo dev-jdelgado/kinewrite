@@ -42,11 +42,9 @@ class HandwritingSample {
 
                 imagePath,
 
-                JSON.stringify(strokeJson),
+                JSON.stringify(strokeJson || []),
 
-                guideJson
-                    ? JSON.stringify(guideJson)
-                    : null,
+                JSON.stringify(guideJson || {}),
 
             ]
 
@@ -55,6 +53,7 @@ class HandwritingSample {
         return result.insertId;
 
     }
+
 
     // ==========================================
     // Get Sample by Attempt
@@ -90,41 +89,90 @@ class HandwritingSample {
 
         }
 
+        const row =
+            rows[0];
+
+
+        // ==========================================
+        // Parse Stroke JSON
+        // ==========================================
+
+        let strokeJson = [];
+
+        if (
+            row.stroke_json
+        ) {
+
+            try {
+
+                strokeJson =
+                    typeof row.stroke_json === "string"
+                        ? JSON.parse(
+                            row.stroke_json
+                        )
+                        : row.stroke_json;
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to parse stroke_json:",
+                    error
+                );
+
+                strokeJson = [];
+
+            }
+
+        }
+
+
+        // ==========================================
+        // Parse Guide JSON
+        // ==========================================
+
+        let guideJson = null;
+
+        if (
+            row.guide_json
+        ) {
+
+            try {
+
+                guideJson =
+                    typeof row.guide_json === "string"
+                        ? JSON.parse(
+                            row.guide_json
+                        )
+                        : row.guide_json;
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to parse guide_json:",
+                    error
+                );
+
+                guideJson = null;
+
+            }
+
+        }
+
+
         return {
 
-            ...rows[0],
-
-            // ======================================
-            // Parse Stroke JSON
-            // ======================================
+            ...row,
 
             stroke_json:
+                strokeJson,
 
-                rows[0].stroke_json
-
-                    ? JSON.parse(
-                        rows[0].stroke_json
-                    )
-
-                    : [],
-
-            // ======================================
-            // Parse Guide JSON
-            // ======================================
-
-            guide:
-
-                rows[0].guide_json
-
-                    ? JSON.parse(
-                        rows[0].guide_json
-                    )
-
-                    : null,
+            guide_json:
+                guideJson,
 
         };
 
     }
+
 
     // ==========================================
     // Delete Sample
@@ -156,4 +204,5 @@ class HandwritingSample {
 
 }
 
-module.exports = HandwritingSample;
+module.exports =
+    HandwritingSample;
