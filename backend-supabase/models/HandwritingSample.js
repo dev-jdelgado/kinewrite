@@ -52,13 +52,6 @@ class HandwritingSample {
                     ? JSON.parse(row.stroke_json)
                     : row.stroke_json)
                 : [],
-            guide_json: row.guide_json
-                ? (typeof row.guide_json === "string"
-                    ? JSON.parse(row.guide_json)
-                    : row.guide_json)
-                : null,
-
-            // Backwards-compatible alias for existing Supabase code.
             guide: row.guide_json
                 ? (typeof row.guide_json === "string"
                     ? JSON.parse(row.guide_json)

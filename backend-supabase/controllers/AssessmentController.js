@@ -217,11 +217,7 @@ class AssessmentController {
 
                 image,
 
-                referenceImage,
-
                 strokes,
-
-                guide,
 
             } = req.body;
 
@@ -252,11 +248,7 @@ class AssessmentController {
 
                     image,
 
-                    referenceImage,
-
                     strokes,
-
-                    guide,
 
                 });
 
