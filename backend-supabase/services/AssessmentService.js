@@ -88,29 +88,44 @@ class AssessmentService {
 
     }) {
 
+        const databaseCategoryMap = {
+            alignment: "Alignment",
+            spacing: "Spacing",
+            stroke: "Stroke",
+        };
+        
+        const normalizedCategory =
+            databaseCategoryMap[
+                String(activityCategory || "")
+                    .trim()
+                    .toLowerCase()
+            ] || activityCategory;
+        
+        
         const attemptId =
             await AssessmentAttempt.create({
-
+        
                 assessmentId,
-
+        
                 activityNo,
-
-                activityCategory,
-
+        
+                activityCategory:
+                    normalizedCategory,
+        
                 activityName,
-
+        
                 activityType,
-
+        
                 promptText,
-
+        
                 promptType,
-
+        
                 completionTime,
-
+        
                 penLifts,
-
+        
                 strokeCount,
-
+        
             });
 
 
