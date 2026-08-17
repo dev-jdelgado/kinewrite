@@ -80,29 +80,70 @@ class AssessmentService {
 
     }) {
 
+        const normalizedCategory =
+            String(
+                activityCategory || ""
+            )
+                .trim()
+                .toLowerCase();
+        
+        let databaseCategory;
+        
+        switch (normalizedCategory) {
+        
+            case "alignment":
+        
+                databaseCategory =
+                    "Alignment";
+        
+                break;
+        
+            case "spacing":
+        
+                databaseCategory =
+                    "Spacing";
+        
+                break;
+        
+            case "stroke":
+        
+                databaseCategory =
+                    "Stroke";
+        
+                break;
+        
+            default:
+        
+                throw new Error(
+                    `Invalid activity category: ${activityCategory}`
+                );
+        
+        }
+        
         const attemptId =
             await AssessmentAttempt.create({
-
+        
                 assessmentId,
-
+        
                 activityNo,
-
-                activityCategory,
-
+        
+                activityCategory:
+                    databaseCategory,
+        
                 activityName,
-
+        
                 activityType,
-
+        
                 promptText,
-
+        
                 promptType,
-
+        
                 completionTime,
-
+        
                 penLifts,
-
+        
                 strokeCount,
-
+        
             });
 
 
