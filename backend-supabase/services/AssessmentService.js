@@ -626,13 +626,13 @@ class AssessmentService {
             
             }
 
-        console.log(
-            JSON.stringify(
-                analysis,
-                null,
-                2
-            )
-        );
+        // console.log(
+        //     JSON.stringify(
+        //         analysis,
+        //         null,
+        //         2
+        //     )
+        // );
 
         return analysis;
 

@@ -1,7 +1,15 @@
-const Assessment = require("../models/Assessment");
-const AssessmentAttempt = require("../models/AssessmentAttempt");
-const HandwritingSample = require("../models/HandwritingSample");
-const AssessmentAnalysis = require("../models/AssessmentAnalysis");
+const Assessment =
+    require("../models/Assessment");
+
+const AssessmentAttempt =
+    require("../models/AssessmentAttempt");
+
+const HandwritingSample =
+    require("../models/HandwritingSample");
+
+const AssessmentAnalysis =
+    require("../models/AssessmentAnalysis");
+
 
 const ReferenceFitAnalyzer =
     require("../utils/handwriting/ReferenceFitAnalyzer");
@@ -308,89 +316,11 @@ class AssessmentService {
         }
 
 
+
         return categories;
 
     }
 
-
-    // ==========================================
-    // Check Reference-Fit Samples
-    // ==========================================
-
-    static hasReferenceFitSamples(
-
-        categoryData
-
-    ) {
-
-        if (
-            !categoryData ||
-            !Array.isArray(
-                categoryData.samples
-            )
-        ) {
-
-            return false;
-
-        }
-
-
-        return categoryData.samples.some(
-
-            sample => {
-
-                if (
-                    !sample
-                ) {
-
-                    return false;
-
-                }
-
-
-                const studentImage =
-                    sample.image_path;
-
-
-                let guideData =
-                    sample.guide_json;
-
-
-                if (
-                    typeof guideData === "string"
-                ) {
-
-                    try {
-
-                        guideData =
-                            JSON.parse(
-                                guideData
-                            );
-
-                    } catch (error) {
-
-                        guideData =
-                            null;
-
-                    }
-
-                }
-
-
-                const referenceImage =
-                    guideData?.referenceImage;
-
-
-                return Boolean(
-                    studentImage &&
-                    referenceImage
-                );
-
-            }
-
-        );
-
-    }
 
 
     // ==========================================
@@ -463,15 +393,6 @@ class AssessmentService {
         const hasStroke =
             categories.stroke.strokes.length > 0;
 
-        const hasAlignmentReference =
-            this.hasReferenceFitSamples(
-                categories.alignment
-            );
-        
-        const hasSpacingReference =
-            this.hasReferenceFitSamples(
-                categories.spacing
-            );
 
 
         // ==========================================
@@ -494,32 +415,22 @@ class AssessmentService {
         // ==========================================
         // Analyze Alignment
         //
-        // DO NOT CHANGE CURRENT ALIGNMENT BEHAVIOR
+        // KEEP ALIGNMENT UNCHANGED
         // ==========================================
 
         const alignmentAnalysis =
 
-            hasAlignmentReference
+            hasAlignment
 
-                ? ReferenceFitAnalyzer.analyze({
+                ? HandwritingAnalyzer.analyze(
 
-                    samples:
-                        categories.alignment.samples,
+                    categories.alignment,
 
-                    options: {
+                    {
+                        category: "alignment",
+                    }
 
-                        preservePosition:
-                            false,
-
-                        toleranceRadius:
-                            8,
-
-                        maxDistance:
-                            20,
-
-                    },
-
-                })
+                )
 
                 : null;
 
@@ -527,15 +438,11 @@ class AssessmentService {
         // ==========================================
         // Analyze Spacing
         //
-        // Saved student image + saved guide image
-        // remain PRIMARY.
-        //
-        // Geometry remains SECONDARY.
         // ==========================================
 
-        const spacingGeometry =
+        const spacingAnalysis =
 
-            categories.spacing.attempts.length > 0
+            hasSpacing
 
                 ? HandwritingAnalyzer.analyze(
 
@@ -549,83 +456,6 @@ class AssessmentService {
 
                 : null;
 
-
-        const spacingReference =
-
-            hasSpacingReference
-            
-                ? ReferenceFitAnalyzer.analyze({
-            
-                    samples:
-                        categories.spacing.samples,
-            
-                    options: {
-            
-                        preservePosition:
-                            true,
-            
-                        toleranceRadius:
-                            12,
-            
-                        maxDistance:
-                            30,
-            
-                        referenceThreshold:
-                            245,
-            
-                    },
-            
-                })
-            
-                : null;
-
-
-        const spacingAnalysis =
-
-            spacingReference
-
-                ? {
-
-                    ...(spacingGeometry || {}),
-
-                    category:
-                        "spacing",
-
-                    score:
-                        Number(
-
-                            (
-
-                                (
-                                    spacingReference.score *
-                                    0.80
-                                )
-
-                                +
-
-                                (
-                                    (
-                                        spacingGeometry?.score ??
-                                        0
-                                    )
-
-                                    *
-                                    0.20
-                                )
-
-                            ).toFixed(2)
-
-                        ),
-
-                    referenceFit:
-                        spacingReference,
-
-                    spacingMetrics:
-                        spacingGeometry,
-
-                }
-
-                : spacingGeometry;
 
 
         // ==========================================
@@ -660,7 +490,7 @@ class AssessmentService {
             
                     options: {
             
-                        preservePosition:
+                        preserveCanvasPosition:
                             true,
             
                         toleranceRadius:
@@ -707,14 +537,22 @@ class AssessmentService {
                                         strokeReference?.valid
                                             ? strokeReference.score
                                             : strokeGeometry.score
-                                    ) *
+
+                                    )
+
+                                    *
+
                                     0.85
                                 )
 
                                 +
 
                                 (
-                                    strokeGeometry.score *
+
+                                    strokeGeometry.score
+
+                                    *
+
                                     0.15
                                 )
 
@@ -885,19 +723,6 @@ class AssessmentService {
 
         }
 
-
-        console.log(
-
-            JSON.stringify(
-
-                analysis,
-
-                null,
-                2
-
-            )
-
-        );
 
 
         return analysis;
