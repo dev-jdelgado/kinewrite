@@ -129,29 +129,27 @@ const RecentSessionsTable = ({
                                                 "
                                             >
                                                 <td className="px-6 py-5 font-semibold">
-                                                    #{session.session_number}
+                                                    #{session.session_id}
                                                 </td>
 
                                                 <td className="px-6 py-5">
                                                     <div className="flex items-center gap-2">
                                                         <CalendarDays size={16} />
-                                                        {
-                                                            new Date(
-                                                                session.session_date
-                                                            ).toLocaleDateString()
-                                                        }
+                                                        {session.session_date
+                                                            ? new Date(session.session_date).toLocaleDateString()
+                                                            : "-"}
                                                     </div>
                                                 </td>
 
                                                 <td className="px-6 py-5">
                                                     <div className="flex items-center gap-2">
                                                         <Clock3 size={16} />
-                                                        {session.duration} mins
+                                                        {session.duration ? `${session.duration} mins` : "-"}
                                                     </div>
                                                 </td>
 
                                                 <td className="px-6 py-5">
-                                                    {session.average_accuracy}%
+                                                    {Number(session.total_score || 0).toFixed(1)}%
                                                 </td>
 
                                                 <td className="px-6 py-5">

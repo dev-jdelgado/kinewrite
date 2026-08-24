@@ -147,7 +147,7 @@ const GenerateReportCard = ({
                     mt-8
                     grid
                     grid-cols-1
-                    md:grid-cols-2
+                    md:grid-cols-1
                     gap-6
                 "
             >
@@ -173,31 +173,6 @@ const GenerateReportCard = ({
                 >
                     <Download size={24} />
                     Generate PDF Report
-                </button>
-
-                <button
-                    onClick={onPrint}
-                    className="
-                        flex
-                        items-center
-                        justify-center
-                        gap-3
-                        rounded-2xl
-                        border-2
-                        border-[#9b4c00]
-                        bg-white
-                        px-6
-                        py-5
-                        text-lg
-                        font-semibold
-                        text-[#9b4c00]
-                        transition-all
-                        hover:bg-orange-50
-                        hover:scale-[1.02]
-                    "
-                >
-                    <Printer size={24} />
-                    Print Report
                 </button>
             </div>
 

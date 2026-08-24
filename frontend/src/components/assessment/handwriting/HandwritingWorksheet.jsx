@@ -33,6 +33,8 @@ const HandwritingWorksheet = forwardRef(
         const {
             activityType,
             promptText,
+            showGuide = true,
+            canvasGuide = null,
         } = activity;
 
 
@@ -1083,26 +1085,34 @@ const HandwritingWorksheet = forwardRef(
 
         const renderGuide = () => {
 
+            // Activity explicitly provides its own canvas guide
+            if (canvasGuide) {
+                return canvasGuide;
+            }
+        
+            // Hide the worksheet's normal tracing guide
+            if (!showGuide) {
+                return null;
+            }
+        
+            // Existing stroke analyzer/tracing guide
             if (
                 activityType === "stroke"
             ) {
-
+        
                 return (
-
                     <StrokeGuide
                         type={promptText}
                     />
-
                 );
-
+        
             }
-
-
+        
+            // Existing letter/word guide
             return (
-
                 <span
                     ref={guideRef}
-
+        
                     className="
                         font-light
                         text-slate-300
@@ -1110,27 +1120,22 @@ const HandwritingWorksheet = forwardRef(
                         select-none
                         leading-none
                     "
-
+        
                     style={{
-
                         fontSize:
                             getFontSize(),
-
+        
                         letterSpacing:
                             getLetterSpacing(),
-
+        
                         opacity:
                             guideOpacity,
-
                     }}
                 >
-
                     {promptText}
-
                 </span>
-
             );
-
+        
         };
 
 

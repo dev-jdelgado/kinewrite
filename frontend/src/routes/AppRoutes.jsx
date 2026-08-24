@@ -8,8 +8,12 @@ import StudentRecords from "../pages/StudentRecords";
 import Settings from "../pages/Settings"
 
 import StudentProgress from "../pages/StudentProgress";
+import Reports from "../pages/Reports";
 
 import Assessment from "../pages/Assessment";
+import { AssessmentProvider } from "../components/assessment/utils/AssessmentContext";
+
+import Exercises from "../pages/Exercises";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -64,6 +68,16 @@ const AppRoutes = () => {
                 }
             />
 
+            {/* Student Progress Report */}
+            <Route
+                path="/student-records/:studentId/report"
+                element={
+                    <ProtectedRoute>
+                        <Reports />
+                    </ProtectedRoute>
+                }
+            />
+
             {/* Student Progress */}
             <Route
                 path="/student-records/:studentId"
@@ -89,9 +103,9 @@ const AppRoutes = () => {
                 path="/exercise/:studentId"
                 element={
                     <ProtectedRoute>
-                        <div className="flex items-center justify-center min-h-screen text-4xl font-bold">
-                            Exercise Session Page
-                        </div>
+                        <AssessmentProvider>
+                            <Exercises />
+                        </AssessmentProvider>
                     </ProtectedRoute>
                 }
             />

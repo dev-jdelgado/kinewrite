@@ -48,9 +48,45 @@ class Assessment {
         const [rows] = await pool.query(
 
             `
-            SELECT *
-            FROM assessments
-            WHERE assessment_id = ?
+            SELECT
+
+                a.*,
+
+                COALESCE(
+                    aa.spacing_score,
+                    a.spacing_score
+                ) AS spacing_score,
+
+                COALESCE(
+                    aa.alignment_score,
+                    a.alignment_score
+                ) AS alignment_score,
+
+                COALESCE(
+                    aa.stroke_score,
+                    a.stroke_score
+                ) AS stroke_score,
+
+                COALESCE(
+                    aa.overall_score,
+                    a.overall_score
+                ) AS overall_score,
+
+                COALESCE(
+                    aa.classification,
+                    a.assessment_classification
+                ) AS assessment_classification,
+
+                aa.analysis_id
+
+            FROM assessments a
+
+            LEFT JOIN assessment_analysis aa
+                ON aa.assessment_id = a.assessment_id
+
+            WHERE a.assessment_id = ?
+
+            LIMIT 1
             `,
 
             [id]
@@ -70,12 +106,54 @@ class Assessment {
         const [rows] = await pool.query(
 
             `
-            SELECT *
-            FROM assessments
+            SELECT
 
-            WHERE student_id = ?
+                a.*,
 
-            ORDER BY assessment_date DESC
+                /*
+                 * Use the analyzed result from
+                 * assessment_analysis when available.
+                 *
+                 * Fall back to assessments when
+                 * analysis does not exist.
+                 */
+
+                COALESCE(
+                    aa.spacing_score,
+                    a.spacing_score
+                ) AS spacing_score,
+
+                COALESCE(
+                    aa.alignment_score,
+                    a.alignment_score
+                ) AS alignment_score,
+
+                COALESCE(
+                    aa.stroke_score,
+                    a.stroke_score
+                ) AS stroke_score,
+
+                COALESCE(
+                    aa.overall_score,
+                    a.overall_score
+                ) AS overall_score,
+
+                COALESCE(
+                    aa.classification,
+                    a.assessment_classification
+                ) AS assessment_classification,
+
+                aa.analysis_id
+
+            FROM assessments a
+
+            LEFT JOIN assessment_analysis aa
+                ON aa.assessment_id = a.assessment_id
+
+            WHERE a.student_id = ?
+
+            ORDER BY a.assessment_date DESC
+
             `,
 
             [
