@@ -1,11 +1,20 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    useCallback
+} from "react";
 import toast from "react-hot-toast";
 
 import StudentService from "../services/StudentService";
+import { useAuth } from "./AuthContext";
 
 const StudentContext = createContext();
 
 export const StudentProvider = ({ children }) => {
+
+    const { admin, token } = useAuth();
 
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,18 +23,40 @@ export const StudentProvider = ({ children }) => {
     // Load Students
     // ==============================
 
-    const fetchStudents = async () => {
+    const fetchStudents = useCallback(async () => {
+
+        if (!token || !admin?.school_id) {
+            setStudents([]);
+            setLoading(false);
+            return;
+        }
+
         try {
+
             setLoading(true);
+
             const response = await StudentService.getStudents();
-            setStudents(response.data.students);
+
+            setStudents(response.data.students || []);
 
         } catch (error) {
-            toast.error("Unable to load students.");
+
+            console.error("Fetch Students Error:", error);
+
+            setStudents([]);
+
+            toast.error(
+                error.response?.data?.message ||
+                "Unable to load students."
+            );
+
         } finally {
+
             setLoading(false);
+
         }
-    };
+
+    }, [token, admin?.school_id]);
 
     // ==============================
     // Create Student
@@ -90,7 +121,7 @@ export const StudentProvider = ({ children }) => {
 
     useEffect(() => {
         fetchStudents();
-    }, []);
+    }, [fetchStudents]);
 
     return (
         <StudentContext.Provider

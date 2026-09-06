@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "../pages/Login";
+import Signup from "../pages/Signup";
 import TherapistDashboard from "../pages/TherapistDashboard";
 import StudentManagement from "../pages/StudentManagement";
 import StudentSelection from "../pages/StudentSelection";
@@ -23,6 +24,12 @@ const AppRoutes = () => {
                 element={<Login />}
             />
 
+            {/* Signup */}
+            <Route
+                path="/signup"
+                element={<Signup />}
+            />
+
             {/* Therapist Dashboard */}
             <Route
                 path="/dashboard"
@@ -43,7 +50,7 @@ const AppRoutes = () => {
                 }
             />
 
-            
+
             {/* Account Settings */}
             <Route
                 path="/account-settings"

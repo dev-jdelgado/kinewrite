@@ -59,3 +59,4 @@ app.listen(PORT, () => {
 // Upload Photo
 // ==========================================
 app.use("/uploads", express.static("uploads"));
+

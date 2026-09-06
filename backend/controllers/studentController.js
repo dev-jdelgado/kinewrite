@@ -8,7 +8,9 @@ const generateStudentCode = require("../utils/generateStudentCode");
 
 exports.getStudents = async (req, res) => {
     try {
-        const students = await Student.findAll();
+        const schoolId = req.user.school_id;
+
+        const students = await Student.findAll(schoolId);
 
         res.json({
             success: true,
@@ -32,7 +34,12 @@ exports.getStudents = async (req, res) => {
 
 exports.getStudentById = async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id);
+        const schoolId = req.user.school_id;
+
+        const student = await Student.findById(
+            req.params.id,
+            schoolId
+        );
 
         if (!student) {
             return res.status(404).json({
@@ -88,7 +95,10 @@ exports.createStudent = async (req, res) => {
 
         await connection.beginTransaction();
 
+        const schoolId = req.user.school_id;
+
         const studentId = await Student.create(connection, {
+            school_id: schoolId,
             student_fname,
             student_lname,
             student_gender,
@@ -112,7 +122,10 @@ exports.createStudent = async (req, res) => {
 
         await connection.commit();
 
-        const student = await Student.findById(studentId);
+        const student = await Student.findById(
+            studentId,
+            schoolId
+        );
 
         res.status(201).json({
             success: true,
@@ -155,7 +168,12 @@ exports.updateStudent = async (req, res) => {
             student_notes,
         } = req.body;
 
-        const student = await Student.findById(req.params.id);
+        const schoolId = req.user.school_id;
+
+        const student = await Student.findById(
+            req.params.id,
+            schoolId
+        );
 
         if (!student) {
             return res.status(404).json({
@@ -164,16 +182,22 @@ exports.updateStudent = async (req, res) => {
             });
         }
 
-        await Student.update(req.params.id, {
-            student_fname,
-            student_lname,
-            student_gender,
-            student_bday,
-            student_grade_level,
-            student_notes,
-        });
+        await Student.update(
+            req.params.id,
+            schoolId,
+            {
+                student_fname,
+                student_lname,
+                student_gender,
+                student_bday,
+                student_grade_level,
+                student_notes,
+            });
 
-        const updatedStudent = await Student.findById(req.params.id);
+        const updatedStudent = await Student.findById(
+            req.params.id,
+            schoolId
+        );
 
         res.json({
             success: true,
@@ -202,7 +226,12 @@ exports.archiveStudent = async (req, res) => {
 
     try {
 
-        const student = await Student.findById(req.params.id);
+        const schoolId = req.user.school_id;
+
+        const student = await Student.findById(
+            req.params.id,
+            schoolId
+        );
 
         if (!student) {
             return res.status(404).json({
@@ -211,7 +240,10 @@ exports.archiveStudent = async (req, res) => {
             });
         }
 
-        await Student.archive(req.params.id);
+        await Student.archive(
+            req.params.id,
+            schoolId
+        );
 
         res.json({
             success: true,

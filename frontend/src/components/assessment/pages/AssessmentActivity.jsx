@@ -1,5 +1,6 @@
 import {
-    useRef,
+    useEffect,
+    useRef
 } from "react";
 
 import {
@@ -16,7 +17,28 @@ import HandwritingToolbar from "../handwriting/HandwritingToolbar";
 import Cloud from "../../../assets/assessment/cloud.png";
 import Logo from "../../../assets/assessment/KineWrite-logo.png";
 
+import { useSound } from "../../../contexts/SoundContext";
+
+
 const AssessmentActivity = () => {
+    const {
+        startGameMusic,
+        stopGameMusic,
+        startWebsiteMusic,
+        playComplete
+    } = useSound();
+
+    useEffect(() => {
+
+        startGameMusic();
+
+        return () => {
+
+            stopGameMusic();
+
+        };
+
+    }, []);
 
     const canvasRef = useRef(null);
 
@@ -433,7 +455,9 @@ const AssessmentActivity = () => {
             activities.length - 1
 
         ) {
-
+            // Exercise completed
+            playComplete();
+            stopGameMusic();
             goToPage("analysis");
 
         }

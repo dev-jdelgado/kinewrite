@@ -57,7 +57,7 @@ const Login = () => {
 
         console.log("After login");
         console.log(result);
-        
+
         setLoading(false);
 
         if (result.success) {
@@ -69,67 +69,79 @@ const Login = () => {
     };
 
     return (
-            <AuthLayout>
-                <div className="absolute md:w-60 w-36 top-10 sm:left-20 left-2">
-                    <img
-                        src={SunRays}
-                        alt="Sun Rays"
-                        className="absolute top-2 -left-[3px] inset-0 w-full animate-spin-slow"
-                    />
+        <AuthLayout>
+            <div className="absolute md:w-60 w-36 top-10 sm:left-20 left-2">
+                <img
+                    src={SunRays}
+                    alt="Sun Rays"
+                    className="absolute top-2 -left-[3px] inset-0 w-full animate-spin-slow"
+                />
 
-                    <img
-                        src={SunCenter}
-                        alt="Sun"
-                        className="relative w-full"
+                <img
+                    src={SunCenter}
+                    alt="Sun"
+                    className="relative w-full"
+                />
+            </div>
+            <img src={Star} alt="Sun" className="absolute w-20 md:top-20 top-12 sm:right-70 right-[25%] animate-spin-slow" />
+            <img src={Star1} alt="Sun" className="absolute w-20 md:bottom-60 bottom-36 sm:left-20 left-12 animate-spin-slow" />
+            <img src={Balloon} alt="Balloon" className="absolute md:w-60 w-32 top-30 right-1 animate-swing" />
+            <div className="bg-white rounded-3xl shadow-xl w-full relative sm:px-12 px-6 py-10 sm:top-15">
+                <img src={People} alt="people" className="absolute sm:w-80 w-[70%] sm:bottom-80 bottom-[290px] sm:left-[20%] left-[12.6vw]" />
+                <img src={KinewriteLogo} alt="Kinewritelogo" className="absolute sm:max-w-100 max-w-[70%] sm:bottom-62 bottom-[265px] sm:left-[10%] left-[12.6vw]" />
+                <form
+                    className="space-y-6"
+                    onSubmit={handleSubmit}
+                >
+                    <Input
+                        label="Username"
+                        name="username"
+                        value={credentials.username}
+                        onChange={handleChange}
+                        placeholder="Enter username"
+                        icon={<FaUser />}
                     />
-                </div>
-                <img src={Star} alt="Sun" className="absolute w-20 md:top-20 top-12 sm:right-70 right-[25%] animate-spin-slow"/>
-                <img src={Star1} alt="Sun" className="absolute w-20 md:bottom-60 bottom-36 sm:left-20 left-12 animate-spin-slow"/>
-                <img src={Balloon} alt="Balloon" className="absolute md:w-60 w-32 top-30 right-1 animate-swing"/>
-                <div className="bg-white rounded-3xl shadow-xl w-full relative sm:px-12 px-6 py-10">
-                    <img src={People} alt="people" className="absolute sm:w-80 w-[70%] sm:bottom-72 bottom-[270px] sm:left-[20%] left-[12.6vw]" />
-                    <img src={KinewriteLogo} alt="Kinewritelogo" className="absolute sm:max-w-100 max-w-[70%] sm:bottom-55 bottom-[250px] sm:left-[10%] left-[12.6vw]" />
-                    <form
-                        className="space-y-6"
-                        onSubmit={handleSubmit}
+                    <Input
+                        label="Password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        value={credentials.password}
+                        onChange={handleChange}
+                        placeholder="Enter password"
+                        icon={<FaLock />}
+                        rightIcon={
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="text-slate-400 hover:text-blue-600 transition-colors"
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        }
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        loading={loading}
                     >
-                        <Input
-                            label="Username"
-                            name="username"
-                            value={credentials.username}
-                            onChange={handleChange}
-                            placeholder="Enter username"
-                            icon={<FaUser />}
-                        />
-                        <Input
-                            label="Password"
-                            name="password"
-                            type={showPassword ? "text" : "password"}
-                            value={credentials.password}
-                            onChange={handleChange}
-                            placeholder="Enter password"
-                            icon={<FaLock />}
-                            rightIcon={
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="text-slate-400 hover:text-blue-600 transition-colors"
-                                    aria-label={showPassword ? "Hide password" : "Show password"}
-                                >
-                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                </button>
-                            }
-                        />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            loading={loading}
-                        >
-                            Login
-                        </Button>
-                    </form>
-                </div>
-            </AuthLayout>
+                        Login
+                    </Button>
+                    <div className="text-center pt-2">
+                        <p className="text-sm text-slate-500">
+                            Don't have an account?{" "}
+                            <button
+                                type="button"
+                                onClick={() => navigate("/signup")}
+                                className="font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+                            >
+                                Create an account
+                            </button>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </AuthLayout>
     );
 };
 
