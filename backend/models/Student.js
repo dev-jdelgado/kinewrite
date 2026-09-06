@@ -4,23 +4,27 @@ const Student = {
     // ==========================================
     // Get All Active Students
     // ==========================================
-    async findAll() {
-        const [rows] = await db.query(`
-            SELECT
-                student_id,
-                student_code,
-                student_fname,
-                student_lname,
-                student_gender,
-                student_grade_level,
-                student_classification,
-                student_assessment_status,
-                student_current_level,
-                student_last_activity
-            FROM students
-            WHERE student_is_active = 1
-            ORDER BY student_fname ASC
-        `);
+    async findAll(schoolId) {
+        const [rows] = await db.query(
+            `
+        SELECT
+            student_id,
+            student_code,
+            student_fname,
+            student_lname,
+            student_gender,
+            student_grade_level,
+            student_classification,
+            student_assessment_status,
+            student_current_level,
+            student_last_activity
+        FROM students
+        WHERE student_is_active = 1
+        AND school_id = ?
+        ORDER BY student_fname ASC
+        `,
+            [schoolId]
+        );
 
         return rows;
     },
@@ -28,15 +32,16 @@ const Student = {
     // ==========================================
     // Get Student By ID
     // ==========================================
-    async findById(id) {
+    async findById(id, schoolId) {
         const [rows] = await db.query(
             `
-            SELECT *
-            FROM students
-            WHERE student_id = ?
-            AND student_is_active = 1
-            `,
-            [id]
+        SELECT *
+        FROM students
+        WHERE student_id = ?
+        AND school_id = ?
+        AND student_is_active = 1
+        `,
+            [id, schoolId]
         );
 
         return rows[0] || null;
@@ -48,18 +53,20 @@ const Student = {
     async create(connection, studentData) {
         const [result] = await connection.query(
             `
-            INSERT INTO students
-            (
-                student_fname,
-                student_lname,
-                student_gender,
-                student_bday,
-                student_grade_level,
-                student_notes
-            )
-            VALUES (?, ?, ?, ?, ?, ?)
-            `,
+        INSERT INTO students
+        (
+            school_id,
+            student_fname,
+            student_lname,
+            student_gender,
+            student_bday,
+            student_grade_level,
+            student_notes
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        `,
             [
+                studentData.school_id,
                 studentData.student_fname,
                 studentData.student_lname,
                 studentData.student_gender,
@@ -68,25 +75,27 @@ const Student = {
                 studentData.student_notes || null,
             ]
         );
+
         return result.insertId;
     },
 
     // ==========================================
     // Update Student
     // ==========================================
-    async update(id, studentData) {
+    async update(id, schoolId, studentData) {
         await db.query(
             `
-            UPDATE students
-            SET
-                student_fname = ?,
-                student_lname = ?,
-                student_gender = ?,
-                student_bday = ?,
-                student_grade_level = ?,
-                student_notes = ?
-            WHERE student_id = ?
-            `,
+        UPDATE students
+        SET
+            student_fname = ?,
+            student_lname = ?,
+            student_gender = ?,
+            student_bday = ?,
+            student_grade_level = ?,
+            student_notes = ?
+        WHERE student_id = ?
+        AND school_id = ?
+        `,
             [
                 studentData.student_fname,
                 studentData.student_lname,
@@ -95,6 +104,7 @@ const Student = {
                 studentData.student_grade_level,
                 studentData.student_notes || null,
                 id,
+                schoolId,
             ]
         );
     },
@@ -167,14 +177,15 @@ const Student = {
     // ==========================================
     // Soft Delete Student
     // ==========================================
-    async archive(id) {
+    async archive(id, schoolId) {
         await db.query(
             `
-            UPDATE students
-            SET student_is_active = 0
-            WHERE student_id = ?
-            `,
-            [id]
+        UPDATE students
+        SET student_is_active = 0
+        WHERE student_id = ?
+        AND school_id = ?
+        `,
+            [id, schoolId]
         );
     },
 

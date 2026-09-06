@@ -8,6 +8,7 @@ import App from "./App";
 import { AuthProvider } from "./contexts/AuthContext";
 import { StudentProvider } from "./contexts/StudentContext";
 
+import { SoundProvider } from "./contexts/SoundContext";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -15,10 +16,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <BrowserRouter>
             <AuthProvider>
                 <StudentProvider>
-                    <App />
-                    <Toaster
-                        position="top-right"
-                    />
+                    <SoundProvider>
+                        <App />
+                        <Toaster
+                            position="top-right"
+                        />
+                    </SoundProvider>
                 </StudentProvider>
             </AuthProvider>
         </BrowserRouter>

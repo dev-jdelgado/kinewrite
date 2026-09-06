@@ -1,6 +1,11 @@
-import SkyBackground from "../../../assets/assessment/sky-background.png";
+import { useTheme } from "../../../contexts/ThemeContext";
+
+import BlueLogin from "../../../assets/login/Lightbg.png";
+import BgLoginDark from "../../../assets/login/Darkmodemoon1.png";
 
 const AssessmentLayout = ({ children }) => {
+
+    const { darkMode } = useTheme();
 
     return (
 
@@ -14,12 +19,14 @@ const AssessmentLayout = ({ children }) => {
                 flex
                 flex-col
                 justify-center
+                transition-all
+                duration-500
             "
             style={{
-                backgroundImage:
-                    `url(${SkyBackground})`,
+                backgroundImage: `url(${darkMode ? BgLoginDark : BlueLogin})`,
             }}
         >
+
             <div
                 className="
                     mx-auto
