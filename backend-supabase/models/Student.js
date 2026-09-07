@@ -7,22 +7,22 @@ const Student = {
     async findAll(schoolId) {
         const { rows } = await db.query(
             `
-        SELECT
-            student_id,
-            student_code,
-            student_fname,
-            student_lname,
-            student_gender,
-            student_grade_level,
-            student_classification,
-            student_assessment_status,
-            student_current_level,
-            student_last_activity
-        FROM students
-        WHERE student_is_active = TRUE
-        AND school_id = $1
-        ORDER BY student_fname ASC
-        `,
+            SELECT
+                student_id,
+                student_code,
+                student_fname,
+                student_lname,
+                student_gender,
+                student_grade_level,
+                student_classification,
+                student_assessment_status,
+                student_current_level,
+                student_last_activity
+            FROM students
+            WHERE student_is_active = TRUE
+            AND school_id = $1
+            ORDER BY student_fname ASC
+            `,
             [schoolId]
         );
 
@@ -35,12 +35,12 @@ const Student = {
     async findById(id, schoolId) {
         const { rows } = await db.query(
             `
-        SELECT *
-        FROM students
-        WHERE student_id = $1
-        AND school_id = $2
-        AND student_is_active = TRUE
-        `,
+            SELECT *
+            FROM students
+            WHERE student_id = $1
+            AND school_id = $2
+            AND student_is_active = TRUE
+            `,
             [id, schoolId]
         );
 
@@ -51,23 +51,39 @@ const Student = {
     // Create Student
     // ==========================================
     async create(connection, studentData) {
+        /*
+         * student_code is NOT NULL in Supabase.
+         *
+         * The actual student code is generated after
+         * PostgreSQL creates the student_id.
+         *
+         * Therefore, insert a temporary code first.
+         * The controller will replace it using
+         * updateStudentCode().
+         */
+        const temporaryStudentCode = `TEMP-${Date.now()}-${Math.random()
+            .toString(36)
+            .substring(2, 8)}`;
+
         const result = await connection.query(
             `
-        INSERT INTO students
-        (
-            school_id,
-            student_fname,
-            student_lname,
-            student_gender,
-            student_bday,
-            student_grade_level,
-            student_notes
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING student_id
-        `,
+            INSERT INTO students
+            (
+                school_id,
+                student_code,
+                student_fname,
+                student_lname,
+                student_gender,
+                student_bday,
+                student_grade_level,
+                student_notes
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING student_id
+            `,
             [
                 studentData.school_id,
+                temporaryStudentCode,
                 studentData.student_fname,
                 studentData.student_lname,
                 studentData.student_gender,
@@ -86,17 +102,17 @@ const Student = {
     async update(id, schoolId, studentData) {
         await db.query(
             `
-        UPDATE students
-        SET
-            student_fname = $1,
-            student_lname = $2,
-            student_gender = $3,
-            student_bday = $4,
-            student_grade_level = $5,
-            student_notes = $6
-        WHERE student_id = $7
-        AND school_id = $8
-        `,
+            UPDATE students
+            SET
+                student_fname = $1,
+                student_lname = $2,
+                student_gender = $3,
+                student_bday = $4,
+                student_grade_level = $5,
+                student_notes = $6
+            WHERE student_id = $7
+            AND school_id = $8
+            `,
             [
                 studentData.student_fname,
                 studentData.student_lname,
@@ -141,7 +157,6 @@ const Student = {
         studentId,
         level
     ) {
-
         await connection.query(
             `
             UPDATE students
@@ -181,11 +196,11 @@ const Student = {
     async archive(id, schoolId) {
         await db.query(
             `
-        UPDATE students
-        SET student_is_active = FALSE
-        WHERE student_id = $1
-        AND school_id = $2
-        `,
+            UPDATE students
+            SET student_is_active = FALSE
+            WHERE student_id = $1
+            AND school_id = $2
+            `,
             [id, schoolId]
         );
     },
@@ -250,8 +265,13 @@ const Student = {
                 )
                 VALUES ($1, $2, 0, 0, 0, $3)
                 `,
-                [studentId, currentLevel, classification]
+                [
+                    studentId,
+                    currentLevel,
+                    classification,
+                ]
             );
+
             return;
         }
 
@@ -264,7 +284,11 @@ const Student = {
                 updated_at = CURRENT_TIMESTAMP
             WHERE student_id = $3
             `,
-            [currentLevel, classification, studentId]
+            [
+                currentLevel,
+                classification,
+                studentId,
+            ]
         );
     },
 
@@ -276,19 +300,12 @@ const Student = {
         connection,
         assessmentData
     ) {
-
         const {
-
             studentId,
-
             assessmentId,
-
             classification,
-
             level,
-
             accuracy,
-
         } = assessmentData;
 
         // --------------------------------------
@@ -296,7 +313,6 @@ const Student = {
         // --------------------------------------
 
         await connection.query(
-
             `
             UPDATE students
             SET
@@ -306,17 +322,11 @@ const Student = {
                 student_last_activity = CURRENT_TIMESTAMP
             WHERE student_id = $3
             `,
-
             [
-
                 classification,
-
                 level,
-
                 studentId,
-
             ]
-
         );
 
         // --------------------------------------
@@ -324,42 +334,25 @@ const Student = {
         // --------------------------------------
 
         await connection.query(
-
             `
             UPDATE student_progress
             SET
-
                 last_assessment_id = $1,
-
                 current_level = $2,
-
                 current_classification = $3,
-
                 average_accuracy = $4,
-
                 last_session = CURRENT_TIMESTAMP,
-
                 updated_at = CURRENT_TIMESTAMP
-
             WHERE student_id = $5
             `,
-
             [
-
                 assessmentId,
-
                 level,
-
                 classification,
-
                 accuracy,
-
                 studentId,
-
             ]
-
         );
-
     }
 };
 
