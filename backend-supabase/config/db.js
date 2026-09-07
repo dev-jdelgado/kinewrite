@@ -3,9 +3,10 @@ require("dotenv").config();
 
 /**
  * KineWrite PostgreSQL connection pool.
+ * Supabase provides PostgreSQL.
  *
- * Supabase provides PostgreSQL. For Render, use the Supabase
- * Session Pooler DATABASE_URL because Render is IPv4 based.
+ * DATABASE_URL should be the Supabase Session Pooler / connection string
+ * used by the staging backend.
  */
 const connectionString = process.env.DATABASE_URL;
 
@@ -32,6 +33,7 @@ async function testConnection() {
 
     try {
         const client = await pool.connect();
+
         try {
             await client.query("SELECT 1");
             console.log("✅ Supabase PostgreSQL Connected");
