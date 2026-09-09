@@ -16,7 +16,7 @@ import {
 
 const steps = [
     "Collecting handwriting samples...",
-    "Processing 17 handwriting activities...",
+    "Processing 10 handwriting activities...",
     "Analyzing letter alignment...",
     "Analyzing word spacing...",
     "Analyzing stroke patterns...",

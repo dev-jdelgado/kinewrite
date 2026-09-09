@@ -49,111 +49,118 @@ const preAssessmentActivities = [
         themeColor: "#F59E0B",
     },
 
-    {
-        id: 4,
-        category: "alignment",
-        activityName: "Letters D and d",
-        activityType: "letter",
-        title: "ALIGNMENT",
-        instruction:
-            "Trace and copy the letters while keeping them aligned on the guide.",
-        promptText: "D d",
-        promptType: "Letter",
-        illustration: "donut",
-        reward: "star",
-        themeColor: "#F59E0B",
-    },
-
-    {
-        id: 5,
-        category: "alignment",
-        activityName: "Letters E and e",
-        activityType: "letter",
-        title: "ALIGNMENT",
-        instruction:
-            "Trace and copy the letters while keeping them aligned on the guide.",
-        promptText: "E e",
-        promptType: "Letter",
-        illustration: "egg",
-        reward: "star",
-        themeColor: "#F59E0B",
-    },
-
     // ==========================================
     // SPACING
     // ==========================================
 
-    ...[
-        ["CAT", "cat"],
-        ["DOG", "dog"],
-        ["PEN", "pen"],
-        ["SUN", "sun"],
-        ["BOOK", "books"],
-    ].map((x, i) => ({
-
-        id: i + 6,
-
+    {
+        id: 4,
         category: "spacing",
-
-        activityName: x[0],
-
+        activityName: "CAT",
         activityType: "word",
-
         title: "SPACING",
-
         instruction:
             "Trace and copy the word while maintaining even spacing between letters.",
-
-        promptText: x[0],
-
+        promptText: "CAT",
         promptType: "Word",
-
-        illustration: x[1],
-
+        illustration: "cat",
         reward: "star",
-
         themeColor: "#3A8DDE",
+    },
 
-    })),
+    {
+        id: 5,
+        category: "spacing",
+        activityName: "PEN",
+        activityType: "word",
+        title: "SPACING",
+        instruction:
+            "Trace and copy the word while maintaining even spacing between letters.",
+        promptText: "PEN",
+        promptType: "Word",
+        illustration: "pen",
+        reward: "star",
+        themeColor: "#3A8DDE",
+    },
+
+    {
+        id: 6,
+        category: "spacing",
+        activityName: "BOOK",
+        activityType: "word",
+        title: "SPACING",
+        instruction:
+            "Trace and copy the word while maintaining even spacing between letters.",
+        promptText: "BOOK",
+        promptType: "Word",
+        illustration: "books",
+        reward: "star",
+        themeColor: "#3A8DDE",
+    },
 
     // ==========================================
     // STROKES
     // ==========================================
 
-    ...[
-        "Horizontal",
-        "Vertical",
-        "Diagonal",
-        "Zigzag",
-        "Wave",
-        "Circle",
-        "Curves",
-    ].map((name, i) => ({
-
-        id: i + 11,
-
+    {
+        id: 7,
         category: "stroke",
-
-        activityName: name,
-
+        activityName: "Horizontal",
         activityType: "stroke",
-
         title: "STROKE",
-
         instruction:
             "Trace and copy the stroke pattern as accurately as possible.",
-
-        promptText: name,
-
+        promptText: "Horizontal",
         promptType: "Stroke",
-
-        illustration: name.toLowerCase(),
-
+        illustration: "horizontal",
         reward: "star",
-
         themeColor: "#22C55E",
+    },
 
-    })),
+    {
+        id: 8,
+        category: "stroke",
+        activityName: "Vertical",
+        activityType: "stroke",
+        title: "STROKE",
+        instruction:
+            "Trace and copy the stroke pattern as accurately as possible.",
+        promptText: "Vertical",
+        promptType: "Stroke",
+        illustration: "vertical",
+        reward: "star",
+        themeColor: "#22C55E",
+    },
+
+    {
+        id: 9,
+        category: "stroke",
+        activityName: "Zigzag",
+        activityType: "stroke",
+        title: "STROKE",
+        instruction:
+            "Trace and copy the stroke pattern as accurately as possible.",
+        promptText: "Zigzag",
+        promptType: "Stroke",
+        illustration: "zigzag",
+        reward: "star",
+        themeColor: "#22C55E",
+    },
+
+    {
+        id: 10,
+        category: "stroke",
+        activityName: "Circle",
+        activityType: "stroke",
+        title: "STROKE",
+        instruction:
+            "Trace and copy the stroke pattern as accurately as possible.",
+        promptText: "Circle",
+        promptType: "Stroke",
+        illustration: "circle",
+        reward: "star",
+        themeColor: "#22C55E",
+    },
 
 ];
 

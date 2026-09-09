@@ -7,11 +7,12 @@ const postAssessmentActivities = [
     {
         id: 1,
         category: "alignment",
-        activityName: "Letter A",
+        activityName: "Letters A and a",
         activityType: "letter",
         title: "ALIGNMENT",
-        instruction: "Trace and copy the letter while keeping it aligned on the writing guide.",
-        promptText: "A",
+        instruction:
+            "Trace and copy the letters while keeping them aligned on the writing guide.",
+        promptText: "A a",
         promptType: "Letter",
         illustration: "apple",
         reward: "star",
@@ -21,11 +22,12 @@ const postAssessmentActivities = [
     {
         id: 2,
         category: "alignment",
-        activityName: "Letter B",
+        activityName: "Letters B and b",
         activityType: "letter",
         title: "ALIGNMENT",
-        instruction: "Trace and copy the letter while keeping it aligned on the writing guide.",
-        promptText: "B",
+        instruction:
+            "Trace and copy the letters while keeping them aligned on the writing guide.",
+        promptText: "B b",
         promptType: "Letter",
         illustration: "basketball",
         reward: "star",
@@ -35,41 +37,14 @@ const postAssessmentActivities = [
     {
         id: 3,
         category: "alignment",
-        activityName: "Letter C",
+        activityName: "Letters C and c",
         activityType: "letter",
         title: "ALIGNMENT",
-        instruction: "Trace and copy the letter while keeping it aligned on the writing guide.",
-        promptText: "C",
+        instruction:
+            "Trace and copy the letters while keeping them aligned on the writing guide.",
+        promptText: "C c",
         promptType: "Letter",
         illustration: "cap",
-        reward: "star",
-        themeColor: "#F59E0B",
-    },
-
-    {
-        id: 4,
-        category: "alignment",
-        activityName: "Letter D",
-        activityType: "letter",
-        title: "ALIGNMENT",
-        instruction: "Trace and copy the letter while keeping it aligned on the writing guide.",
-        promptText: "D",
-        promptType: "Letter",
-        illustration: "donut",
-        reward: "star",
-        themeColor: "#F59E0B",
-    },
-
-    {
-        id: 5,
-        category: "alignment",
-        activityName: "Letter E",
-        activityType: "letter",
-        title: "ALIGNMENT",
-        instruction: "Trace and copy the letter while keeping it aligned on the writing guide.",
-        promptText: "E",
-        promptType: "Letter",
-        illustration: "egg",
         reward: "star",
         themeColor: "#F59E0B",
     },
@@ -79,12 +54,13 @@ const postAssessmentActivities = [
     // ==========================================================
 
     {
-        id: 6,
+        id: 4,
         category: "spacing",
         activityName: "CAT",
         activityType: "word",
         title: "SPACING",
-        instruction: "Trace and copy the word while maintaining equal spacing between letters.",
+        instruction:
+            "Trace and copy the word while maintaining equal spacing between letters.",
         promptText: "CAT",
         promptType: "Word",
         illustration: "cat",
@@ -93,26 +69,13 @@ const postAssessmentActivities = [
     },
 
     {
-        id: 7,
-        category: "spacing",
-        activityName: "DOG",
-        activityType: "word",
-        title: "SPACING",
-        instruction: "Trace and copy the word while maintaining equal spacing between letters.",
-        promptText: "DOG",
-        promptType: "Word",
-        illustration: "dog",
-        reward: "star",
-        themeColor: "#3A8DDE",
-    },
-
-    {
-        id: 8,
+        id: 5,
         category: "spacing",
         activityName: "PEN",
         activityType: "word",
         title: "SPACING",
-        instruction: "Trace and copy the word while maintaining equal spacing between letters.",
+        instruction:
+            "Trace and copy the word while maintaining equal spacing between letters.",
         promptText: "PEN",
         promptType: "Word",
         illustration: "pen",
@@ -121,26 +84,13 @@ const postAssessmentActivities = [
     },
 
     {
-        id: 9,
-        category: "spacing",
-        activityName: "SUN",
-        activityType: "word",
-        title: "SPACING",
-        instruction: "Trace and copy the word while maintaining equal spacing between letters.",
-        promptText: "SUN",
-        promptType: "Word",
-        illustration: "sun",
-        reward: "star",
-        themeColor: "#3A8DDE",
-    },
-
-    {
-        id: 10,
+        id: 6,
         category: "spacing",
         activityName: "BOOK",
         activityType: "word",
         title: "SPACING",
-        instruction: "Trace and copy the word while maintaining equal spacing between letters.",
+        instruction:
+            "Trace and copy the word while maintaining equal spacing between letters.",
         promptText: "BOOK",
         promptType: "Word",
         illustration: "books",
@@ -153,12 +103,13 @@ const postAssessmentActivities = [
     // ==========================================================
 
     {
-        id: 11,
+        id: 7,
         category: "stroke",
-        activityName: "Horizontal Line",
+        activityName: "Horizontal",
         activityType: "stroke",
         title: "STROKE",
-        instruction: "Trace and copy the stroke pattern carefully.",
+        instruction:
+            "Trace and copy the stroke pattern carefully.",
         promptText: "Horizontal",
         promptType: "Stroke",
         illustration: "horizontal",
@@ -167,12 +118,13 @@ const postAssessmentActivities = [
     },
 
     {
-        id: 12,
+        id: 8,
         category: "stroke",
-        activityName: "Vertical Line",
+        activityName: "Vertical",
         activityType: "stroke",
         title: "STROKE",
-        instruction: "Trace and copy the stroke pattern carefully.",
+        instruction:
+            "Trace and copy the stroke pattern carefully.",
         promptText: "Vertical",
         promptType: "Stroke",
         illustration: "vertical",
@@ -181,26 +133,13 @@ const postAssessmentActivities = [
     },
 
     {
-        id: 13,
-        category: "stroke",
-        activityName: "Diagonal Line",
-        activityType: "stroke",
-        title: "STROKE",
-        instruction: "Trace and copy the stroke pattern carefully.",
-        promptText: "Diagonal",
-        promptType: "Stroke",
-        illustration: "diagonal",
-        reward: "star",
-        themeColor: "#22C55E",
-    },
-
-    {
-        id: 14,
+        id: 9,
         category: "stroke",
         activityName: "Zigzag",
         activityType: "stroke",
         title: "STROKE",
-        instruction: "Trace and copy the stroke pattern carefully.",
+        instruction:
+            "Trace and copy the stroke pattern carefully.",
         promptText: "Zigzag",
         promptType: "Stroke",
         illustration: "zigzag",
@@ -209,43 +148,16 @@ const postAssessmentActivities = [
     },
 
     {
-        id: 15,
-        category: "stroke",
-        activityName: "Wave",
-        activityType: "stroke",
-        title: "STROKE",
-        instruction: "Trace and copy the stroke pattern carefully.",
-        promptText: "Wave",
-        promptType: "Stroke",
-        illustration: "wave",
-        reward: "star",
-        themeColor: "#22C55E",
-    },
-
-    {
-        id: 16,
+        id: 10,
         category: "stroke",
         activityName: "Circle",
         activityType: "stroke",
         title: "STROKE",
-        instruction: "Trace and copy the stroke pattern carefully.",
+        instruction:
+            "Trace and copy the stroke pattern carefully.",
         promptText: "Circle",
         promptType: "Stroke",
         illustration: "circle",
-        reward: "star",
-        themeColor: "#22C55E",
-    },
-
-    {
-        id: 17,
-        category: "stroke",
-        activityName: "Curves",
-        activityType: "stroke",
-        title: "STROKE",
-        instruction: "Trace and copy the stroke pattern carefully.",
-        promptText: "Curves",
-        promptType: "Stroke",
-        illustration: "curves",
         reward: "star",
         themeColor: "#22C55E",
     },

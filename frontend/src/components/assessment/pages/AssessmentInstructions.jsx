@@ -28,20 +28,19 @@ const AssessmentInstructions = () => {
         >
 
             <AssessmentHeader
-
                 title="Assessment Instructions"
-
                 subtitle="Please read the instructions carefully before starting your handwriting assessment."
 
             />
 
             <div
                 className="
-                    mt-8
+                    mt-6
                     bg-white
                     rounded-3xl
                     shadow-xl
-                    p-10
+                    md:px-10 px-6
+                    md:py-10 py-5
                 "
             >
 
@@ -61,7 +60,7 @@ const AssessmentInstructions = () => {
 
                     <h2
                         className="
-                            text-3xl
+                            md:text-3xl text-2xl
                             font-bold
                         "
                     >
@@ -90,8 +89,8 @@ const AssessmentInstructions = () => {
 
                     <InstructionItem
                         icon={<Layers3 />}
-                        title="Complete All 17 Activities"
-                        description="The assessment contains 17 handwriting activities divided into Alignment, Spacing, and Stroke exercises. Complete each activity before proceeding."
+                        title="Complete All 10 Activities"
+                        description="The assessment contains 10 handwriting activities divided into Alignment, Spacing, and Stroke exercises. Complete each activity before proceeding."
                     />
 
                     <InstructionItem
