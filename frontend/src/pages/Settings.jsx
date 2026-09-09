@@ -37,12 +37,12 @@ export default function Settings() {
                 </div>
 
                 {/* Settings Card */}
-                <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl p-8 mt-20">
+                <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl sm:p-8 p-5 mt-20">
 
                     {/* Tabs */}
                     <div
                         role="tablist"
-                        className="grid grid-cols-2 md:grid-cols-4 gap-2"
+                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mb-10"
                     >
                         <button
                             role="tab"

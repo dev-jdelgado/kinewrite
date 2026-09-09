@@ -1,6 +1,6 @@
 const About = () => {
     return (
-        <section className="min-h-screen py-16 px-6">
+        <section className="min-h-screen sm:py-16 py-8 sm:px-6 px-1">
             <div className="max-w-5xl mx-auto">
 
                 {/* Header */}
