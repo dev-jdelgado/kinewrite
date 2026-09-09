@@ -117,7 +117,10 @@ const AssessmentActivity = () => {
                     "
                 >
 
-                    <BackButton />
+                    <BackButton
+                        to="/dashboard"
+                        label="Home"
+                    />
 
                     <img
                         src={Logo}
