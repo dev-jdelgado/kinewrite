@@ -320,6 +320,65 @@ const getAlignmentGuide = (
     return null;
 };
 
+const getActivityProgress = (
+    activity,
+    history
+) => {
+
+    const attempts = history.filter(
+        attempt => {
+
+            let meta = {};
+
+            try {
+                meta =
+                    typeof attempt.stroke_data === "string"
+                        ? JSON.parse(attempt.stroke_data)
+                        : attempt.stroke_data || {};
+            } catch {
+                meta = {};
+            }
+
+            return (
+                String(meta.activityId) ===
+                String(activity.id)
+            );
+
+        }
+    );
+
+    if (!attempts.length) {
+        return {
+            completed: false,
+            score: null,
+        };
+    }
+
+    const scores = attempts
+        .map(attempt => Number(attempt.accuracy))
+        .filter(score => Number.isFinite(score));
+
+    if (!scores.length) {
+        return {
+            completed: true,
+            score: null,
+        };
+    }
+
+    const average =
+        scores.reduce(
+            (sum, value) => sum + value,
+            0
+        ) / scores.length;
+
+    return {
+        completed: true,
+        score: Number(
+            average.toFixed(2)
+        ),
+    };
+
+};
 
 const Exercises = () => {
 
@@ -366,7 +425,11 @@ const Exercises = () => {
     const sessionStartPromiseRef = useRef(null);
     const itemStartedAtRef = useRef(Date.now());
     const [savingAttempt, setSavingAttempt] = useState(false);
+
     const [lastResult, setLastResult] = useState(null);
+    
+    const [exerciseHistory, setExerciseHistory] = useState([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
 
     const ensureExerciseSession = async () => {
         if (sessionIdRef.current) return sessionIdRef.current;
@@ -381,6 +444,47 @@ const Exercises = () => {
             .finally(() => { sessionStartPromiseRef.current = null; });
         return sessionStartPromiseRef.current;
     };
+
+    useEffect(() => {
+        if (!studentId || !showActivities) return;
+    
+        const loadExerciseHistory = async () => {
+            setHistoryLoading(true);
+    
+            try {
+                const response =
+                    await ExerciseService.getStudentHistory(
+                        Number(studentId)
+                    );
+    
+                const history =
+                    response?.data?.attempts || [];
+                
+                setExerciseHistory(
+                    Array.isArray(history)
+                        ? history
+                        : []
+                );
+    
+            } catch (error) {
+                console.error(
+                    "Failed to load exercise history:",
+                    error
+                );
+    
+                setExerciseHistory([]);
+    
+            } finally {
+                setHistoryLoading(false);
+            }
+        };
+    
+        loadExerciseHistory();
+    
+    }, [
+        studentId,
+        showActivities,
+    ]);
 
     useEffect(() => {
 
@@ -815,130 +919,201 @@ const Exercises = () => {
                                             (
                                                 item,
                                                 index
-                                            ) => (
+                                            ) => {
 
-                                                <button
-                                                    key={
-                                                        item.id
-                                                    }
+                                                const progress =
+                                                    getActivityProgress(
+                                                        item,
+                                                        exerciseHistory
+                                                    );
 
-                                                    onClick={() =>
-                                                        selectActivity(
-                                                            item
-                                                        )
-                                                    }
+                                                return (
 
-                                                    className="
-                                                        text-left
-                                                        bg-white
-                                                        rounded-[30px]
-                                                        shadow-xl
-                                                        sm:p-7 p-5
-                                                        border-4
-                                                        border-transparent
-                                                        hover:border-sky-400
-                                                        hover:-translate-y-1
-                                                        transition-all
-                                                    "
-                                                >
-
-                                                    <div
-                                                        className="
-                                                            flex
-                                                            items-center
-                                                            justify-between
-                                                        "
-                                                    >
-
-                                                        <span
-                                                            className="
-                                                                text-xs
-                                                                font-black
-                                                                uppercase
-                                                                tracking-widest
-                                                            "
-                                                            style={{
-                                                                color:
-                                                                    item.themeColor,
-                                                            }}
-                                                        >
-                                                            Activity{" "}
-                                                            {index + 1}
-                                                        </span>
-
-
-                                                        <Star
-                                                            size={24}
-                                                            className="
-                                                                text-yellow-400
-                                                                fill-yellow-400
-                                                            "
-                                                        />
-
-                                                    </div>
-
-
-                                                    <h2
-                                                        className="
-                                                            mt-4
-                                                            text-2xl
-                                                            font-black
-                                                            text-slate-800
-                                                        "
-                                                    >
-                                                        {
-                                                            item.title
+                                                    <button
+                                                        key={item.id}
+                                                        onClick={() =>
+                                                            selectActivity(item)
                                                         }
-                                                    </h2>
-
-
-                                                    <p
                                                         className="
-                                                            mt-3
-                                                            text-slate-500
-                                                            leading-7
-                                                        "
-                                                    >
-                                                        {
-                                                            item.description
-                                                        }
-                                                    </p>
-
-
-                                                    <div
-                                                        className="
-                                                            mt-6
-                                                            flex
-                                                            justify-between
-                                                            items-center
+                                                            text-left
+                                                            bg-white
+                                                            rounded-[30px]
+                                                            shadow-xl
+                                                            sm:p-7 p-5
+                                                            border-4
+                                                            border-transparent
+                                                            hover:border-sky-400
+                                                            hover:-translate-y-1
+                                                            transition-all
                                                         "
                                                     >
 
-                                                        <span
+                                                        <div
                                                             className="
-                                                                text-sm
-                                                                font-bold
-                                                                text-slate-400
+                                                                flex
+                                                                items-center
+                                                                justify-between
                                                             "
                                                         >
-                                                            10 Items
-                                                        </span>
+
+                                                            <span
+                                                                className="
+                                                                    text-xs
+                                                                    font-black
+                                                                    uppercase
+                                                                    tracking-widest
+                                                                "
+                                                                style={{
+                                                                    color:
+                                                                        item.themeColor,
+                                                                }}
+                                                            >
+                                                                Activity {index + 1}
+                                                            </span>
 
 
-                                                        <span
+                                                            {progress.completed ? (
+
+                                                                <span
+                                                                    className="
+                                                                        inline-flex
+                                                                        items-center
+                                                                        gap-1
+                                                                        px-3
+                                                                        py-1.5
+                                                                        rounded-full
+                                                                        bg-green-100
+                                                                        text-green-700
+                                                                        text-xs
+                                                                        font-black
+                                                                    "
+                                                                >
+
+                                                                    <CheckCircle2
+                                                                        size={15}
+                                                                    />
+
+                                                                    Completed
+
+                                                                </span>
+
+                                                            ) : (
+
+                                                                <Star
+                                                                    size={24}
+                                                                    className="
+                                                                        text-yellow-400
+                                                                        fill-yellow-400
+                                                                    "
+                                                                />
+
+                                                            )}
+
+                                                        </div>
+
+
+                                                        <h2
                                                             className="
+                                                                mt-4
+                                                                text-2xl
                                                                 font-black
-                                                                text-sky-500
+                                                                text-slate-800
                                                             "
                                                         >
-                                                            Start Activity →
-                                                        </span>
+                                                            {item.title}
+                                                        </h2>
 
-                                                    </div>
 
-                                                </button>
+                                                        <p
+                                                            className="
+                                                                mt-3
+                                                                text-slate-500
+                                                                leading-7
+                                                            "
+                                                        >
+                                                            {item.description}
+                                                        </p>
 
-                                            )
+
+                                                        <div
+                                                            className="
+                                                                mt-6
+                                                                flex
+                                                                justify-between
+                                                                items-end
+                                                                gap-4
+                                                                h-9
+                                                            "
+                                                        >
+
+                                                            <div>
+
+                                                                {progress.completed ? (
+
+                                                                    <>
+
+                                                                        <div
+                                                                            className="
+                                                                                text-xs
+                                                                                font-black
+                                                                                uppercase
+                                                                                tracking-widest
+                                                                                text-slate-400
+                                                                            "
+                                                                        >
+                                                                            Score / Accuracy
+                                                                        </div>
+
+                                                                        <div
+                                                                            className="
+                                                                                text-xl
+                                                                                font-black
+                                                                                text-green-600
+                                                                            "
+                                                                        >
+                                                                            {progress.score !== null
+                                                                                ? `${progress.score}%`
+                                                                                : "Completed"}
+                                                                        </div>
+
+                                                                    </>
+
+                                                                ) : (
+
+                                                                    <span
+                                                                        className="
+                                                                            text-sm
+                                                                            font-bold
+                                                                            text-slate-400
+                                                                        "
+                                                                    >
+                                                                        Not completed
+                                                                    </span>
+
+                                                                )}
+
+                                                            </div>
+
+
+                                                            <span
+                                                                className="
+                                                                    font-black
+                                                                    text-sky-500
+                                                                    whitespace-nowrap
+                                                                "
+                                                            >
+                                                                {progress.completed
+                                                                    ? "Practice Again →"
+                                                                    : "Start Activity →"}
+                                                            </span>
+
+                                                        </div>
+
+                                                    </button>
+
+                                                );
+
+                                            }
                                         )}
 
                                     </div>
@@ -948,6 +1123,20 @@ const Exercises = () => {
                             );
 
                         }
+                    )}
+
+                    {historyLoading && (
+                        <div
+                            className="
+                                mb-8
+                                text-center
+                                text-sm
+                                font-bold
+                                text-slate-400
+                            "
+                        >
+                            Loading student progress...
+                        </div>
                     )}
 
                 </div>
