@@ -125,13 +125,7 @@ const GenerateExercisePlan = () => {
 
 
         navigate(
-            `/exercise/${student?.student_id}`,
-            {
-                state: {
-                    activity:
-                        exercisePlan[0],
-                },
-            }
+            `/exercise/${student?.student_id}`
         );
 
     };
@@ -141,9 +135,10 @@ const GenerateExercisePlan = () => {
 
         <div
             className="
-                py-10
                 max-w-6xl
                 mx-auto
+                px-6
+                pb-12
             "
         >
 
@@ -167,7 +162,7 @@ const GenerateExercisePlan = () => {
                     border
                     border-blue-200
                     rounded-3xl
-                    p-8
+                    sm:p-8 p-5
                 "
             >
 

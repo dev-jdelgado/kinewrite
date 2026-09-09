@@ -37,7 +37,7 @@ const TherapistRemarks = () => {
 
         <div
             className="
-                py-10
+                px-6
                 max-w-6xl
                 mx-auto
             "
@@ -62,7 +62,7 @@ const TherapistRemarks = () => {
                     border
                     border-blue-200
                     rounded-3xl
-                    p-8
+                    sm:p-8 p-5
                 "
             >
 
@@ -83,7 +83,7 @@ const TherapistRemarks = () => {
 
                     <h2
                         className="
-                            text-2xl
+                            sm:text-2xl text-xl
                             font-bold
                         "
                     >
@@ -119,7 +119,7 @@ const TherapistRemarks = () => {
                     bg-white
                     rounded-3xl
                     shadow-lg
-                    p-8
+                    sm:p-8 p-5
                 "
             >
 
@@ -140,7 +140,7 @@ const TherapistRemarks = () => {
 
                     <h2
                         className="
-                            text-2xl
+                            sm:text-2xl text-xl
                             font-bold
                         "
                     >
@@ -197,7 +197,7 @@ const TherapistRemarks = () => {
                     bg-white
                     rounded-3xl
                     shadow-lg
-                    p-8
+                    sm:p-8 p-5
                 "
             >
 
@@ -218,7 +218,7 @@ const TherapistRemarks = () => {
 
                     <h2
                         className="
-                            text-2xl
+                            sm:text-2xl text-xl
                             font-bold
                         "
                     >
@@ -291,7 +291,7 @@ const TherapistRemarks = () => {
 
                     rounded-3xl
 
-                    p-8
+                    sm:p-8 p-5
                 "
             >
 

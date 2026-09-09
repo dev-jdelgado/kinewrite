@@ -160,7 +160,7 @@ const SystemAnalysis = () => {
                 items-center
 
                 text-center
-
+                py-10
                 px-6
             "
         >

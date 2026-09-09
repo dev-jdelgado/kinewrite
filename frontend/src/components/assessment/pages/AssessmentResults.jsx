@@ -33,6 +33,7 @@ const AssessmentResults = () => {
                 max-w-7xl
                 mx-auto
                 py-10
+                px-6
             "
         >
 
@@ -44,7 +45,7 @@ const AssessmentResults = () => {
 
                 <h1
                     className="
-                        text-5xl
+                        sm:text-5xl text-3xl
                         font-black
                         text-sky-600
                     "
@@ -78,7 +79,7 @@ const AssessmentResults = () => {
 
                     shadow-xl
 
-                    p-10
+                    sm:p-10 p-5
 
                     text-center
                 "
@@ -106,7 +107,7 @@ const AssessmentResults = () => {
                     className="
                         mt-5
 
-                        text-7xl
+                        sm:text-7xl text-5xl
 
                         font-black
 
@@ -163,13 +164,13 @@ const AssessmentResults = () => {
 
             <div
                 className="
-                    mt-10
+                    sm:mt-10 mt-5
 
                     grid
 
                     lg:grid-cols-3
 
-                    gap-8
+                    sm:gap-8 gap-4
                 "
             >
 
@@ -277,7 +278,7 @@ const ScoreCard = ({
 
             shadow-xl
 
-            p-8
+            sm:p-8 p-4
 
             text-center
         "
@@ -299,7 +300,6 @@ const ScoreCard = ({
 
         <h3
             className="
-                mt-5
 
                 text-2xl
 
@@ -313,9 +313,9 @@ const ScoreCard = ({
 
         <p
             className="
-                mt-5
+                mt-2
 
-                text-6xl
+                sm:text-6xl text-4xl
 
                 font-black
 

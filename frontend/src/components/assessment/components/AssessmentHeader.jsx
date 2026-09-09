@@ -49,7 +49,7 @@ const AssessmentHeader = ({
                     flex-wrap
                     items-center
                     justify-between
-                    gap-5
+                    gap-1
                 "
             >
 

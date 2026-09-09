@@ -410,57 +410,6 @@ const Exercises = () => {
     ]);
 
 
-    // ==========================================
-    // Load Saved Plan
-    // ==========================================
-
-    useEffect(() => {
-
-        if (activity) {
-            return;
-        }
-
-
-        const saved =
-            localStorage.getItem(
-                `kinewrite-exercise-plan-${studentId}`
-            );
-
-
-        if (!saved) {
-            return;
-        }
-
-
-        try {
-
-            const plan =
-                JSON.parse(saved);
-
-
-            if (
-                Array.isArray(plan) &&
-                plan.length > 0
-            ) {
-
-                setActivity(
-                    plan[0]
-                );
-
-            }
-
-        } catch {
-
-            // Keep activity library available.
-
-        }
-
-    }, [
-        studentId,
-        activity,
-    ]);
-
-
     const currentItem =
         activity?.items?.[itemIndex];
 
@@ -762,7 +711,7 @@ const Exercises = () => {
                         <h1
                             className="
                                 mt-5
-                                text-5xl
+                                sm:text-5xl text-4xl
                                 font-black
                                 text-slate-800
                             "
@@ -884,7 +833,7 @@ const Exercises = () => {
                                                         bg-white
                                                         rounded-[30px]
                                                         shadow-xl
-                                                        p-7
+                                                        sm:p-7 p-5
                                                         border-4
                                                         border-transparent
                                                         hover:border-sky-400

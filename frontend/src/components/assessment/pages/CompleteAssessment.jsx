@@ -22,7 +22,7 @@ const CompleteAssessment = () => {
 
         <div
             className="
-                py-10
+                px-6
                 max-w-6xl
                 mx-auto
             "
@@ -52,7 +52,7 @@ const CompleteAssessment = () => {
 
                     rounded-3xl
 
-                    p-8
+                    sm:p-8 p-5
 
                     text-center
                 "
@@ -70,7 +70,7 @@ const CompleteAssessment = () => {
                     className="
                         mt-5
 
-                        text-3xl
+                        sm:text-3xl text-2xl
 
                         font-black
 
@@ -109,7 +109,7 @@ const CompleteAssessment = () => {
 
                     shadow-lg
 
-                    p-8
+                    sm:p-8 p-5
                 "
             >
 
@@ -130,7 +130,7 @@ const CompleteAssessment = () => {
 
                     <h2
                         className="
-                            text-2xl
+                            sm:text-2xl text-xl
                             font-bold
                         "
                     >
@@ -179,7 +179,7 @@ const CompleteAssessment = () => {
 
                     shadow-lg
 
-                    p-8
+                    sm:p-8 p-5
                 "
             >
 
@@ -200,7 +200,7 @@ const CompleteAssessment = () => {
 
                     <h2
                         className="
-                            text-2xl
+                            sm:text-2xl text-xl
                             font-bold
                         "
                     >
@@ -239,7 +239,7 @@ const CompleteAssessment = () => {
 
                     border-orange-200
 
-                    p-8
+                    sm:p-8 p-5
                 "
             >
 

@@ -32,8 +32,10 @@ const AssessmentToolbar = ({
             className="
                 mt-10
                 pb-12
+                gap-5
                 flex
-                items-center
+                md:flex-row flex-col
+                md:items-center
                 justify-between
             "
         >
@@ -55,14 +57,14 @@ const AssessmentToolbar = ({
                                 inline-flex
                                 items-center
                                 gap-3
-
+                                justify-center
                                 rounded-2xl
 
                                 bg-slate-200
 
                                 px-8
-                                py-4
-
+                                sm:py-4 py-3
+                                w-full
                                 text-lg
                                 font-semibold
                                 text-slate-700
@@ -106,14 +108,14 @@ const AssessmentToolbar = ({
                                 inline-flex
                                 items-center
                                 gap-3
-
+                                justify-center
                                 rounded-2xl
 
                                 bg-[#9b4c00]
 
-                                px-10
-                                py-4
-
+                                px-8
+                                sm:py-4 py-3
+                                w-full
                                 text-lg
                                 font-bold
                                 text-white
