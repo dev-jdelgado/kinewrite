@@ -1148,22 +1148,28 @@ const HandwritingWorksheet = forwardRef(
             <div
                 ref={worksheetRef}
 
-                className="
+                className={`
                     relative
                     w-full
-                    h-[600px]
-
+                    ${(
+                        activity?.mode === "write-line" ||
+                        activity?.mode === "follow-line" ||
+                        activity?.mode === "ruled-sentence" ||
+                        activity?.mode === "complete-sentence" ||
+                        activity?.mode === "copy-sentence" ||
+                        activity?.mode === "copy-phrase"
+                    )
+                        ? "h-[450px]"
+                        : "h-[600px]"
+                    }
+                
                     rounded-[40px]
-
                     border-[5px]
                     border-sky-500
-
                     bg-white
-
                     shadow-2xl
-
                     overflow-hidden
-                "
+                `}
 
                 style={{
                     containerType: "size",

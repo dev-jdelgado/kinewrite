@@ -156,16 +156,153 @@ const getInstruction = (activity) => {
 
 };
 
-const getAlignmentGuide = (
-    mode,
-    itemIndex
+const singleStrokeGlyphs = {
+    A: "M0 100 L50 0 L100 100 M20 65 L80 65",
+    B: "M0 0 L0 100 M0 0 C80 0 80 50 0 50 M0 50 C80 50 80 100 0 100",
+    C: "M100 10 C20 -10 0 30 0 50 C0 70 20 110 100 90",
+    D: "M0 0 L0 100 M0 0 C70 0 100 25 100 50 C100 75 70 100 0 100",
+    E: "M100 0 L0 0 L0 100 L100 100 M0 50 L75 50",
+    F: "M0 100 L0 0 L100 0 M0 50 L75 50",
+    G: "M100 15 C20 -10 0 25 0 50 C0 80 25 105 100 90 L100 55 L55 55",
+    H: "M0 0 L0 100 L0 50 L100 50 L100 0 L100 100",
+    I: "M0 0 L100 0 M50 0 L50 100 M0 100 L100 100",
+    L: "M0 0 L0 100 L100 100",
+    M: "M0 100 L0 0 L50 60 L100 0 L100 100",
+    N: "M0 100 L0 0 L100 100 L100 0",
+    O: "M50 0 C15 0 0 20 0 50 C0 80 15 100 50 100 C85 100 100 80 100 50 C100 20 85 0 50 0",
+    P: "M0 100 L0 0 C75 0 90 15 90 35 C90 55 75 65 0 65",
+    R: "M0 100 L0 0 C75 0 90 15 90 35 C90 55 75 65 0 65 M50 65 L100 100",
+    T: "M0 0 L100 0 M50 0 L50 100",
+    U: "M0 0 L0 70 C0 110 100 110 100 70 L100 0",
+    W: "M0 0 L25 100 L50 45 L75 100 L100 0",
+    Y: "M0 0 L50 50 L100 0 M50 50 L50 100",
+};
+
+const renderSingleStrokeWord = (
+    text,
+    {
+        startX = 120,
+        topY = 75,
+        letterHeight = 100,
+        letterWidth = 70,
+        spacing = 18,
+        strokeWidth = 3,
+    } = {}
 ) => {
 
-    if (
-        mode === "write-line" ||
-        mode === "follow-line"
-    ) {
+    const scaleY =
+        letterHeight / 100;
 
+    const scaleX =
+        letterWidth / 100;
+
+    let cursorX = startX;
+
+    return String(text || "")
+        .toUpperCase()
+        .split("")
+        .map((character, index) => {
+
+            if (character === " ") {
+                cursorX += letterWidth * 0.55;
+                return null;
+            }
+
+            const path =
+                singleStrokeGlyphs[character];
+
+            if (!path) {
+                cursorX += letterWidth + spacing;
+                return null;
+            }
+
+            const currentX =
+                cursorX;
+
+            cursorX +=
+                letterWidth +
+                spacing;
+
+            return (
+                <path
+                    key={`${character}-${index}`}
+                    d={path}
+                    transform={`
+                        translate(${currentX} ${topY})
+                        scale(${scaleX} ${scaleY})
+                    `}
+                    fill="none"
+                    stroke="#94A3B8"
+                    strokeWidth={strokeWidth}
+                    strokeDasharray="2 7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity="0.55"
+                />
+            );
+        });
+};
+
+const getAlignmentGuide = (
+    mode,
+    itemIndex,
+    promptText
+) => {
+
+    if (mode === "write-line") {
+        return (
+            <div className="absolute inset-0 pointer-events-none z-0">
+    
+                {/* Top blue guide */}
+                <div
+                    className="
+                        absolute
+                        left-[8%]
+                        right-[8%]
+                        border-b-2
+                        border-blue-300
+                        top-[35%]
+                        sm:top-[32%]
+                        md:top-[28%]
+                    "
+                />
+    
+                {/* Middle red baseline */}
+                <div
+                    className="
+                        absolute
+                        left-[8%]
+                        right-[8%]
+                        border-b-2
+                        border-red-400
+                        top-[50%]
+                    "
+                />
+    
+                {/* Bottom blue guide */}
+                <div
+                    className="
+                        absolute
+                        left-[8%]
+                        right-[8%]
+                        border-b-2
+                        border-blue-300
+                        top-[65%]
+                        sm:top-[68%]
+                        md:top-[72%]
+                    "
+                />
+    
+            </div>
+        );
+    }
+
+    if (
+        mode === "complete-sentence" ||
+        mode === "copy-sentence" ||
+        mode === "copy-phrase"
+    ) {
+    
         return (
             <div
                 className="
@@ -173,23 +310,523 @@ const getAlignmentGuide = (
                     inset-0
                     pointer-events-none
                     z-0
+                    bg-white
                 "
             >
+    
+                {/* Top blue guide */}
                 <div
                     className="
                         absolute
                         left-[8%]
                         right-[8%]
-                        top-[60%]
-                        border-b-[4px]
-                        border-sky-400
+                        border-b-2
+                        border-blue-300
+                        top-[35%]
+                        sm:top-[32%]
+                        md:top-[28%]
                     "
                 />
+    
+                {/* Middle red baseline */}
+                <div
+                    className="
+                        absolute
+                        left-[8%]
+                        right-[8%]
+                        border-b-2
+                        border-red-400
+                        top-[50%]
+                    "
+                />
+    
+                {/* Bottom blue guide */}
+                <div
+                    className="
+                        absolute
+                        left-[8%]
+                        right-[8%]
+                        border-b-2
+                        border-blue-300
+                        top-[65%]
+                        sm:top-[68%]
+                        md:top-[72%]
+                    "
+                />
+    
             </div>
         );
-
+    
     }
 
+    if (mode === "trace-letter") {
+
+        const prompt =
+            String(promptText || "").toUpperCase();
+    
+        /*
+         * Responsive guide area
+         *
+         * Same responsive height as Follow the Writing Line.
+         */
+        const isMobile =
+            typeof window !== "undefined" &&
+            window.innerWidth < 640;
+    
+        const isSmall =
+            typeof window !== "undefined" &&
+            window.innerWidth >= 640 &&
+            window.innerWidth < 768;
+    
+    
+        const guideHeight =
+            isMobile
+                ? 30
+                : isSmall
+                    ? 36
+                    : 44;
+    
+        const guideTop =
+            isMobile
+                ? 35
+                : isSmall
+                    ? 32
+                    : 28;
+    
+    
+        /*
+         * Normalized SVG coordinate system.
+         */
+        const SVG_WIDTH = 1000;
+    
+    
+        /*
+         * The letter occupies the complete
+         * height of the responsive guide.
+         */
+        const letterHeight = 100;
+        const topY = 0;
+    
+    
+        /*
+         * Letter dimensions follow the
+         * responsive guide height.
+         */
+        const letterWidth =
+            guideHeight * 2.2;
+    
+        const letterSpacing =
+            guideHeight * 0.0;
+    
+    
+        /*
+         * Calculate natural word width.
+         */
+        const naturalWordWidth =
+            prompt
+                .split("")
+                .reduce(
+                    (total, character) => {
+    
+                        if (character === " ") {
+                            return total +
+                                letterWidth * 0.55;
+                        }
+    
+                        return total +
+                            letterWidth +
+                            letterSpacing;
+    
+                    },
+                    0
+                );
+    
+    
+        /*
+         * Keep the word inside the writing area.
+         */
+        const maxWordWidth =
+            SVG_WIDTH * 0.84;
+    
+    
+        const wordScale =
+            naturalWordWidth > maxWordWidth
+                ? maxWordWidth / naturalWordWidth
+                : 1;
+    
+    
+        const finalLetterWidth =
+            letterWidth * wordScale;
+    
+        const finalLetterSpacing =
+            letterSpacing * wordScale;
+    
+    
+        /*
+         * Calculate final word width.
+         */
+        const finalWordWidth =
+            prompt
+                .split("")
+                .reduce(
+                    (total, character) => {
+    
+                        if (character === " ") {
+                            return total +
+                                finalLetterWidth * 0.55;
+                        }
+    
+                        return total +
+                            finalLetterWidth +
+                            finalLetterSpacing;
+    
+                    },
+                    0
+                );
+    
+    
+        /*
+         * Center the guide.
+         */
+        const startX =
+            Math.max(
+                40,
+                (SVG_WIDTH - finalWordWidth) / 2
+            );
+    
+    
+        /*
+         * Responsive dotted stroke.
+         */
+        const guideStrokeWidth =
+            Math.max(
+                2,
+                Math.min(
+                    4.6,
+                    guideHeight * 0.12
+                )
+            );
+    
+    
+        return (
+            <div
+                className="
+                    absolute
+                    inset-0
+                    pointer-events-none
+                    z-0
+                    bg-white
+                "
+            >
+    
+                {/* RESPONSIVE SINGLE-STROKE LETTER GUIDE */}
+                <svg
+                    className="
+                        absolute
+                        left-0
+                        top-[35%]
+                        w-full
+                        h-[30%]
+                        pointer-events-none
+                        overflow-visible
+                        sm:top-[32%]
+                        sm:h-[36%]
+                        md:top-[28%]
+                        md:h-[44%]
+                    "
+                    viewBox="0 0 1000 100"
+                    preserveAspectRatio="xMidYMid slice"
+                >
+    
+                    {renderSingleStrokeWord(
+                        prompt,
+                        {
+                            startX,
+                            topY,
+                            letterHeight,
+                            letterWidth: finalLetterWidth,
+                            spacing: finalLetterSpacing,
+                            strokeWidth: guideStrokeWidth,
+                        }
+                    )}
+    
+                </svg>
+    
+            </div>
+        );
+    }
+
+    if (mode === "follow-line") {
+
+        const prompt =
+            String(promptText || "").toUpperCase();
+    
+        /*
+         * SVG coordinate system
+         */
+        const SVG_WIDTH = 1000;
+        const SVG_HEIGHT = 300;
+    
+    
+        /*
+         * Responsive writing-line positions
+         */
+        const isMobile =
+            typeof window !== "undefined" &&
+            window.innerWidth < 640;
+    
+        const isSmall =
+            typeof window !== "undefined" &&
+            window.innerWidth >= 640 &&
+            window.innerWidth < 768;
+    
+    
+        const topRatio =
+            isMobile
+                ? 0.35
+                : isSmall
+                    ? 0.32
+                    : 0.28;
+    
+        const bottomRatio =
+            isMobile
+                ? 0.65
+                : isSmall
+                    ? 0.68
+                    : 0.72;
+    
+    
+        /*
+         * Convert responsive percentages
+         * into SVG coordinates.
+         */
+        const topLineY =
+            SVG_HEIGHT * topRatio;
+    
+        const bottomLineY =
+            SVG_HEIGHT * bottomRatio;
+    
+    
+        /*
+         * THIS is the actual height available
+         * for the letters.
+         */
+        const letterHeight =
+            bottomLineY - topLineY;
+    
+    
+        /*
+         * Letter starts exactly at the
+         * top blue writing line.
+         */
+        const topY =
+            topLineY;
+    
+    
+        /*
+         * Letter width follows letter height.
+         *
+         * This keeps the letters proportional.
+         */
+        const letterWidth =
+            letterHeight * 0.92;
+    
+        const letterSpacing =
+            letterHeight * 0.12;
+    
+    
+        /*
+         * Calculate natural word width.
+         */
+        const naturalWordWidth =
+            prompt
+                .split("")
+                .reduce(
+                    (total, character) => {
+    
+                        if (character === " ") {
+                            return total +
+                                letterWidth * 0.55;
+                        }
+    
+                        return total +
+                            letterWidth +
+                            letterSpacing;
+    
+                    },
+                    0
+                );
+    
+    
+        /*
+         * Maximum available width.
+         */
+        const maxWordWidth =
+            SVG_WIDTH * 0.84;
+    
+    
+        /*
+         * Only scale if the word is actually
+         * too wide to fit.
+         */
+        const wordScale =
+            naturalWordWidth > maxWordWidth
+                ? maxWordWidth / naturalWordWidth
+                : 1;
+    
+    
+        /*
+         * IMPORTANT:
+         *
+         * Do NOT scale letterHeight here.
+         *
+         * Only width is adjusted when necessary.
+         */
+        const finalLetterWidth =
+            letterWidth * wordScale;
+    
+        const finalLetterSpacing =
+            letterSpacing * wordScale;
+    
+    
+        /*
+         * Calculate final word width.
+         */
+        const finalWordWidth =
+            prompt
+                .split("")
+                .reduce(
+                    (total, character) => {
+    
+                        if (character === " ") {
+                            return total +
+                                finalLetterWidth * 0.55;
+                        }
+    
+                        return total +
+                            finalLetterWidth +
+                            finalLetterSpacing;
+    
+                    },
+                    0
+                );
+    
+    
+        /*
+         * Center the word.
+         */
+        const startX =
+            Math.max(
+                40,
+                (SVG_WIDTH - finalWordWidth) / 2
+            );
+    
+    
+        /*
+         * Stroke width follows the
+         * responsive letter height.
+         */
+        const guideStrokeWidth =
+            Math.max(
+                2,
+                Math.min(
+                    4.6,
+                    letterHeight * 0.045
+                )
+            );
+    
+    
+        return (
+            <div
+                className="
+                    absolute
+                    inset-0
+                    pointer-events-none
+                    z-0
+                    bg-white
+                "
+            >
+    
+                {/* TOP BLUE WRITING LINE */}
+                <div
+                    className="
+                        absolute
+                        left-[8%]
+                        right-[8%]
+                        border-b-2
+                        border-blue-300
+                        top-[35%]
+                        sm:top-[32%]
+                        md:top-[28%]
+                    "
+                />
+    
+    
+                {/* RED BASELINE */}
+                <div
+                    className="
+                        absolute
+                        left-[8%]
+                        right-[8%]
+                        border-b-2
+                        border-red-400
+                        top-[50%]
+                    "
+                />
+    
+    
+                {/* BOTTOM BLUE WRITING LINE */}
+                <div
+                    className="
+                        absolute
+                        left-[8%]
+                        right-[8%]
+                        border-b-2
+                        border-blue-300
+                        top-[65%]
+                        sm:top-[68%]
+                        md:top-[72%]
+                    "
+                />
+    
+    
+                    {/* SINGLE-STROKE DOTTED LETTER GUIDE */}
+                    <svg
+                        className="
+                            absolute
+                            left-0
+                            top-[35%]
+                            w-full
+                            h-[30%]
+                            pointer-events-none
+                            overflow-visible
+                            sm:top-[32%]
+                            sm:h-[36%]
+                            md:top-[28%]
+                            md:h-[44%]
+                        "
+                        viewBox="0 0 1000 100"
+                        preserveAspectRatio="none"
+                    >
+    
+                    {renderSingleStrokeWord(
+                        prompt,
+                        {
+                            startX,
+                            topY: 0,
+                            letterHeight: 100,
+                            letterWidth: finalLetterWidth,
+                            spacing: finalLetterSpacing,
+                            strokeWidth: guideStrokeWidth,
+                        }
+                    )}
+    
+                </svg>
+    
+            </div>
+        );
+    }
+    
 
     if (
         mode === "ruled-sentence"
@@ -1892,15 +2529,26 @@ const Exercises = () => {
                                 activity.category === "stroke" &&
                                 (
                                     activity.mode === "trace-line" ||
-                                    activity.mode === "trace-shape" ||
-                                    activity.mode === "trace-letter"
+                                    activity.mode === "trace-shape"
                                 ),
 
                             canvasGuide:
-                                activity.category === "alignment"
+                                (
+                                    activity.category === "alignment" ||
+                                    (
+                                        activity.category === "spacing" &&
+                                        (
+                                            activity.mode === "complete-sentence" ||
+                                            activity.mode === "copy-sentence" ||
+                                            activity.mode === "copy-phrase"
+                                        )
+                                    ) ||
+                                    activity.mode === "trace-letter"
+                                )
                                     ? getAlignmentGuide(
                                         activity.mode,
-                                        itemIndex
+                                        itemIndex,
+                                        currentItem.promptText
                                     )
                                     : null,
                         }}
