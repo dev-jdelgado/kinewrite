@@ -127,7 +127,7 @@ const Login = () => {
                     >
                         Login
                     </Button>
-                    <div className="text-center pt-2">
+                    {/* <div className="text-center pt-2">
                         <p className="text-sm text-slate-500">
                             Don't have an account?{" "}
                             <button
@@ -138,7 +138,7 @@ const Login = () => {
                                 Create an account
                             </button>
                         </p>
-                    </div>
+                    </div> */}
                 </form>
             </div>
         </AuthLayout>
