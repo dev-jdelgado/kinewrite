@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
+
 import AuthService from "../services/AuthService";
 
 const AuthContext = createContext();
@@ -9,43 +15,118 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    /**
-     * Restore Login Session
-     */
-    useEffect(() => {
-        const savedToken = localStorage.getItem("token");
-        const savedAdmin = localStorage.getItem("admin");
-
-        if (savedToken && savedAdmin) {
-            setToken(savedToken);
-            setAdmin(JSON.parse(savedAdmin));
+    // ==========================================
+    // Check if JWT is expired
+    // ==========================================
+    const isTokenExpired = (jwtToken) => {
+        try {
+            const payload =
+                JSON.parse(
+                    atob(
+                        jwtToken.split(".")[1]
+                    )
+                );
+            if (!payload.exp) {
+                return true;
+            }
+            const currentTime =
+                Math.floor(Date.now() / 1000);
+            return payload.exp <= currentTime;
+        } catch (error) {
+            console.error(
+                "Invalid JWT format:",
+                error
+            );
+            return true;
         }
+    };
 
+
+    // ==========================================
+    // Restore Login Session
+    // ==========================================
+    useEffect(() => {
+        const savedToken =
+            localStorage.getItem("token");
+        const savedAdmin =
+            localStorage.getItem("admin");
+        if (
+            savedToken &&
+            savedAdmin
+        ) {
+            // Check token expiration
+            if (
+                isTokenExpired(savedToken)
+            ) {
+                console.log(
+                    "Saved token has expired. Clearing session."
+                );
+                localStorage.removeItem("token");
+                localStorage.removeItem("admin");
+                setToken(null);
+                setAdmin(null);
+            } else {
+
+                try {
+                    setToken(savedToken);
+                    setAdmin(
+                        JSON.parse(savedAdmin)
+                    );
+                } catch (error) {
+                    console.error(
+                        "Failed to restore saved session:",
+                        error
+                    );
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("admin");
+                    setToken(null);
+                    setAdmin(null);
+                }
+            }
+        } else {
+            // No saved session
+            setToken(null);
+            setAdmin(null);
+        }
         setLoading(false);
     }, []);
 
-    /**
-     * Login
-     */
+    // ==========================================
+    // Login
+    // ==========================================
     const login = async (credentials) => {
         try {
-            console.log("Calling API...");
-
-            const response = await AuthService.login(credentials);
-
-            console.log("API Response:", response);
-    
-            if (response.data.success) {
-                const jwtToken = response.data.token;
-                const adminData = response.data.admin;
-    
-                localStorage.setItem("token", jwtToken);
-                localStorage.setItem("admin", JSON.stringify(adminData));
-    
+            console.log(
+                "Calling API..."
+            );
+            const response =
+                await AuthService.login(
+                    credentials
+                );
+            console.log(
+                "API Response:",
+                response
+            );
+            if (
+                response.data.success
+            ) {
+                const jwtToken =
+                    response.data.token;
+                const adminData =
+                    response.data.admin;
+                localStorage.setItem(
+                    "token",
+                    jwtToken
+                );
+                localStorage.setItem(
+                    "admin",
+                    JSON.stringify(adminData)
+                );
                 setToken(jwtToken);
-                
-                console.log("Login successful");
-    
+                setAdmin(adminData);
+                console.log(
+                    "Login successful"
+                );
                 return {
                     success: true,
                     admin: adminData,
@@ -54,7 +135,8 @@ export const AuthProvider = ({ children }) => {
     
             return {
                 success: false,
-                message: response.data.message,
+                message:
+                    response.data.message,
             };
         } catch (error) {
             return {
@@ -66,9 +148,9 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    /**
-     * Logout
-     */
+    // ==========================================
+    // Logout
+    // ==========================================
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("admin");
@@ -77,9 +159,9 @@ export const AuthProvider = ({ children }) => {
         setAdmin(null);
     };
 
-    /**
-     * Authentication Checker
-     */
+    // ==========================================
+    // Authentication Checker
+    // ==========================================
     const isAuthenticated = () => {
         return !!token;
     };
@@ -100,4 +182,5 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () =>
+    useContext(AuthContext);
