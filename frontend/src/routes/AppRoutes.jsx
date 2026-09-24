@@ -18,6 +18,8 @@ import Exercises from "../pages/Exercises";
 
 import ProtectedRoute from "./ProtectedRoute";
 
+import TakeHomeActivity from "../pages/TakeHomeActivity";
+
 const AppRoutes = () => {
     return (
         <Routes>
@@ -124,6 +126,11 @@ const AppRoutes = () => {
                         <Assessment />
                     </ProtectedRoute>
                 }
+            />
+
+            <Route
+                path="/take-home/:studentId"
+                element={<TakeHomeActivity />}
             />
 
             {/* Unknown Routes */}
