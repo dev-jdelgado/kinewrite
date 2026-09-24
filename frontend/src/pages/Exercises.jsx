@@ -902,32 +902,115 @@ const getActivityProgress = (
         }
     );
 
-    if (!attempts.length) {
+    const totalItems =
+        Array.isArray(activity?.items)
+            ? activity.items.length
+            : 0;
+
+    /*
+     * Count unique completed items.
+     *
+     * Each attempt already stores itemNo inside
+     * stroke_data, so we can determine exactly how
+     * many items have been completed.
+     */
+    const completedItemNumbers =
+        new Set();
+
+    attempts.forEach(attempt => {
+
+        let meta = {};
+
+        try {
+            meta =
+                typeof attempt.stroke_data === "string"
+                    ? JSON.parse(attempt.stroke_data)
+                    : attempt.stroke_data || {};
+        } catch {
+            meta = {};
+        }
+
+        if (
+            meta.itemNo !== undefined &&
+            meta.itemNo !== null
+        ) {
+            completedItemNumbers.add(
+                String(meta.itemNo)
+            );
+        }
+
+    });
+
+    /*
+     * Fallback for older attempts that may not have
+     * itemNo stored in stroke_data.
+     *
+     * In that case, count the attempts themselves,
+     * but never exceed the number of activity items.
+     */
+    const completedCount =
+        completedItemNumbers.size > 0
+            ? Math.min(
+                completedItemNumbers.size,
+                totalItems
+            )
+            : Math.min(
+                attempts.length,
+                totalItems
+            );
+
+    const isCompleted =
+        totalItems > 0 &&
+        completedCount >= totalItems;
+
+    const isOngoing =
+        completedCount > 0 &&
+        completedCount < totalItems;
+
+    /*
+     * Accuracy is only relevant/displayed after
+     * every item has been completed.
+     */
+    if (!isCompleted) {
         return {
             completed: false,
+            ongoing: isOngoing,
+            completedCount,
+            totalItems,
             score: null,
         };
     }
 
     const scores = attempts
-        .map(attempt => Number(attempt.accuracy))
-        .filter(score => Number.isFinite(score));
+        .map(attempt =>
+            Number(attempt.accuracy)
+        )
+        .filter(score =>
+            Number.isFinite(score)
+        );
 
     if (!scores.length) {
         return {
             completed: true,
+            ongoing: false,
+            completedCount,
+            totalItems,
             score: null,
         };
     }
 
     const average =
         scores.reduce(
-            (sum, value) => sum + value,
+            (sum, value) =>
+                sum + value,
             0
         ) / scores.length;
 
     return {
         completed: true,
+        ongoing: false,
+        completedCount,
+        totalItems,
         score: Number(
             average.toFixed(2)
         ),
@@ -985,6 +1068,33 @@ const Exercises = () => {
 
     const [exerciseHistory, setExerciseHistory] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
+
+    const getActivityProgressKey = (activityId) =>
+        `kinewrite-exercise-progress-${studentId}-${activityId}`;
+    
+    const saveActivityProgress = (
+        activityId,
+        nextItemIndex,
+        currentScore
+    ) => {
+        if (!studentId || !activityId) return;
+    
+        localStorage.setItem(
+            getActivityProgressKey(activityId),
+            JSON.stringify({
+                itemIndex: nextItemIndex,
+                score: Number(currentScore) || 0,
+            })
+        );
+    };
+    
+    const clearActivityProgress = (activityId) => {
+        if (!studentId || !activityId) return;
+    
+        localStorage.removeItem(
+            getActivityProgressKey(activityId)
+        );
+    };
 
     const ensureExerciseSession = async () => {
         if (sessionIdRef.current) return sessionIdRef.current;
@@ -1091,42 +1201,96 @@ const Exercises = () => {
     const selectActivity = (
         selected
     ) => {
-
+    
+        const progressKey =
+            getActivityProgressKey(
+                selected.id
+            );
+    
+        let savedItemIndex = 0;
+        let savedScore = 0;
+    
+        const savedProgress =
+            localStorage.getItem(
+                progressKey
+            );
+    
+        if (savedProgress) {
+            try {
+    
+                const parsed =
+                    JSON.parse(
+                        savedProgress
+                    );
+    
+                if (
+                    Number.isInteger(
+                        parsed.itemIndex
+                    )
+                ) {
+                    savedItemIndex =
+                        Math.max(
+                            0,
+                            Math.min(
+                                parsed.itemIndex,
+                                selected.items.length - 1
+                            )
+                        );
+                }
+    
+                if (
+                    Number.isFinite(
+                        Number(parsed.score)
+                    )
+                ) {
+                    savedScore =
+                        Number(parsed.score);
+                }
+    
+            } catch {
+                savedItemIndex = 0;
+                savedScore = 0;
+            }
+        }
+    
         setActivity(
             selected
         );
-
+    
         setItemIndex(
-            0
+            savedItemIndex
         );
-
+    
         setScore(
-            0
+            savedScore
         );
-
+    
         setChecked(
             false
         );
-
+    
         setCompleted(
             false
         );
-
+    
         setShowActivities(
             false
         );
-
+    
         setLastResult(null);
-        itemStartedAtRef.current = Date.now();
-        ensureExerciseSession().catch(console.error);
-
-
+    
+        itemStartedAtRef.current =
+            Date.now();
+    
+        ensureExerciseSession()
+            .catch(console.error);
+    
         setTimeout(() => {
-
+    
             canvasRef.current?.clear?.();
-
+    
         }, 100);
-
+    
     };
 
 
@@ -1253,14 +1417,55 @@ const Exercises = () => {
                     );
                 }
 
+                clearActivityProgress(
+                    activity.id
+                );
+
                 setCompleted(true);
                 return;
             }
             setTimeout(() => {
-                setItemIndex(previous => previous + 1);
-                setChecked(false); setLastResult(null);
-                itemStartedAtRef.current = Date.now();
+
+                const nextItemIndex =
+                    itemIndex + 1;
+            
+                const nextScore =
+                    Number(
+                        (
+                            score +
+                            (
+                                result.score /
+                                Math.max(
+                                    1,
+                                    activity.items.length
+                                )
+                            )
+                        ).toFixed(2)
+                    );
+            
+                setItemIndex(
+                    nextItemIndex
+                );
+            
+                setScore(
+                    nextScore
+                );
+            
+                saveActivityProgress(
+                    activity.id,
+                    nextItemIndex,
+                    nextScore
+                );
+            
+                setChecked(false);
+            
+                setLastResult(null);
+            
+                itemStartedAtRef.current =
+                    Date.now();
+            
                 canvasRef.current?.clear?.();
+            
             }, 900);
         } catch (error) {
             console.error("Save exercise attempt failed:", error);
@@ -1275,14 +1480,35 @@ const Exercises = () => {
 
     const handleBackToActivities = () => {
 
+        if (
+            activity &&
+            currentItem
+        ) {
+    
+            saveActivityProgress(
+                activity.id,
+                itemIndex,
+                score
+            );
+    
+        }
+    
         setShowActivities(
             true
         );
-
+    
         setCompleted(
             false
         );
-
+    
+        setChecked(
+            false
+        );
+    
+        setLastResult(
+            null
+        );
+    
     };
 
 
@@ -1562,7 +1788,32 @@ const Exercises = () => {
 
                                                                 </span>
 
-                                                            ) : (
+                                                                ) : progress.ongoing ? (
+
+                                                                <span
+                                                                    className="
+                                                                        inline-flex
+                                                                        items-center
+                                                                        gap-1
+                                                                        px-3
+                                                                        py-1.5
+                                                                        rounded-full
+                                                                        bg-orange-100
+                                                                        text-orange-700
+                                                                        text-xs
+                                                                        font-black
+                                                                    "
+                                                                >
+
+                                                                    <RotateCcw
+                                                                        size={15}
+                                                                    />
+
+                                                                    Ongoing
+
+                                                                </span>
+
+                                                                ) : (
 
                                                                 <Star
                                                                     size={24}
@@ -1572,7 +1823,7 @@ const Exercises = () => {
                                                                     "
                                                                 />
 
-                                                            )}
+                                                                )}
 
                                                         </div>
 
@@ -1615,51 +1866,80 @@ const Exercises = () => {
 
                                                             <div>
 
-                                                                {progress.completed ? (
+                                                            {progress.completed ? (
 
-                                                                    <>
+                                                                <>
 
-                                                                        <div
-                                                                            className="
-                                                                                text-xs
-                                                                                font-black
-                                                                                uppercase
-                                                                                tracking-widest
-                                                                                text-slate-400
-                                                                                dark:text-slate-500
-                                                                            "
-                                                                        >
-                                                                            Score / Accuracy
-                                                                        </div>
+                                                                    <div
+                                                                        className="
+                                                                            text-xs
+                                                                            font-black
+                                                                            uppercase
+                                                                            tracking-widest
+                                                                            text-slate-400
+                                                                            dark:text-slate-500
+                                                                        "
+                                                                    >
+                                                                        Score / Accuracy
+                                                                    </div>
 
-                                                                        <div
-                                                                            className="
-                                                                                text-xl
-                                                                                font-black
-                                                                                text-green-600
-                                                                            "
-                                                                        >
-                                                                            {progress.score !== null
-                                                                                ? `${progress.score}%`
-                                                                                : "Completed"}
-                                                                        </div>
+                                                                    <div
+                                                                        className="
+                                                                            text-xl
+                                                                            font-black
+                                                                            text-green-600
+                                                                        "
+                                                                    >
+                                                                        {progress.score !== null
+                                                                            ? `${progress.score}%`
+                                                                            : "Completed"}
+                                                                    </div>
 
-                                                                    </>
+                                                                </>
+
+                                                                ) : progress.ongoing ? (
+
+                                                                <>
+
+                                                                    <div
+                                                                        className="
+                                                                            text-xs
+                                                                            font-black
+                                                                            uppercase
+                                                                            tracking-widest
+                                                                            text-slate-400
+                                                                            dark:text-slate-500
+                                                                        "
+                                                                    >
+                                                                        Progress
+                                                                    </div>
+
+                                                                    <div
+                                                                        className="
+                                                                            text-xl
+                                                                            font-black
+                                                                            text-orange-500
+                                                                        "
+                                                                    >
+                                                                        {progress.completedCount} / {progress.totalItems}
+                                                                    </div>
+
+                                                                </>
 
                                                                 ) : (
 
-                                                                    <span
-                                                                        className="
-                                                                            text-sm
-                                                                            font-bold
-                                                                            text-slate-400
-                                                                            dark:text-slate-200
-                                                                        "
-                                                                    >
-                                                                        Not completed
-                                                                    </span>
+                                                                <span
+                                                                    className="
+                                                                        text-sm
+                                                                        font-bold
+                                                                        text-slate-400
+                                                                        dark:text-slate-200
+                                                                    "
+                                                                >
+                                                                    Not started
+                                                                </span>
 
-                                                                )}
+                                                            )}
 
                                                             </div>
 
@@ -1673,7 +1953,9 @@ const Exercises = () => {
                                                             >
                                                                 {progress.completed
                                                                     ? "Practice Again →"
-                                                                    : "Start Activity →"}
+                                                                    : progress.ongoing
+                                                                        ? "Continue Activity →"
+                                                                        : "Start Activity →"}
                                                             </span>
 
                                                         </div>
