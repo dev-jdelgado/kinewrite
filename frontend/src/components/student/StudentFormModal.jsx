@@ -112,8 +112,10 @@ const StudentFormModal = ({
             <div
                 className="
                     bg-white
+                    dark:bg-slate-800
                     rounded-3xl
                     shadow-2xl
+                    dark:shadow-black/50
                     w-full
                     max-w-4xl
                     max-h-[90vh]
@@ -141,12 +143,13 @@ const StudentFormModal = ({
                                 sm:text-3xl
                                 font-bold
                                 text-black
+                                dark:text-white
                             "
                         >
                             {student ? "Edit Student" : "Add Student"}
                         </h2>
 
-                        <p className="text-slate-500 mt-1 text-sm sm:text-base">
+                        <p className="text-slate-500 dark:text-slate-300 mt-1 text-sm sm:text-base">
                             Enter the student's information below.
                         </p>
                     </div>
@@ -158,6 +161,9 @@ const StudentFormModal = ({
                             p-2
                             rounded-xl
                             hover:bg-slate-100
+                            dark:hover:bg-slate-700
+                            text-slate-700
+                            dark:text-slate-200
                             transition
                         "
                     >
@@ -190,6 +196,7 @@ const StudentFormModal = ({
                                     h-28
                                     rounded-full
                                     bg-orange-100
+                                    dark:bg-orange-950/60
                                     flex
                                     items-center
                                     justify-center
@@ -204,7 +211,7 @@ const StudentFormModal = ({
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="font-medium mb-2 block">
+                                <label className="font-medium mb-2 block text-slate-700 dark:text-slate-200">
                                     First Name
                                 </label>
 
@@ -217,12 +224,21 @@ const StudentFormModal = ({
                                     className="
                                         w-full
                                         border
+                                        border-slate-300
+                                        dark:border-slate-600
                                         rounded-xl
+                                        bg-white
+                                        dark:bg-slate-700
                                         px-4
                                         py-3
+                                        text-slate-800
+                                        dark:text-white
+                                        placeholder:text-slate-400
+                                        dark:placeholder:text-slate-500
                                         outline-none
                                         focus:ring-2
                                         focus:ring-blue-400
+                                        dark:focus:ring-blue-500
                                     "
                                 />
                             </div>
@@ -241,12 +257,21 @@ const StudentFormModal = ({
                                     className="
                                         w-full
                                         border
+                                        border-slate-300
+                                        dark:border-slate-600
                                         rounded-xl
+                                        bg-white
+                                        dark:bg-slate-700
                                         px-4
                                         py-3
+                                        text-slate-800
+                                        dark:text-white
+                                        placeholder:text-slate-400
+                                        dark:placeholder:text-slate-500
                                         outline-none
                                         focus:ring-2
                                         focus:ring-blue-400
+                                        dark:focus:ring-blue-500
                                     "
                                 />
                             </div>
@@ -264,12 +289,21 @@ const StudentFormModal = ({
                                     className="
                                         w-full
                                         border
+                                        border-slate-300
+                                        dark:border-slate-600
                                         rounded-xl
+                                        bg-white
+                                        dark:bg-slate-700
                                         px-4
                                         py-3
+                                        text-slate-800
+                                        dark:text-white
+                                        placeholder:text-slate-400
+                                        dark:placeholder:text-slate-500
                                         outline-none
                                         focus:ring-2
                                         focus:ring-blue-400
+                                        dark:focus:ring-blue-500
                                     "
                                 >
                                     <option value="Male">Male</option>
@@ -291,12 +325,21 @@ const StudentFormModal = ({
                                     className="
                                         w-full
                                         border
+                                        border-slate-300
+                                        dark:border-slate-600
                                         rounded-xl
+                                        bg-white
+                                        dark:bg-slate-700
                                         px-4
                                         py-3
+                                        text-slate-800
+                                        dark:text-white
+                                        placeholder:text-slate-400
+                                        dark:placeholder:text-slate-500
                                         outline-none
                                         focus:ring-2
                                         focus:ring-blue-400
+                                        dark:focus:ring-blue-500
                                     "
                                 />
                             </div>
@@ -314,12 +357,21 @@ const StudentFormModal = ({
                                     className="
                                         w-full
                                         border
+                                        border-slate-300
+                                        dark:border-slate-600
                                         rounded-xl
+                                        bg-white
+                                        dark:bg-slate-700
                                         px-4
                                         py-3
+                                        text-slate-800
+                                        dark:text-white
+                                        placeholder:text-slate-400
+                                        dark:placeholder:text-slate-500
                                         outline-none
                                         focus:ring-2
                                         focus:ring-blue-400
+                                        dark:focus:ring-blue-500
                                     "
                                 >
                                     <option value="">
@@ -351,14 +403,22 @@ const StudentFormModal = ({
                                 disabled={loading}
                                 className="
                                     w-full
-                                    border
-                                    rounded-xl
-                                    px-4
-                                    py-3
-                                    resize-none
-                                    outline-none
-                                    focus:ring-2
-                                    focus:ring-blue-400
+                                        border
+                                        border-slate-300
+                                        dark:border-slate-600
+                                        rounded-xl
+                                        bg-white
+                                        dark:bg-slate-700
+                                        px-4
+                                        py-3
+                                        text-slate-800
+                                        dark:text-white
+                                        placeholder:text-slate-400
+                                        dark:placeholder:text-slate-500
+                                        outline-none
+                                        focus:ring-2
+                                        focus:ring-blue-400
+                                        dark:focus:ring-blue-500
                                 "
                             />
                         </div>
@@ -368,6 +428,10 @@ const StudentFormModal = ({
                     <div
                         className="
                             border-t
+                            border-slate-200
+                            dark:border-slate-700
+                            bg-slate-50
+                            dark:bg-slate-900/40
                             px-6
                             sm:px-8
                             py-6
@@ -390,8 +454,15 @@ const StudentFormModal = ({
                                 py-3
                                 rounded-xl
                                 border
+                                border-slate-300
+                                dark:border-slate-600
                                 font-semibold
+                                text-slate-700
+                                dark:text-slate-200
+                                bg-white
+                                dark:bg-slate-800
                                 hover:bg-slate-100
+                                dark:hover:bg-slate-700
                                 transition
                             "
                         >
@@ -407,11 +478,15 @@ const StudentFormModal = ({
                                 px-8
                                 py-3
                                 rounded-xl
-                                bg-blue-300
-                                text-black
+                                bg-blue-500
+                                dark:bg-blue-500
+                                text-white
                                 font-semibold
-                                hover:bg-blue-400
+                                hover:bg-blue-600
+                                dark:hover:bg-blue-400
                                 border
+                                border-blue-500
+                                dark:border-blue-400
                                 disabled:opacity-60
                                 disabled:cursor-not-allowed
                                 transition-all

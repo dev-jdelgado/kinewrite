@@ -18,10 +18,14 @@ const GenerateReportCard = ({
         <div
             className="
                 bg-white
+                dark:bg-slate-800
                 rounded-3xl
                 shadow-lg
+                dark:shadow-black/30
                 p-8
                 mb-8
+                transition-colors
+                duration-300
             "
         >
             <div
@@ -34,7 +38,7 @@ const GenerateReportCard = ({
             >
                 <FileText
                     size={28}
-                    className="text-[#9b4c00]"
+                    className="text-[#9b4c00] dark:text-orange-400"
                 />
                 <div>
                     <h2
@@ -42,11 +46,12 @@ const GenerateReportCard = ({
                             text-2xl
                             font-bold
                             text-slate-800
+                            dark:text-white
                         "
                     >
                         Student Progress Report
                     </h2>
-                    <p className="text-slate-500 mt-1">
+                    <p className="text-slate-500 dark:text-slate-300 mt-1">
                         Generate a printable therapy progress report for parents,
                         teachers, or documentation.
                     </p>
@@ -57,8 +62,10 @@ const GenerateReportCard = ({
                 className="
                     rounded-2xl
                     bg-orange-50
+                    dark:bg-orange-950/40
                     border
                     border-orange-200
+                    dark:border-orange-900
                     p-6
                 "
             >
@@ -72,7 +79,7 @@ const GenerateReportCard = ({
                     "
                 >
                     <div>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
                             Student
                         </p>
                         <h3
@@ -81,6 +88,7 @@ const GenerateReportCard = ({
                                 text-lg
                                 font-bold
                                 text-slate-800
+                                dark:text-white
                             "
                         >
                             {student
@@ -99,6 +107,7 @@ const GenerateReportCard = ({
                                 text-lg
                                 font-bold
                                 text-slate-800
+                                dark:text-slate-400
                             "
                         >
                             {student?.student_code || "-"}
@@ -106,7 +115,7 @@ const GenerateReportCard = ({
                     </div>
 
                     <div>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
                             Current Level
                         </p>
                         <h3
@@ -115,6 +124,7 @@ const GenerateReportCard = ({
                                 text-lg
                                 font-bold
                                 text-slate-800
+                                dark:text-white
                             "
                         >
                             Level {student?.student_current_level || 1}
@@ -122,7 +132,7 @@ const GenerateReportCard = ({
                     </div>
 
                     <div>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
                             Generated On
                         </p>
                         <div
@@ -133,9 +143,16 @@ const GenerateReportCard = ({
                                 gap-2
                                 font-semibold
                                 text-slate-800
+                                dark:text-white
                             "
                         >
-                            <CalendarDays size={18} />
+                            <CalendarDays 
+                                size={18} 
+                                className="
+                                        text-slate-600
+                                        dark:text-slate-300
+                                    "
+                            />
                             {generatedDate}
                         </div>
                     </div>
@@ -160,14 +177,17 @@ const GenerateReportCard = ({
                         gap-3
                         rounded-2xl
                         bg-[#9b4c00]
+                        dark:bg-orange-600
                         px-6
                         py-5
                         text-lg
                         font-semibold
                         text-white
                         shadow-lg
+                        dark:shadow-black/30
                         transition-all
                         hover:bg-[#7a3b00]
+                        dark:hover:bg-orange-500
                         hover:scale-[1.02]
                     "
                 >
@@ -181,7 +201,10 @@ const GenerateReportCard = ({
                     mt-8
                     rounded-2xl
                     bg-slate-50
+                    dark:bg-slate-900/60
                     border
+                    border-slate-200
+                    dark:border-slate-700
                     p-6
                 "
             >
@@ -190,6 +213,7 @@ const GenerateReportCard = ({
                         text-lg
                         font-bold
                         text-slate-800
+                        dark:text-white
                     "
                 >
                     Report Contents
@@ -202,6 +226,7 @@ const GenerateReportCard = ({
                         md:grid-cols-2
                         gap-y-3
                         text-slate-600
+                        dark:text-slate-300
                     "
                 >
                     <p>✅ Student Profile</p>

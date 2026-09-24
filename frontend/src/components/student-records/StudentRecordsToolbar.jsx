@@ -54,6 +54,7 @@ const StudentRecordsToolbar = ({
                         top-1/2
                         -translate-y-1/2
                         text-slate-400
+                        dark:text-slate-500
                     "
                 />
 
@@ -67,15 +68,24 @@ const StudentRecordsToolbar = ({
                         rounded-xl
                         border
                         border-slate-300
+                        dark:border-slate-600
                         bg-white
+                        dark:bg-slate-800
                         py-3
                         pl-12
                         pr-4
+                        text-slate-700
+                        dark:text-white
+                        placeholder:text-slate-400
+                        dark:placeholder:text-slate-500
                         outline-none
                         transition-all
+                        duration-200
                         focus:border-orange-400
+                        dark:focus:border-orange-500
                         focus:ring-2
                         focus:ring-orange-200
+                        dark:focus:ring-orange-900/50
                     "
                 />
             </div>

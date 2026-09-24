@@ -8,7 +8,7 @@ const DashboardLayout = ({ children }) => {
     const { darkMode } = useTheme();
     return (
         <div
-            className="min-h-screen bg-cover bg-center bg-no-repeat transition-all duration-500"
+            className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed transition-all duration-500"
                     style={{
                         backgroundImage: `url(${darkMode ? BgLoginDark : BlueLogin})`,
                     }}

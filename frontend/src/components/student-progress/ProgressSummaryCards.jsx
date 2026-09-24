@@ -16,25 +16,45 @@ const ProgressSummaryCards = ({
             title: "Current Level",
             value: student.student_current_level || 1,
             icon: Layers3,
-            color: "bg-blue-100 text-blue-600",
+            color: `
+                bg-blue-100
+                text-blue-600
+                dark:bg-blue-950/60
+                dark:text-blue-400
+            `,
         },
         {
             title: "Classification",
             value: student.student_classification || "Pending",
             icon: Target,
-            color: "bg-green-100 text-green-600",
+            color: `
+                bg-green-100
+                text-green-600
+                dark:bg-green-950/60
+                dark:text-green-400
+            `,  
         },
         {
             title: "Completed Exercises",
             value: student.completed_exercises ?? 0,
             icon: PenTool,
-            color: "bg-orange-100 text-orange-600",
+            color: `
+                bg-orange-100
+                text-orange-600
+                dark:bg-orange-950/60
+                dark:text-orange-400
+            `,
         },
         {
             title: "Total Stars",
             value: student.total_stars ?? 0,
             icon: Trophy,
-            color: "bg-yellow-100 text-yellow-600",
+            color: `
+                bg-yellow-100
+                text-yellow-600
+                dark:bg-yellow-950/60
+                dark:text-yellow-400
+            `,
         },
     ];
 
@@ -57,14 +77,18 @@ const ProgressSummaryCards = ({
                         key={card.title}
                         className="
                             bg-white
+                            dark:bg-slate-800
                             rounded-3xl
                             shadow-lg
+                            dark:shadow-black/30
                             p-6
                             flex
                             items-center
                             justify-between
                             hover:shadow-xl
+                            dark:hover:shadow-black/40
                             transition-all
+                            duration-300
                         "
                     >
                         <div>
@@ -73,6 +97,7 @@ const ProgressSummaryCards = ({
                                     text-sm
                                     font-medium
                                     text-slate-500
+                                    dark:text-slate-400
                                 "
                             >
                                 {card.title}
@@ -84,6 +109,7 @@ const ProgressSummaryCards = ({
                                     text-3xl
                                     font-bold
                                     text-slate-800
+                                    dark:text-white
                                 "
                             >
                                 {card.value}

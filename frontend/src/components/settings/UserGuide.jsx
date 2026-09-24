@@ -17,6 +17,10 @@ import SettingsImage from "../../assets/userguide/Settings.png";
 import GeneralSettingsImage from "../../assets/userguide/GeneralSettings.png";
 import ChangePasswordImage from "../../assets/userguide/ChangePassword.png";
 
+import Spacing from '../../assets/userguide/Activities1.png'
+import Alignment from '../../assets/userguide/Activities2.png'
+import Stroke from '../../assets/userguide/Activities3.png'
+
 import AboutImage from "../../assets/userguide/About.png";
 export default function UserGuide() {
     const [activeSection, setActiveSection] = useState("getting-started");
@@ -65,11 +69,11 @@ export default function UserGuide() {
             case "getting-started":
                 return (
                     <section>
-                        <h2 className="text-3xl font-bold text-[#17365D] mb-2">
+                        <h2 className="text-3xl font-bold text-[#17365D] dark:text-white mb-2">
                             Getting Started
                         </h2>
 
-                        <p className="text-slate-500 mb-8">
+                        <p className="text-slate-500 dark:text-slate-300 mb-8">
                             Learn how to access KineWrite, create an account,
                             navigate the dashboard, and start your first activity.
                         </p>
@@ -78,11 +82,11 @@ export default function UserGuide() {
                         {/* Login */}
                         <div className="mb-10">
 
-                            <h3 className="text-xl font-bold text-[#17365D] mb-3">
+                            <h3 className="text-xl font-bold text-[#17365D] dark:text-white mb-3">
                                 1. How to Log In
                             </h3>
 
-                            <p className="text-slate-600 leading-7 mb-4">
+                            <p className="text-slate-600 dark:text-slate-300 leading-7 mb-4">
                                 To access KineWrite, users must first log in
                                 using their registered account.
                             </p>
@@ -94,7 +98,7 @@ export default function UserGuide() {
                                         Step 1:
                                     </span>
 
-                                    <p className="text-slate-600">
+                                    <p className="text-slate-600 dark:text-slate-300">
                                         Open the KineWrite website using a
                                         supported web browser.
                                     </p>
@@ -105,7 +109,7 @@ export default function UserGuide() {
                                         Step 2:
                                     </span>
 
-                                    <p className="text-slate-600">
+                                    <p className="text-slate-600 dark:text-slate-300">
                                         Enter your registered username and
                                         password.
                                     </p>
@@ -116,7 +120,7 @@ export default function UserGuide() {
                                         Step 3:
                                     </span>
 
-                                    <p className="text-slate-600">
+                                    <p className="text-slate-600 dark:text-slate-300">
                                         Click the <strong>Login</strong> button.
                                     </p>
                                 </div>
@@ -126,7 +130,7 @@ export default function UserGuide() {
                                         Step 4:
                                     </span>
 
-                                    <p className="text-slate-600">
+                                    <p className="text-slate-600 dark:text-slate-300">
                                         After successful authentication, you
                                         will be redirected to the dashboard.
                                     </p>
@@ -146,7 +150,7 @@ export default function UserGuide() {
                                 </div>
 
                                 <p className="text-sm text-slate-500 text-center mt-3">
-                                    Figure 1. KineWrite Login Page
+                                    KineWrite Login Page
                                 </p>
                             </div>
 
@@ -166,22 +170,22 @@ export default function UserGuide() {
                         {/* Create Account */}
                         <div className="mb-10">
 
-                            <h3 className="text-xl font-bold text-[#17365D] mb-3">
+                            <h3 className="text-xl font-bold text-[#17365D] dark:text-white mb-3">
                                 2. Creating an Account
                             </h3>
 
-                            <p className="text-slate-600 leading-7 mb-4">
+                            <p className="text-slate-600 dark:text-slate-300 leading-7 mb-4">
                                 If you do not have an account, click
                                 <strong> Create an account</strong> on the
                                 Login page.
                             </p>
 
 
-                            <h4 className="font-bold text-[#17365D] mt-6 mb-2">
+                            <h4 className="font-bold text-[#17365D] dark:text-white mt-6 mb-2">
                                 School Information
                             </h4>
 
-                            <ul className="list-disc ml-6 space-y-2 text-slate-600">
+                            <ul className="list-disc ml-6 space-y-2 text-slate-600 dark:text-slate-300">
                                 <li>
                                     <strong>School Name</strong> – Enter the
                                     complete name of your school.
@@ -194,11 +198,11 @@ export default function UserGuide() {
                             </ul>
 
 
-                            <h4 className="font-bold text-[#17365D] mt-6 mb-2">
+                            <h4 className="font-bold text-[#17365D] dark:text-white mt-6 mb-2">
                                 Administrator Information
                             </h4>
 
-                            <ul className="list-disc ml-6 space-y-2 text-slate-600">
+                            <ul className="list-disc ml-6 space-y-2 text-slate-600 dark:text-slate-300">
                                 <li>Full Name</li>
                                 <li>Username</li>
                                 <li>Email Address</li>
@@ -218,21 +222,21 @@ export default function UserGuide() {
                                 </div>
 
                                 <p className="text-sm text-slate-500 text-center mt-3">
-                                    Figure 2. KineWrite Create School Account Page
+                                    KineWrite Create School Account Page
                                 </p>
                             </div>
 
 
-                            <h4 className="font-bold text-[#17365D] mt-6 mb-2">
+                            <h4 className="font-bold text-[#17365D] dark:text-white mt-6 mb-2">
                                 Email Verification
                             </h4>
 
-                            <p className="text-slate-600 leading-7 mb-3">
+                            <p className="text-slate-600 dark:text-slate-300 leading-7 mb-3">
                                 The email address is verified using an
                                 <strong> OTP (One-Time Password)</strong>.
                             </p>
 
-                            <ol className="list-decimal ml-6 space-y-2 text-slate-600">
+                            <ol className="list-decimal ml-6 space-y-2 text-slate-600 dark:text-slate-300">
                                 <li>Enter your email address.</li>
                                 <li>Click <strong>Send OTP</strong>.</li>
                                 <li>
@@ -245,11 +249,11 @@ export default function UserGuide() {
                             </ol>
 
 
-                            <h4 className="font-bold text-[#17365D] mt-6 mb-2">
+                            <h4 className="font-bold text-[#17365D] dark:text-white mt-6 mb-2">
                                 Password Requirements
                             </h4>
 
-                            <ul className="list-disc ml-6 space-y-2 text-slate-600">
+                            <ul className="list-disc ml-6 space-y-2 text-slate-600 dark:text-slate-300">
                                 <li>At least 8 characters</li>
                                 <li>One uppercase letter</li>
                                 <li>One lowercase letter</li>
@@ -272,11 +276,11 @@ export default function UserGuide() {
                         {/* Dashboard */}
                         <div className="mb-10">
 
-                            <h3 className="text-xl font-bold text-[#17365D] mb-3">
+                            <h3 className="text-xl font-bold text-[#17365D] dark:text-white mb-3">
                                 3. Understanding the Dashboard
                             </h3>
 
-                            <p className="text-slate-600 leading-7 mb-4">
+                            <p className="text-slate-600 dark:text-slate-300 leading-7 mb-4">
                                 The dashboard serves as the main area for
                                 accessing KineWrite's features and activities.
                                 From the dashboard, users can navigate to
@@ -297,7 +301,7 @@ export default function UserGuide() {
                                 </div>
 
                                 <p className="text-sm text-slate-500 text-center mt-3">
-                                    Figure 3. KineWrite Dashboard
+                                    KineWrite Dashboard
                                 </p>
                             </div>
 
@@ -307,17 +311,17 @@ export default function UserGuide() {
                         {/* Starting Activity */}
                         <div>
 
-                            <h3 className="text-xl font-bold text-[#17365D] mb-3">
+                            <h3 className="text-xl font-bold text-[#17365D] dark:text-white mb-3">
                                 4. Starting an Activity
                             </h3>
 
-                            <p className="text-slate-600 leading-7 mb-4">
+                            <p className="text-slate-600 dark:text-slate-300 leading-7 mb-4">
                                 KineWrite provides activities that allow users
                                 to practice typing and improve their skills.
                                 Activities can be accessed from the dashboard.
                             </p>
 
-                            <ol className="list-decimal ml-6 space-y-2 text-slate-600">
+                            <ol className="list-decimal ml-6 space-y-2 text-slate-600 dark:text-slate-300">
                                 <li>
                                     Log in to your KineWrite account.
                                 </li>
@@ -356,7 +360,7 @@ export default function UserGuide() {
                                 </div>
 
                                 <p className="text-sm text-slate-500 text-center mt-3">
-                                    Figure 4. KineWrite Activity Selection
+                                    KineWrite Activity Selection
                                 </p>
                             </div>
 
@@ -377,11 +381,11 @@ export default function UserGuide() {
             case "typing-practice":
                 return (
                     <section>
-                        <h2 className="text-3xl font-bold text-[#17365D] mb-2">
+                        <h2 className="text-3xl font-bold text-[#17365D] dark:text-white mb-2">
                             Typing Practice
                         </h2>
 
-                        <p className="text-slate-500 mb-8">
+                        <p className="text-slate-500 dark:text-slate-300 mb-8">
                             Learn how to complete typing practice activities
                             and understand your typing performance.
                         </p>
@@ -442,7 +446,7 @@ export default function UserGuide() {
                                         </div>
 
                                         <p className="text-sm text-slate-500 text-center mt-3">
-                                            Figure 5. KineWrite Typing Practice Activity
+                                            KineWrite Typing Practice Activity
                                         </p>
                                     </div>
 
@@ -588,11 +592,11 @@ export default function UserGuide() {
             case "exercises":
                 return (
                     <section>
-                        <h2 className="text-3xl font-bold text-[#17365D] mb-2">
+                        <h2 className="text-3xl font-bold text-[#17365D] dark:text-white mb-2">
                             Exercises
                         </h2>
 
-                        <p className="text-slate-500 mb-8">
+                        <p className="text-slate-500 dark:text-slate-300 mb-8">
                             Learn how to select, answer, and submit KineWrite
                             exercises.
                         </p>
@@ -645,7 +649,7 @@ export default function UserGuide() {
                                         </div>
 
                                         <p className="text-sm text-slate-500 text-center mt-3">
-                                            Figure 5. KineWrite Exercise Selection
+                                            KineWrite Exercise Selection
                                         </p>
                                     </div>
 
@@ -661,255 +665,248 @@ export default function UserGuide() {
                             }
                         />
 
-
-                        {/* 2. How to Answer Different Question Types */}
+                        {/* 1. How to Answer Handwriting Activities */}
                         <GuideBlock
-                            title="2. How to Answer Different Question Types"
+                            title="2. How to Answer the Handwriting Activities"
                             content={
                                 <>
-                                    <p className="mb-5">
-                                        KineWrite exercises may contain different
-                                        types of questions. Follow the instructions
-                                        for each question type carefully.
+                                    <p className="mb-6">
+                                        KineWrite provides different handwriting activities designed
+                                        to help you practice specific writing skills. Each activity
+                                        focuses on one of three areas: <strong>Spacing</strong>,
+                                        <strong> Alignment</strong>, or <strong>Stroke</strong>.
+                                        Read the instructions carefully and follow the guide provided
+                                        before submitting your answer.
                                     </p>
 
-
-                                    {/* Multiple Choice */}
-                                    <h4 className="font-bold text-[#17365D] mb-2">
-                                        Multiple Choice
-                                    </h4>
-
-                                    <ol className="list-decimal ml-6 space-y-2">
-                                        <li>
-                                            Read the question carefully.
-                                        </li>
-
-                                        <li>
-                                            Review the available choices.
-                                        </li>
-
-                                        <li>
-                                            Select the answer you believe is correct.
-                                        </li>
-
-                                        <li>
-                                            Review your selected answer before
-                                            submitting.
-                                        </li>
-                                    </ol>
-
-
-                                    {/* Identification */}
-                                    <h4 className="font-bold text-[#17365D] mt-6 mb-2">
-                                        Identification
-                                    </h4>
-
-                                    <ol className="list-decimal ml-6 space-y-2">
-                                        <li>
-                                            Read the question carefully.
-                                        </li>
-
-                                        <li>
-                                            Type your answer in the provided field.
-                                        </li>
-
-                                        <li>
-                                            Check your spelling and wording.
-                                        </li>
-
-                                        <li>
-                                            Review your answer.
-                                        </li>
-
-                                        <li>
-                                            Submit your answer.
-                                        </li>
-                                    </ol>
-
-
-                                    {/* Enumeration */}
-                                    <h4 className="font-bold text-[#17365D] mt-6 mb-2">
-                                        Enumeration
-                                    </h4>
-
-                                    <ol className="list-decimal ml-6 space-y-2">
-                                        <li>
-                                            Read the question carefully.
-                                        </li>
-
-                                        <li>
-                                            Identify all the items being requested.
-                                        </li>
-
-                                        <li>
-                                            Enter each answer in the appropriate
-                                            field.
-                                        </li>
-
-                                        <li>
-                                            Make sure all required items are provided.
-                                        </li>
-
-                                        <li>
-                                            Review your answers before submitting.
-                                        </li>
-
-                                        <li>
-                                            Submit your answers.
-                                        </li>
-                                    </ol>
-
-
-                                    {/* Practical */}
-                                    <h4 className="font-bold text-[#17365D] mt-6 mb-2">
-                                        Practical Activities
-                                    </h4>
-
-                                    <ol className="list-decimal ml-6 space-y-2">
-                                        <li>
-                                            Read the instructions carefully.
-                                        </li>
-
-                                        <li>
-                                            Follow the required procedure.
-                                        </li>
-
-                                        <li>
-                                            Complete the assigned task.
-                                        </li>
-
-                                        <li>
-                                            Review your work.
-                                        </li>
-
-                                        <li>
-                                            Submit the activity when finished.
-                                        </li>
-                                    </ol>
-
-
-                                    {/* Exercise Screenshot */}
-                                    <div className="mt-6">
-                                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 shadow-sm">
-                                            <img
-                                                src={StartExercisesImage}
-                                                alt="KineWrite Exercise Activity"
-                                                className="w-full max-w-4xl mx-auto rounded-xl"
-                                            />
+                                    {/* ================= SPACING ================= */}
+                                    <div className="mb-8">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <span className="px-4 py-2 rounded-full bg-blue-100 text-blue-700 font-bold text-sm">
+                                                2.1 SPACING
+                                            </span>
                                         </div>
 
-                                        <p className="text-sm text-slate-500 text-center mt-3">
-                                            Figure 6. KineWrite Exercise Activity
+                                        <p className="mb-4">
+                                            Spacing activities help you practice keeping a consistent
+                                            distance between letters and words.
                                         </p>
+
+                                        <ol className="list-decimal ml-6 space-y-2">
+                                            <li>
+                                                Open the <strong>Spacing</strong> section.
+                                            </li>
+
+                                            <li>
+                                                Choose an available spacing activity.
+                                            </li>
+
+                                            <li>
+                                                Read the instruction shown on the activity screen.
+                                            </li>
+
+                                            <li>
+                                                Write the required word, phrase, or sentence.
+                                            </li>
+
+                                            <li>
+                                                Keep the letters and words evenly spaced.
+                                            </li>
+
+                                            <li>
+                                                Review your writing and submit your answer.
+                                            </li>
+                                        </ol>
+
+                                        <div className="mt-6">
+                                            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 shadow-sm">
+                                                <img
+                                                    src={Spacing}
+                                                    alt="KineWrite Exercise Selection"
+                                                    className="w-full max-w-4xl mx-auto rounded-xl"
+                                                />
+                                            </div>
+
+                                            <p className="text-sm text-slate-500 text-center mt-3">
+                                                KineWrite Exercise Selection
+                                            </p>
+                                        </div>
+
+                                        <div className="mt-5 p-4 rounded-xl bg-blue-50 border border-blue-100">
+                                            <p className="text-sm text-blue-800">
+                                                💡 <strong>Tip:</strong> Avoid putting letters too close
+                                                together or leaving unusually large spaces between
+                                                words.
+                                            </p>
+                                        </div>
                                     </div>
 
 
-                                    <div className="mt-5 p-4 rounded-xl bg-amber-50 border border-amber-100">
-                                        <p className="text-sm text-amber-800">
-                                            ⚠️ <strong>Important:</strong> Make sure
-                                            you provide the required answer before
-                                            submitting the question.
+                                    {/* ================= ALIGNMENT ================= */}
+                                    <div className="mb-8">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <span className="px-4 py-2 rounded-full bg-orange-100 text-orange-700 font-bold text-sm">
+                                                2.2 ALIGNMENT
+                                            </span>
+                                        </div>
+
+                                        <p className="mb-4">
+                                            Alignment activities help you practice keeping your
+                                            handwriting properly positioned on or around the provided
+                                            writing guide.
                                         </p>
+
+                                        <ol className="list-decimal ml-6 space-y-2">
+                                            <li>
+                                                Open the <strong>Alignment</strong> section.
+                                            </li>
+
+                                            <li>
+                                                Choose an available alignment activity.
+                                            </li>
+
+                                            <li>
+                                                Read the writing instruction carefully.
+                                            </li>
+
+                                            <li>
+                                                Follow the writing line or guide shown on the screen.
+                                            </li>
+
+                                            <li>
+                                                Write the required letters, words, or sentences while
+                                                keeping them aligned with the guide.
+                                            </li>
+
+                                            <li>
+                                                Review your writing and submit your answer.
+                                            </li>
+                                        </ol>
+
+                                        <div className="mt-6">
+                                            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 shadow-sm">
+                                                <img
+                                                    src={Alignment}
+                                                    alt="KineWrite Exercise Selection"
+                                                    className="w-full max-w-4xl mx-auto rounded-xl"
+                                                />
+                                            </div>
+
+                                            <p className="text-sm text-slate-500 text-center mt-3">
+                                                KineWrite Exercise Selection
+                                            </p>
+                                        </div>
+
+                                        <div className="mt-5 p-4 rounded-xl bg-orange-50 border border-orange-100">
+                                            <p className="text-sm text-orange-800">
+                                                💡 <strong>Tip:</strong> Try to keep your writing
+                                                consistently positioned along the provided guide line.
+                                            </p>
+                                        </div>
+                                    </div>
+
+
+                                    {/* ================= STROKE ================= */}
+                                    <div className="mb-4">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <span className="px-4 py-2 rounded-full bg-green-100 text-green-700 font-bold text-sm">
+                                                2.3 STROKE
+                                            </span>
+                                        </div>
+
+                                        <p className="mb-4">
+                                            Stroke activities help you practice making controlled
+                                            strokes and following the correct writing or tracing path.
+                                        </p>
+
+                                        <ol className="list-decimal ml-6 space-y-2">
+                                            <li>
+                                                Open the <strong>Stroke</strong> section.
+                                            </li>
+
+                                            <li>
+                                                Choose an available stroke activity.
+                                            </li>
+
+                                            <li>
+                                                Read the activity instructions carefully.
+                                            </li>
+
+                                            <li>
+                                                Follow the provided stroke or tracing guide.
+                                            </li>
+
+                                            <li>
+                                                Write or trace using smooth and controlled movements.
+                                            </li>
+
+                                            <li>
+                                                Try to follow the correct direction and path of the
+                                                stroke.
+                                            </li>
+
+                                            <li>
+                                                Review your work and submit your answer.
+                                            </li>
+                                        </ol>
+
+                                        <div className="mt-6">
+                                            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 shadow-sm">
+                                                <img
+                                                    src={Stroke}
+                                                    alt="KineWrite Exercise Selection"
+                                                    className="w-full max-w-4xl mx-auto rounded-xl"
+                                                />
+                                            </div>
+
+                                            <p className="text-sm text-slate-500 text-center mt-3">
+                                                KineWrite Exercise Selection
+                                            </p>
+                                        </div>
+
+                                        <div className="mt-5 p-4 rounded-xl bg-green-50 border border-green-100">
+                                            <p className="text-sm text-green-800">
+                                                💡 <strong>Tip:</strong> Follow the stroke guide
+                                                carefully and avoid unnecessary or incorrect strokes.
+                                                Focus on controlled and deliberate movements.
+                                            </p>
+                                        </div>
+                                    </div>
+
+
+                                    {/* ================= GENERAL REMINDER ================= */}
+                                    <div className="mt-6 p-5 rounded-xl bg-slate-50 border border-slate-200">
+                                        <h4 className="font-bold text-slate-800 mb-2">
+                                            Before You Submit
+                                        </h4>
+
+                                        <ul className="list-disc ml-6 space-y-2 text-sm text-slate-600">
+                                            <li>
+                                                Make sure you followed the activity instructions.
+                                            </li>
+
+                                            <li>
+                                                Check your spacing, alignment, or stroke depending on
+                                                the activity.
+                                            </li>
+
+                                            <li>
+                                                Make sure your writing is inside the designated
+                                                writing area when required.
+                                            </li>
+
+                                            <li>
+                                                Submit your answer only when you are finished.
+                                            </li>
+                                        </ul>
                                     </div>
                                 </>
                             }
                         />
 
 
-                        {/* 3. How to Submit an Answer */}
-                        <GuideBlock
-                            title="3. How to Submit an Answer"
-                            content={
-                                <>
-                                    <p className="mb-4">
-                                        Before submitting an answer, carefully review
-                                        your response to minimize avoidable errors.
-                                    </p>
-
-                                    <ol className="list-decimal ml-6 space-y-2">
-                                        <li>
-                                            Read the question carefully.
-                                        </li>
-
-                                        <li>
-                                            Review your answer.
-                                        </li>
-
-                                        <li>
-                                            Check for spelling or typing errors.
-                                        </li>
-
-                                        <li>
-                                            Confirm that all required fields are
-                                            completed.
-                                        </li>
-
-                                        <li>
-                                            Click the <strong>Submit</strong> button.
-                                        </li>
-                                    </ol>
 
 
-                                    <div className="mt-5 p-4 rounded-xl bg-blue-50 border border-blue-100">
-                                        <p className="text-sm text-blue-800">
-                                            💡 <strong>Tip:</strong> Always review
-                                            your answer before clicking Submit,
-                                            especially for identification and
-                                            enumeration questions.
-                                        </p>
-                                    </div>
-                                </>
-                            }
-                        />
-
-
-                        {/* 4. What Happens After Submission */}
-                        <GuideBlock
-                            title="4. What Happens After Submission"
-                            content={
-                                <>
-                                    <p>
-                                        After submitting an answer, KineWrite
-                                        evaluates your response according to the
-                                        rules of the activity.
-                                    </p>
-
-                                    <ul className="list-disc ml-6 mt-4 space-y-2">
-                                        <li>
-                                            Correct answers may receive points.
-                                        </li>
-
-                                        <li>
-                                            Incorrect answers may be marked
-                                            accordingly.
-                                        </li>
-
-                                        <li>
-                                            Your score may be updated.
-                                        </li>
-
-                                        <li>
-                                            Your progress may be recorded.
-                                        </li>
-
-                                        <li>
-                                            You may proceed to the next question
-                                            or view the results.
-                                        </li>
-                                    </ul>
-
-
-                                    <div className="mt-5 p-4 rounded-xl bg-green-50 border border-green-100">
-                                        <p className="text-sm text-green-800">
-                                            ✅ <strong>Remember:</strong> Your answers
-                                            are evaluated by the system after
-                                            submission. Review your responses
-                                            carefully before submitting.
-                                        </p>
-                                    </div>
-                                </>
-                            }
-                        />
 
                     </section>
                 );
@@ -917,11 +914,11 @@ export default function UserGuide() {
             case "results":
                 return (
                     <section>
-                        <h2 className="text-3xl font-bold text-[#17365D] mb-2">
+                        <h2 className="text-3xl font-bold text-[#17365D] dark:text-white mb-2">
                             Results & Performance
                         </h2>
 
-                        <p className="text-slate-500 mb-8">
+                        <p className="text-slate-500 dark:text-slate-300 mb-8">
                             Understand your typing and exercise performance,
                             review your mistakes, and track your progress over time.
                         </p>
@@ -1009,7 +1006,7 @@ export default function UserGuide() {
                                         </div>
 
                                         <p className="text-sm text-slate-500 text-center mt-3">
-                                            Figure 7. KineWrite Results Page
+                                            KineWrite Results Page
                                         </p>
                                     </div>
 
@@ -1123,7 +1120,7 @@ export default function UserGuide() {
                                         </div>
 
                                         <p className="text-sm text-slate-500 text-center mt-3">
-                                            Figure 9. KineWrite Performance Analysis
+                                            KineWrite Performance Analysis
                                         </p>
                                     </div>
 
@@ -1146,11 +1143,11 @@ export default function UserGuide() {
             case "settings":
                 return (
                     <section>
-                        <h2 className="text-3xl font-bold text-[#17365D] mb-2">
+                        <h2 className="text-3xl font-bold text-[#17365D] dark:text-white mb-2">
                             Settings
                         </h2>
 
-                        <p className="text-slate-500 mb-8">
+                        <p className="text-slate-500 dark:text-slate-300 mb-8">
                             Customize your KineWrite experience and manage your
                             account using the available settings.
                         </p>
@@ -1177,7 +1174,7 @@ export default function UserGuide() {
                                         </div>
 
                                         <p className="text-sm text-slate-500 text-center mt-3">
-                                            Figure 10. KineWrite Settings
+                                            KineWrite Settings
                                         </p>
                                     </div>
                                 </>
@@ -1338,7 +1335,7 @@ export default function UserGuide() {
                                         </div>
 
                                         <p className="text-sm text-slate-500 text-center mt-3">
-                                            Figure 11. KineWrite General Settings
+                                            KineWrite General Settings
                                         </p>
                                     </div>
 
@@ -1369,17 +1366,17 @@ export default function UserGuide() {
                                         account information.
                                     </p>
 
-                                    <h4 className="font-bold text-[#17365D] mt-6 mb-2">
+                                    <h4 className="font-bold text-[#17365D] dark:text-white mt-6 mb-2">
                                         Changing Your Password
                                     </h4>
 
-                                    <p className="text-slate-600 leading-7 mb-4">
+                                    <p className="text-slate-600 dark:text-slate-300 leading-7 mb-4">
                                         KineWrite allows you to change your account password through the
                                         <strong> Account</strong> section of Settings. For security purposes,
                                         you must provide your current password before creating a new one.
                                     </p>
 
-                                    <ol className="list-decimal ml-6 space-y-2 text-slate-600">
+                                    <ol className="list-decimal ml-6 space-y-2 text-slate-600 dark:text-slate-300">
                                         <li>
                                             Open <strong>Settings</strong>.
                                         </li>
@@ -1434,8 +1431,8 @@ export default function UserGuide() {
                                             />
                                         </div>
 
-                                        <p className="text-sm text-slate-500 text-center mt-3">
-                                            Figure 12. KineWrite Change Password Settings
+                                        <p className="text-sm text-slate-500 dark:text-slate-300 text-center mt-3">
+                                            KineWrite Change Password Settings
                                         </p>
                                     </div>
 
@@ -1458,11 +1455,11 @@ export default function UserGuide() {
             case "typing-tips":
                 return (
                     <section>
-                        <h2 className="text-3xl font-bold text-[#17365D] mb-2">
+                        <h2 className="text-3xl font-bold text-[#17365D] dark:text-white mb-2">
                             Tips for Better Stylus Writing
                         </h2>
 
-                        <p className="text-slate-500 mb-8">
+                        <p className="text-slate-500 dark:text-slate-300  mb-8">
                             Follow these tips to develop better stylus writing habits,
                             improve accuracy, and gradually improve your writing speed.
                         </p>
@@ -1720,11 +1717,11 @@ export default function UserGuide() {
             case "troubleshooting":
                 return (
                     <section>
-                        <h2 className="text-3xl font-bold text-[#17365D] mb-2">
+                        <h2 className="text-3xl font-bold text-[#17365D] dark:text-white mb-2">
                             Troubleshooting
                         </h2>
 
-                        <p className="text-slate-500 mb-8">
+                        <p className="text-slate-500 dark:text-slate-300 mb-8">
                             Find solutions to common problems you may encounter
                             while using KineWrite.
                         </p>
@@ -1908,7 +1905,7 @@ export default function UserGuide() {
                             content={
                                 <>
                                     {/* Page Looks Incorrect */}
-                                    <h4 className="font-bold text-[#17365D] mb-2">
+                                    <h4 className="font-bold text-[#17365D] dark:text-white mb-2">
                                         Page Looks Incorrect
                                     </h4>
 
@@ -1941,7 +1938,7 @@ export default function UserGuide() {
 
 
                                     {/* Slow Performance */}
-                                    <h4 className="font-bold text-[#17365D] mt-7 mb-2">
+                                    <h4 className="font-bold text-[#17365D] dark:text-white mt-7 mb-2">
                                         KineWrite Is Responding Slowly
                                     </h4>
 
@@ -1955,7 +1952,7 @@ export default function UserGuide() {
 
 
                                     {/* Login Problems */}
-                                    <h4 className="font-bold text-[#17365D] mt-7 mb-2">
+                                    <h4 className="font-bold text-[#17365D] dark:text-white mt-7 mb-2">
                                         Cannot Log In
                                     </h4>
 
@@ -2018,11 +2015,11 @@ export default function UserGuide() {
 
             {/* Header */}
             <div className="text-center mb-10">
-                <h1 className="text-4xl font-bold text-[#17365D]">
+                <h1 className="text-4xl font-bold text-[#17365D] dark:text-white">
                     KineWrite User Guide
                 </h1>
 
-                <p className="text-slate-500 mt-2 max-w-2xl mx-auto">
+                <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-2xl mx-auto">
                     Learn how to use KineWrite, complete activities,
                     understand your results, and customize your experience.
                 </p>
@@ -2040,15 +2037,20 @@ export default function UserGuide() {
                                 key={section.id}
                                 onClick={() => setActiveSection(section.id)}
                                 className={`
-                                    w-full flex items-center gap-3
-                                    px-4 py-3 rounded-xl
-                                    text-left font-semibold
-                                    transition-all duration-200
-                                    ${activeSection === section.id
+                            w-full flex items-center gap-3
+                            px-4 py-3 rounded-xl
+                            text-left font-semibold
+                            transition-all duration-200
+
+                            ${activeSection === section.id
                                         ? "bg-[#3B9BEF] text-white shadow-md"
-                                        : "text-slate-600 hover:bg-blue-50 hover:text-[#3B9BEF]"
+                                        : `
+                                    text-slate-600 dark:text-slate-300
+                                    hover:bg-blue-50 dark:hover:bg-slate-800
+                                    hover:text-[#3B9BEF]
+                                `
                                     }
-                                `}
+                        `}
                             >
                                 <span className="text-lg">
                                     {section.icon}
@@ -2065,7 +2067,16 @@ export default function UserGuide() {
 
                 {/* Content */}
                 <main className="min-w-0">
-                    <div className="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-100">
+                    <div
+                        className="
+                    bg-slate-50 dark:bg-slate-900
+                    rounded-2xl
+                    p-6 md:p-8
+                    border border-slate-100 dark:border-slate-800
+                    text-slate-900 dark:text-slate-100
+                    transition-colors duration-300
+                "
+                    >
                         {renderContent()}
                     </div>
                 </main>
@@ -2083,13 +2094,15 @@ export default function UserGuide() {
 function GuideBlock({ title, content }) {
     return (
         <div className="mb-8">
-            <h3 className="text-xl font-bold text-[#17365D] mb-3">
+
+            <h3 className="text-xl font-bold text-[#17365D] dark:text-white mb-3">
                 {title}
             </h3>
 
-            <div className="text-slate-600 leading-7 space-y-3">
+            <div className="text-slate-600 dark:text-slate-300 leading-7 space-y-3">
                 {content}
             </div>
+
         </div>
     );
 }
@@ -2101,16 +2114,16 @@ function GuideBlock({ title, content }) {
 
 function InfoCard({ icon, title, text }) {
     return (
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm dark:shadow-black/20 transition-colors duration-300">
             <div className="text-2xl mb-2">
                 {icon}
             </div>
 
-            <h4 className="font-bold text-[#17365D] mb-1">
+            <h4 className="font-bold text-[#17365D] dark:text-white mb-1">
                 {title}
             </h4>
 
-            <p className="text-sm text-slate-500 leading-6">
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-6">
                 {text}
             </p>
         </div>

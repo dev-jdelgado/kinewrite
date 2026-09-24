@@ -62,13 +62,16 @@ const StudentToolbar = ({
                         px-8
                         py-3
                         rounded-xl
-                        bg-blue-100
-                        hover:bg-blue-300
-                        text-black-500
-                        hover:text-white
+                        bg-blue-500
+                        hover:bg-blue-600
+                        dark:bg-blue-500
+                        dark:hover:bg-blue-400
+                        text-white
                         font-semibold
                         shadow-lg
+                        dark:shadow-black/30
                         transition-all
+                        duration-200
                         whitespace-nowrap
                     "
                 >
