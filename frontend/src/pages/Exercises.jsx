@@ -170,7 +170,7 @@ const getAlignmentGuide = (
     if (mode === "write-line") {
         return (
             <div className="absolute inset-0 pointer-events-none z-0">
-    
+
                 {/* Top blue guide */}
                 <div
                     className="
@@ -184,7 +184,7 @@ const getAlignmentGuide = (
                         md:top-[28%]
                     "
                 />
-    
+
                 {/* Middle red baseline */}
                 <div
                     className="
@@ -196,7 +196,7 @@ const getAlignmentGuide = (
                         top-[50%]
                     "
                 />
-    
+
                 {/* Bottom blue guide */}
                 <div
                     className="
@@ -210,7 +210,7 @@ const getAlignmentGuide = (
                         md:top-[72%]
                     "
                 />
-    
+
             </div>
         );
     }
@@ -220,7 +220,7 @@ const getAlignmentGuide = (
         mode === "copy-sentence" ||
         mode === "copy-phrase"
     ) {
-    
+
         return (
             <div
                 className="
@@ -231,7 +231,7 @@ const getAlignmentGuide = (
                     bg-white
                 "
             >
-    
+
                 {/* Top blue guide */}
                 <div
                     className="
@@ -245,7 +245,7 @@ const getAlignmentGuide = (
                         md:top-[28%]
                     "
                 />
-    
+
                 {/* Middle red baseline */}
                 <div
                     className="
@@ -257,7 +257,7 @@ const getAlignmentGuide = (
                         top-[50%]
                     "
                 />
-    
+
                 {/* Bottom blue guide */}
                 <div
                     className="
@@ -271,17 +271,17 @@ const getAlignmentGuide = (
                         md:top-[72%]
                     "
                 />
-    
+
             </div>
         );
-    
+
     }
 
     if (mode === "trace-letter") {
 
         const prompt =
             String(promptText || "").toUpperCase();
-    
+
         /*
          * Responsive guide area
          *
@@ -290,53 +290,53 @@ const getAlignmentGuide = (
         const isMobile =
             typeof window !== "undefined" &&
             window.innerWidth < 640;
-    
+
         const isSmall =
             typeof window !== "undefined" &&
             window.innerWidth >= 640 &&
             window.innerWidth < 768;
-    
-    
+
+
         const guideHeight =
             isMobile
                 ? 30
                 : isSmall
                     ? 36
                     : 44;
-    
+
         const guideTop =
             isMobile
                 ? 35
                 : isSmall
                     ? 32
                     : 28;
-    
-    
+
+
         /*
          * Normalized SVG coordinate system.
          */
         const SVG_WIDTH = 1000;
-    
-    
+
+
         /*
          * The letter occupies the complete
          * height of the responsive guide.
          */
         const letterHeight = 100;
         const topY = 0;
-    
-    
+
+
         /*
          * Letter dimensions follow the
          * responsive guide height.
          */
         const letterWidth =
             guideHeight * 2.2;
-    
+
         const letterSpacing =
             guideHeight * 0.0;
-    
-    
+
+
         /*
          * Calculate natural word width.
          */
@@ -345,41 +345,41 @@ const getAlignmentGuide = (
                 .split("")
                 .reduce(
                     (total, character) => {
-    
+
                         if (character === " ") {
                             return total +
                                 letterWidth * 0.55;
                         }
-    
+
                         return total +
                             letterWidth +
                             letterSpacing;
-    
+
                     },
                     0
                 );
-    
-    
+
+
         /*
          * Keep the word inside the writing area.
          */
         const maxWordWidth =
             SVG_WIDTH * 0.84;
-    
-    
+
+
         const wordScale =
             naturalWordWidth > maxWordWidth
                 ? maxWordWidth / naturalWordWidth
                 : 1;
-    
-    
+
+
         const finalLetterWidth =
             letterWidth * wordScale;
-    
+
         const finalLetterSpacing =
             letterSpacing * wordScale;
-    
-    
+
+
         /*
          * Calculate final word width.
          */
@@ -388,21 +388,21 @@ const getAlignmentGuide = (
                 .split("")
                 .reduce(
                     (total, character) => {
-    
+
                         if (character === " ") {
                             return total +
                                 finalLetterWidth * 0.55;
                         }
-    
+
                         return total +
                             finalLetterWidth +
                             finalLetterSpacing;
-    
+
                     },
                     0
                 );
-    
-    
+
+
         /*
          * Center the guide.
          */
@@ -411,8 +411,8 @@ const getAlignmentGuide = (
                 40,
                 (SVG_WIDTH - finalWordWidth) / 2
             );
-    
-    
+
+
         /*
          * Responsive dotted stroke.
          */
@@ -424,8 +424,8 @@ const getAlignmentGuide = (
                     guideHeight * 0.12
                 )
             );
-    
-    
+
+
         return (
             <div
                 className="
@@ -436,7 +436,7 @@ const getAlignmentGuide = (
                     bg-white
                 "
             >
-    
+
                 {/* RESPONSIVE SINGLE-STROKE LETTER GUIDE */}
                 <svg
                     className="
@@ -455,7 +455,7 @@ const getAlignmentGuide = (
                     viewBox="0 0 1000 100"
                     preserveAspectRatio="xMidYMid slice"
                 >
-    
+
                     {renderSingleStrokeWord(
                         prompt,
                         {
@@ -467,9 +467,9 @@ const getAlignmentGuide = (
                             strokeWidth: guideStrokeWidth,
                         }
                     )}
-    
+
                 </svg>
-    
+
             </div>
         );
     }
@@ -478,69 +478,69 @@ const getAlignmentGuide = (
 
         const prompt =
             String(promptText || "").toUpperCase();
-    
+
         /*
          * SVG coordinate system
          */
         const SVG_WIDTH = 1000;
         const SVG_HEIGHT = 300;
-    
-    
+
+
         /*
          * Responsive writing-line positions
          */
         const isMobile =
             typeof window !== "undefined" &&
             window.innerWidth < 640;
-    
+
         const isSmall =
             typeof window !== "undefined" &&
             window.innerWidth >= 640 &&
             window.innerWidth < 768;
-    
-    
+
+
         const topRatio =
             isMobile
                 ? 0.35
                 : isSmall
                     ? 0.32
                     : 0.28;
-    
+
         const bottomRatio =
             isMobile
                 ? 0.65
                 : isSmall
                     ? 0.68
                     : 0.72;
-    
-    
+
+
         /*
          * Convert responsive percentages
          * into SVG coordinates.
          */
         const topLineY =
             SVG_HEIGHT * topRatio;
-    
+
         const bottomLineY =
             SVG_HEIGHT * bottomRatio;
-    
-    
+
+
         /*
          * THIS is the actual height available
          * for the letters.
          */
         const letterHeight =
             bottomLineY - topLineY;
-    
-    
+
+
         /*
          * Letter starts exactly at the
          * top blue writing line.
          */
         const topY =
             topLineY;
-    
-    
+
+
         /*
          * Letter width follows letter height.
          *
@@ -548,11 +548,11 @@ const getAlignmentGuide = (
          */
         const letterWidth =
             letterHeight * 0.92;
-    
+
         const letterSpacing =
             letterHeight * 0.12;
-    
-    
+
+
         /*
          * Calculate natural word width.
          */
@@ -561,28 +561,28 @@ const getAlignmentGuide = (
                 .split("")
                 .reduce(
                     (total, character) => {
-    
+
                         if (character === " ") {
                             return total +
                                 letterWidth * 0.55;
                         }
-    
+
                         return total +
                             letterWidth +
                             letterSpacing;
-    
+
                     },
                     0
                 );
-    
-    
+
+
         /*
          * Maximum available width.
          */
         const maxWordWidth =
             SVG_WIDTH * 0.84;
-    
-    
+
+
         /*
          * Only scale if the word is actually
          * too wide to fit.
@@ -591,8 +591,8 @@ const getAlignmentGuide = (
             naturalWordWidth > maxWordWidth
                 ? maxWordWidth / naturalWordWidth
                 : 1;
-    
-    
+
+
         /*
          * IMPORTANT:
          *
@@ -602,11 +602,11 @@ const getAlignmentGuide = (
          */
         const finalLetterWidth =
             letterWidth * wordScale;
-    
+
         const finalLetterSpacing =
             letterSpacing * wordScale;
-    
-    
+
+
         /*
          * Calculate final word width.
          */
@@ -615,21 +615,21 @@ const getAlignmentGuide = (
                 .split("")
                 .reduce(
                     (total, character) => {
-    
+
                         if (character === " ") {
                             return total +
                                 finalLetterWidth * 0.55;
                         }
-    
+
                         return total +
                             finalLetterWidth +
                             finalLetterSpacing;
-    
+
                     },
                     0
                 );
-    
-    
+
+
         /*
          * Center the word.
          */
@@ -638,8 +638,8 @@ const getAlignmentGuide = (
                 40,
                 (SVG_WIDTH - finalWordWidth) / 2
             );
-    
-    
+
+
         /*
          * Stroke width follows the
          * responsive letter height.
@@ -652,8 +652,8 @@ const getAlignmentGuide = (
                     letterHeight * 0.045
                 )
             );
-    
-    
+
+
         return (
             <div
                 className="
@@ -664,7 +664,7 @@ const getAlignmentGuide = (
                     bg-white
                 "
             >
-    
+
                 {/* TOP BLUE WRITING LINE */}
                 <div
                     className="
@@ -678,8 +678,8 @@ const getAlignmentGuide = (
                         md:top-[28%]
                     "
                 />
-    
-    
+
+
                 {/* RED BASELINE */}
                 <div
                     className="
@@ -691,8 +691,8 @@ const getAlignmentGuide = (
                         top-[50%]
                     "
                 />
-    
-    
+
+
                 {/* BOTTOM BLUE WRITING LINE */}
                 <div
                     className="
@@ -706,11 +706,11 @@ const getAlignmentGuide = (
                         md:top-[72%]
                     "
                 />
-    
-    
-                    {/* SINGLE-STROKE DOTTED LETTER GUIDE */}
-                    <svg
-                        className="
+
+
+                {/* SINGLE-STROKE DOTTED LETTER GUIDE */}
+                <svg
+                    className="
                             absolute
                             left-0
                             top-[35%]
@@ -723,10 +723,10 @@ const getAlignmentGuide = (
                             md:top-[28%]
                             md:h-[44%]
                         "
-                        viewBox="0 0 1000 100"
-                        preserveAspectRatio="none"
-                    >
-    
+                    viewBox="0 0 1000 100"
+                    preserveAspectRatio="none"
+                >
+
                     {renderSingleStrokeWord(
                         prompt,
                         {
@@ -738,13 +738,13 @@ const getAlignmentGuide = (
                             strokeWidth: guideStrokeWidth,
                         }
                     )}
-    
+
                 </svg>
-    
+
             </div>
         );
     }
-    
+
 
     if (
         mode === "ruled-sentence"
@@ -982,7 +982,7 @@ const Exercises = () => {
     const [savingAttempt, setSavingAttempt] = useState(false);
 
     const [lastResult, setLastResult] = useState(null);
-    
+
     const [exerciseHistory, setExerciseHistory] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
 
@@ -1002,40 +1002,40 @@ const Exercises = () => {
 
     useEffect(() => {
         if (!studentId || !showActivities) return;
-    
+
         const loadExerciseHistory = async () => {
             setHistoryLoading(true);
-    
+
             try {
                 const response =
                     await ExerciseService.getStudentHistory(
                         Number(studentId)
                     );
-    
+
                 const history =
                     response?.data?.attempts || [];
-                
+
                 setExerciseHistory(
                     Array.isArray(history)
                         ? history
                         : []
                 );
-    
+
             } catch (error) {
                 console.error(
                     "Failed to load exercise history:",
                     error
                 );
-    
+
                 setExerciseHistory([]);
-    
+
             } finally {
                 setHistoryLoading(false);
             }
         };
-    
+
         loadExerciseHistory();
-    
+
     }, [
         studentId,
         showActivities,
@@ -1045,24 +1045,24 @@ const Exercises = () => {
 
         itemStartedAtRef.current =
             Date.now();
-    
+
         if (
             activity &&
             studentId
         ) {
-    
+
             ensureExerciseSession()
                 .catch(error => {
-    
+
                     console.error(
                         "Exercise session start failed:",
                         error
                     );
-    
+
                 });
-    
+
         }
-    
+
     }, [
         activity?.id,
         studentId,
@@ -1300,8 +1300,11 @@ const Exercises = () => {
                 className="
                     min-h-screen
                     bg-sky-50
+                    dark:bg-slate-950
                     px-6
                     py-10
+                    transition-colors
+                    duration-300
                 "
             >
 
@@ -1325,7 +1328,9 @@ const Exercises = () => {
                             gap-2
                             mb-8
                             text-slate-600
+                            dark:text-slate-300
                             font-bold
+                            transition-colors
                         "
                     >
 
@@ -1373,6 +1378,7 @@ const Exercises = () => {
                                 sm:text-5xl text-4xl
                                 font-black
                                 text-slate-800
+                                dark:text-white
                             "
                         >
                             Handwriting Activities
@@ -1384,6 +1390,7 @@ const Exercises = () => {
                                 mt-4
                                 text-lg
                                 text-slate-500
+                                dark:text-slate-300
                             "
                         >
                             Practice handwriting through
@@ -1444,7 +1451,7 @@ const Exercises = () => {
                                         >
                                             {
                                                 categoryNames[
-                                                    category
+                                                category
                                                 ]
                                             }
                                         </span>
@@ -1455,6 +1462,7 @@ const Exercises = () => {
                                                 flex-1
                                                 h-px
                                                 bg-slate-200
+                                                dark:bg-slate-700
                                             "
                                         />
 
@@ -1492,8 +1500,10 @@ const Exercises = () => {
                                                         className="
                                                             text-left
                                                             bg-white
+                                                            dark:bg-slate-800
                                                             rounded-[30px]
                                                             shadow-xl
+                                                            dark:shadow-black/30
                                                             sm:p-7 p-5
                                                             border-4
                                                             border-transparent
@@ -1573,6 +1583,7 @@ const Exercises = () => {
                                                                 text-2xl
                                                                 font-black
                                                                 text-slate-800
+                                                                dark:text-white
                                                             "
                                                         >
                                                             {item.title}
@@ -1583,6 +1594,7 @@ const Exercises = () => {
                                                             className="
                                                                 mt-3
                                                                 text-slate-500
+                                                                dark:text-slate-300
                                                                 leading-7
                                                             "
                                                         >
@@ -1614,6 +1626,7 @@ const Exercises = () => {
                                                                                 uppercase
                                                                                 tracking-widest
                                                                                 text-slate-400
+                                                                                dark:text-slate-500
                                                                             "
                                                                         >
                                                                             Score / Accuracy
@@ -1640,6 +1653,7 @@ const Exercises = () => {
                                                                             text-sm
                                                                             font-bold
                                                                             text-slate-400
+                                                                            dark:text-slate-200
                                                                         "
                                                                     >
                                                                         Not completed
@@ -1732,6 +1746,7 @@ const Exercises = () => {
                     items-center
                     justify-center
                     bg-sky-50
+                    dark:bg-slate-950
                     px-6
                 "
             >
@@ -1741,8 +1756,10 @@ const Exercises = () => {
                         max-w-xl
                         w-full
                         bg-white
+                        dark:bg-slate-800
                         rounded-[40px]
                         shadow-2xl
+                        dark:shadow-black/30
                         p-12
                         text-center
                     "
@@ -1763,6 +1780,7 @@ const Exercises = () => {
                             text-4xl
                             font-black
                             text-slate-800
+                            dark:text-white
                         "
                     >
                         Great Job!
@@ -1774,6 +1792,7 @@ const Exercises = () => {
                             mt-4
                             text-xl
                             text-slate-500
+                            dark:text-slate-300
                         "
                     >
                         You completed{" "}
@@ -1817,7 +1836,11 @@ const Exercises = () => {
                                 py-4
                                 rounded-2xl
                                 bg-slate-100
+                                dark:bg-slate-700
+                                 dark:text-white
                                 font-bold
+                                hover:bg-slate-200
+                                dark:hover:bg-slate-600
                             "
                         >
 
@@ -1841,6 +1864,7 @@ const Exercises = () => {
                                 py-4
                                 rounded-2xl
                                 bg-sky-500
+                                hover:bg-sky-600
                                 text-white
                                 font-bold
                             "
@@ -1899,6 +1923,7 @@ const Exercises = () => {
             className="
                 min-h-screen
                 bg-sky-50
+                dark:bg-slate-950
                 px-5
                 py-8
             "
@@ -1935,6 +1960,9 @@ const Exercises = () => {
                             gap-2
                             font-bold
                             text-slate-600
+                            dark:text-slate-300
+                            hover:text-slate-900
+                            dark:hover:text-white
                         "
                     >
 
@@ -1974,6 +2002,7 @@ const Exercises = () => {
                                 text-3xl
                                 font-black
                                 text-slate-800
+                                dark:text-white
                             "
                         >
                             {modeTitles[mode] ||
@@ -1987,7 +2016,9 @@ const Exercises = () => {
                         className="
                             rounded-full
                             bg-white
+                            dark:bg-slate-800
                             shadow
+                            dark:shadow-black/30
                             px-5
                             py-3
                             font-black
@@ -2012,6 +2043,7 @@ const Exercises = () => {
                     className="
                         h-3
                         bg-slate-200
+                        dark:bg-slate-700
                         rounded-full
                         overflow-hidden
                         mb-7
@@ -2026,12 +2058,11 @@ const Exercises = () => {
                         "
                         style={{
                             width:
-                                `${
-                                    (
-                                        itemIndex /
-                                        activity.items.length
-                                    ) *
-                                    100
+                                `${(
+                                    itemIndex /
+                                    activity.items.length
+                                ) *
+                                100
                                 }%`,
                         }}
                     />
@@ -2046,16 +2077,18 @@ const Exercises = () => {
                 <div
                     className={`
                         rounded-[30px]
+                        bg-white
+                        dark:bg-slate-800
                         p-6
                         mb-6
                         shadow-lg
+                        dark:shadow-black/20
                         border
-                        ${
-                            isSpacing
-                                ? "bg-blue-50 border-blue-100"
-                                : isAlignment
-                                    ? "bg-orange-50 border-orange-100"
-                                    : "bg-green-50 border-green-100"
+                        ${isSpacing
+                            ? "bg-blue-50 border-blue-100"
+                            : isAlignment
+                                ? "bg-orange-50 border-orange-100"
+                                : "bg-green-50 border-green-100"
                         }
                     `}
                 >
@@ -2066,6 +2099,7 @@ const Exercises = () => {
                             items-center
                             justify-center
                             gap-3
+                            
                         "
                     >
 
@@ -2087,6 +2121,7 @@ const Exercises = () => {
                                 md:text-xl
                                 font-bold
                                 text-slate-700
+                                dark:text-slate-200
                                 text-center
                             "
                         >
@@ -2104,141 +2139,153 @@ const Exercises = () => {
 
                 {!hideStrokeModel && (
 
-                <div
-                    className="
+                    <div
+                        className="
                         bg-white
+                        dark:bg-slate-800
                         rounded-[35px]
                         shadow-xl
+                        dark:shadow-black/30
                         p-7
                         mb-7
                     "
-                >
+                    >
 
-                    <div
-                        className="
+                        <div
+                            className="
                             flex
                             items-center
                             justify-between
                             mb-5
                         "
-                    >
+                        >
 
-                        <div>
+                            <div>
 
-                            <div
-                                className="
+                                <div
+                                    className="
                                     text-xs
                                     uppercase
                                     tracking-widest
                                     font-black
                                     text-slate-400
+                                    dark:text-slate-500
                                 "
-                            >
-                                {isTracing
-                                    ? "Trace Guide"
-                                    : isSpacing
-                                        ? "Writing Model"
-                                        : "Target"}
-                            </div>
+                                >
+                                    {isTracing
+                                        ? "Trace Guide"
+                                        : isSpacing
+                                            ? "Writing Model"
+                                            : "Target"}
+                                </div>
 
 
-                            <h2
-                                className="
+                                <h2
+                                    className="
                                     mt-1
                                     text-2xl
                                     font-black
                                     text-slate-800
+                                    dark:text-white
                                 "
-                            >
-                                {modeTitles[mode] ||
-                                    activity.title}
-                            </h2>
+                                >
+                                    {modeTitles[mode] ||
+                                        activity.title}
+                                </h2>
 
-                        </div>
+                            </div>
 
 
-                        <div
-                            className="
+                            <div
+                                className="
                                 px-4
                                 py-2
                                 rounded-full
                                 bg-slate-100
+                                dark:bg-slate-700
                                 text-slate-500
+                                dark:text-slate-200
                                 font-black
                                 text-sm
                             "
-                        >
-                            Item {itemIndex + 1}
+                            >
+                                Item {itemIndex + 1}
+                            </div>
+
                         </div>
 
-                    </div>
 
+                        {/* ================================= */}
+                        {/* SPACING MODEL */}
+                        {/* ================================= */}
 
-                    {/* ================================= */}
-                    {/* SPACING MODEL */}
-                    {/* ================================= */}
-
-                    {isSpacing && (
-
-                        <div
-                            className="
-                                rounded-3xl
-                                bg-blue-50
-                                border-2
-                                border-blue-100
-                                p-8
-                                text-center
-                            "
-                        >
+                        {isSpacing && (
 
                             <div
                                 className="
+                                rounded-3xl
+                                bg-blue-50
+                                dark:bg-blue-950/40
+                                border-2
+                                border-blue-100
+                                dark:border-blue-900
+                                p-8
+                                text-center
+                            "
+                            >
+
+                                <div
+                                    className="
                                     text-6xl
                                     md:text-7xl
                                     font-black
                                     tracking-wide
                                     text-slate-700
+                                    dark:text-slate-100
                                     break-words
                                 "
-                            >
-                                {currentItem.promptText}
-                            </div>
+                                >
+                                    {currentItem.promptText}
+                                </div>
 
 
-                            {mode ===
-                                "spacing-challenge" && (
+                                {mode ===
+                                    "spacing-challenge" && (
 
-                                <div
-                                    className="
+                                        <div
+                                            className="
                                         mt-4
                                         text-sm
                                         font-bold
                                         text-blue-500
+                                        dark:text-blue-400
                                     "
-                                >
-                                    Rewrite this with the
-                                    correct spaces.
-                                </div>
+                                        >
+                                            Rewrite this with the
+                                            correct spaces.
+                                        </div>
 
-                            )}
+                                    )}
 
-                        </div>
+                            </div>
 
-                    )}
+                        )}
 
 
-                    {/* ================================= */}
-                    {/* ALIGNMENT MODEL */}
-                    {/* ================================= */}
+                        {/* ================================= */}
+                        {/* ALIGNMENT MODEL */}
+                        {/* ================================= */}
 
-                    {isAlignment && (
+                        {isAlignment && (
 
-                        <div
-                            className="
+                            <div
+                                className="
                                 rounded-3xl
                                 bg-orange-50
+                                dark:bg-orange-950/40
                                 border-2
                                 border-orange-100
+                                dark:border-orange-900
                                 p-8
                                 relative
                                 overflow-hidden
@@ -2247,41 +2294,42 @@ const Exercises = () => {
                                 items-center
                                 justify-center
                             "
-                        >
+                            >
 
-                            {mode ===
-                                "stay-box" && (
+                                {mode ===
+                                    "stay-box" && (
 
-                                <div
-                                    className="
+                                        <div
+                                            className="
                                         absolute
                                         inset-6
                                         border-4
                                         border-dashed
                                         border-orange-300
+                                        dark:border-orange-500
                                         rounded-2xl
                                     "
-                                />
+                                        />
 
-                            )}
+                                    )}
 
 
-                            {mode ===
-                                "alignment-path" && (
+                                {mode ===
+                                    "alignment-path" && (
 
-                                <svg
-                                    className="
+                                        <svg
+                                            className="
                                         absolute
                                         inset-0
                                         w-full
                                         h-full
                                     "
-                                    viewBox="0 0 1000 220"
-                                    preserveAspectRatio="none"
-                                >
+                                            viewBox="0 0 1000 220"
+                                            preserveAspectRatio="none"
+                                        >
 
-                                    <path
-                                        d="
+                                            <path
+                                                d="
                                             M 60 130
                                             C 220 60,
                                             330 190,
@@ -2289,91 +2337,95 @@ const Exercises = () => {
                                             S 740 60,
                                             940 130
                                         "
-                                        fill="none"
-                                        stroke="#fdba74"
-                                        strokeWidth="9"
-                                        strokeDasharray="18 12"
-                                    />
+                                                fill="none"
+                                                stroke="#fdba74"
+                                                strokeWidth="9"
+                                                strokeDasharray="18 12"
+                                            />
 
-                                </svg>
+                                        </svg>
 
-                            )}
+                                    )}
 
 
-                            {mode !==
-                                "alignment-path" && (
+                                {mode !==
+                                    "alignment-path" && (
 
-                                <div
-                                    className="
+                                        <div
+                                            className="
                                         absolute
                                         left-10
                                         right-10
                                         bottom-10
                                         border-b-4
                                         border-orange-300
+                                        dark:border-orange-500
                                     "
-                                />
+                                        />
 
-                            )}
+                                    )}
 
 
-                            <div
-                                className="
+                                <div
+                                    className="
                                     relative
                                     z-10
                                     text-5xl
                                     md:text-6xl
                                     font-black
                                     text-slate-700
+                                    dark:text-slate-100
                                 "
-                            >
-                                {currentItem.promptText}
+                                >
+                                    {currentItem.promptText}
+                                </div>
+
                             </div>
 
-                        </div>
-
-                    )}
+                        )}
 
 
-                    {/* ================================= */}
-                    {/* STROKE MODEL */}
-                    {/* ================================= */}
+                        {/* ================================= */}
+                        {/* STROKE MODEL */}
+                        {/* ================================= */}
 
-                    {isStroke && (
+                        {isStroke && (
 
-                        <div
-                            className="
+                            <div
+                                className="
                                 rounded-3xl
                                 bg-green-50
+                                dark:bg-green-950/40
                                 border-2
                                 border-green-100
+                                dark:border-green-900
                                 p-6
                                 min-h-[250px]
                                 relative
                                 overflow-hidden
                             "
-                        >
+                            >
 
-                            <ExerciseGuide
-                                mode={
-                                    mode
-                                }
+                                <ExerciseGuide
+                                    mode={
+                                        mode
+                                    }
 
-                                prompt={
-                                    currentItem.promptText
-                                }
-                            />
+                                    prompt={
+                                        currentItem.promptText
+                                    }
+                                />
 
 
-                            {(
-                                mode ===
+                                {(
+                                    mode ===
                                     "write-letter" ||
-                                mode ===
+                                    mode ===
                                     "stroke-challenge"
-                            ) && (
+                                ) && (
 
-                                <div
-                                    className="
+                                        <div
+                                            className="
                                         absolute
                                         inset-0
                                         flex
@@ -2381,30 +2433,31 @@ const Exercises = () => {
                                         justify-center
                                         pointer-events-none
                                     "
-                                >
+                                        >
 
-                                    <span
-                                        className="
+                                            <span
+                                                className="
                                             text-7xl
                                             md:text-8xl
                                             font-black
                                             text-green-700
+                                            dark:text-green-300
                                         "
-                                    >
-                                        {
-                                            currentItem.promptText
-                                        }
-                                    </span>
+                                            >
+                                                {
+                                                    currentItem.promptText
+                                                }
+                                            </span>
 
-                                </div>
+                                        </div>
 
-                            )}
+                                    )}
 
-                        </div>
+                            </div>
 
-                    )}
+                        )}
 
-                </div>
+                    </div>
 
                 )}
 
@@ -2416,8 +2469,10 @@ const Exercises = () => {
                 <div
                     className="
                         bg-white
+                        dark:bg-slate-800
                         rounded-[40px]
                         shadow-2xl
+                         dark:shadow-black/30
                         p-4
                     "
                 >
@@ -2428,49 +2483,50 @@ const Exercises = () => {
                             overflow-hidden
                             border-4
                             border-slate-100
+                            dark:border-slate-700
                         "
                     >
 
-                    <HandwritingWorksheet
-                        key={`${activity.id}-${itemIndex}`}
-                        ref={canvasRef}
-                        activity={{
-                            ...activity,
+                        <HandwritingWorksheet
+                            key={`${activity.id}-${itemIndex}`}
+                            ref={canvasRef}
+                            activity={{
+                                ...activity,
 
-                            activityName:
-                                activity.title,
+                                activityName:
+                                    activity.title,
 
-                            promptText:
-                                currentItem.promptText,
+                                promptText:
+                                    currentItem.promptText,
 
-                            showGuide:
-                                activity.category === "stroke" &&
-                                (
-                                    activity.mode === "trace-line" ||
-                                    activity.mode === "trace-shape"
-                                ),
-
-                            canvasGuide:
-                                (
-                                    activity.category === "alignment" ||
+                                showGuide:
+                                    activity.category === "stroke" &&
                                     (
-                                        activity.category === "spacing" &&
+                                        activity.mode === "trace-line" ||
+                                        activity.mode === "trace-shape"
+                                    ),
+
+                                canvasGuide:
+                                    (
+                                        activity.category === "alignment" ||
                                         (
-                                            activity.mode === "complete-sentence" ||
-                                            activity.mode === "copy-sentence" ||
-                                            activity.mode === "copy-phrase"
-                                        )
-                                    ) ||
-                                    activity.mode === "trace-letter"
-                                )
-                                    ? getAlignmentGuide(
-                                        activity.mode,
-                                        itemIndex,
-                                        currentItem.promptText
+                                            activity.category === "spacing" &&
+                                            (
+                                                activity.mode === "complete-sentence" ||
+                                                activity.mode === "copy-sentence" ||
+                                                activity.mode === "copy-phrase"
+                                            )
+                                        ) ||
+                                        activity.mode === "trace-letter"
                                     )
-                                    : null,
-                        }}
-                    />
+                                        ? getAlignmentGuide(
+                                            activity.mode,
+                                            itemIndex,
+                                            currentItem.promptText
+                                        )
+                                        : null,
+                            }}
+                        />
 
                     </div>
 
@@ -2518,8 +2574,10 @@ const Exercises = () => {
                         className="
                             mt-6
                             bg-green-50
+                            dark:bg-green-950/40
                             border
                             border-green-200
+                            dark:border-green-900
                             rounded-3xl
                             p-5
                             text-center
@@ -2531,6 +2589,7 @@ const Exercises = () => {
                             className="
                                 mx-auto
                                 text-green-500
+                                dark:text-green-400
                             "
                         />
 
@@ -2541,6 +2600,7 @@ const Exercises = () => {
                                 text-xl
                                 font-black
                                 text-green-700
+                                dark:text-green-300
                             "
                         >
                             {lastResult ? `${lastResult.score}% — ${lastResult.stars} star${lastResult.stars === 1 ? "" : "s"}` : "Great work!"}
@@ -2551,6 +2611,7 @@ const Exercises = () => {
                             className="
                                 mt-1
                                 text-slate-500
+                                dark:text-slate-300
                             "
                         >
                             {completed ? "Activity complete!" : "Moving to the next item..."}

@@ -632,7 +632,15 @@ const Reports = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-slate-100 py-8 px-5 print:bg-white print:py-0">
+            <div className="
+                min-h-screen
+                bg-slate-100
+                dark:bg-slate-950
+                py-8
+                px-5
+                print:bg-white
+                print:py-0
+            ">
 
                 <div className="max-w-6xl mx-auto">
 
@@ -676,7 +684,16 @@ const Reports = () => {
                         REPORT CONTAINER
                     ========================================= */}
 
-                    <div className="bg-white rounded-[32px] shadow-xl overflow-hidden print:shadow-none print:rounded-none print-report">
+                    <div className="
+                        bg-white
+                        dark:bg-slate-900
+                        rounded-[32px]
+                        shadow-xl
+                        overflow-hidden
+                        print:shadow-none
+                        print:rounded-none
+                        print-report
+                    ">
 
                         {/* =====================================
                             HEADER
@@ -692,19 +709,26 @@ const Reports = () => {
                                         KineWrite
                                     </p>
 
-                                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 mt-2">
+                                    <h1 className="
+                                        text-4xl
+                                        md:text-5xl
+                                        font-black
+                                        text-slate-800
+                                        dark:text-white
+                                        mt-2
+                                    ">
                                         Handwriting Progress Report
                                     </h1>
 
-                                    <p className="text-slate-500 mt-3">
+                                    <p className="text-slate-500 dark:text-slate-300 mt-3">
                                         Assessment and handwriting activity performance summary
                                     </p>
 
                                 </div>
 
-                                <div className="text-left md:text-right text-sm text-slate-500">
+                                <div className="text-left md:text-right text-sm text-slate-500 dark:text-slate-300">
 
-                                    <div className="font-bold text-slate-700">
+                                    <div className="font-bold text-slate-700 dark:text-white">
                                         Report Date
                                     </div>
 
@@ -724,11 +748,21 @@ const Reports = () => {
                             STUDENT PROFILE
                         ===================================== */}
 
-                        <section className="p-8 md:p-12 print-section">
+                        <section className="p-8 md:p-12 print-section bg-white dark:bg-slate-900" >
 
                             <div className="flex flex-col md:flex-row md:items-center gap-6">
 
-                                <div className="w-24 h-24 rounded-full bg-orange-100 flex items-center justify-center text-5xl shrink-0">
+                                <div className="
+                                    w-24
+                                    h-24
+                                    rounded-full
+                                    bg-orange-100
+                                    dark:bg-orange-950
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-5xl
+                                    shrink-0">
                                     {student.student_gender ===
                                     "Female"
                                         ? "👧"
@@ -737,7 +771,7 @@ const Reports = () => {
 
                                 <div className="flex-1">
 
-                                    <h2 className="text-3xl font-black text-slate-800">
+                                    <h2 className="text-3xl font-black text-slate-800 dark:text-white">
                                         {
                                             student.student_fname
                                         }{" "}
@@ -746,7 +780,7 @@ const Reports = () => {
                                         }
                                     </h2>
 
-                                    <div className="flex flex-wrap gap-x-6 gap-y-2 mt-3 text-slate-500">
+                                    <div className="flex flex-wrap gap-x-6 gap-y-2 mt-3 text-slate-500 dark:text-slate-300">
 
                                         <span>
                                             Student Code:{" "}
@@ -784,13 +818,13 @@ const Reports = () => {
                             PRE-ASSESSMENT
                         ===================================== */}
 
-                        <section className="px-8 md:px-12 pb-10 print-section">
+                        <section className="px-8 md:px-12 pb-10 print-section bg-white dark:bg-slate-900">
 
                             <div className="flex items-center gap-3 mb-5">
 
                                 <Target className="text-sky-500" />
 
-                                <h2 className="text-2xl font-black text-slate-800">
+                                <h2 className="text-2xl font-black text-slate-800 dark:text-white">
                                     Pre-Assessment Results
                                 </h2>
 
@@ -847,10 +881,25 @@ const Reports = () => {
 
                                     </div>
 
-                                    <div className="mt-4 rounded-2xl bg-slate-50 p-5 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+                                    <div
+                                        className="
+                                            mt-4
+                                            rounded-2xl
+                                            bg-slate-50
+                                            dark:bg-slate-800
+                                            p-5
+                                            flex
+                                            flex-wrap
+                                            gap-x-8
+                                            gap-y-3
+                                            text-sm
+                                            text-slate-700
+                                            dark:text-slate-200
+                                        "
+                                    >
 
                                         <span>
-                                            <strong>
+                                            <strong className="text-slate-800 dark:text-white">
                                                 Recommended Level:
                                             </strong>{" "}
                                             {getAssessmentValue(
@@ -863,7 +912,7 @@ const Reports = () => {
                                         </span>
 
                                         <span>
-                                            <strong>
+                                            <strong className="text-slate-800 dark:text-white">
                                                 Date:
                                             </strong>{" "}
                                             {formatDate(
@@ -880,7 +929,7 @@ const Reports = () => {
                                             "assessment_remarks"
                                         ) && (
                                             <span className="basis-full">
-                                                <strong>
+                                                <strong className="text-slate-800 dark:text-white">
                                                     Remarks:
                                                 </strong>{" "}
                                                 {getAssessmentValue(
@@ -904,13 +953,26 @@ const Reports = () => {
                             ACTIVITY PERFORMANCE
                         ===================================== */}
 
-                        <section className="px-8 md:px-12 py-10 bg-slate-50 print:bg-white border-y border-slate-200 print-section">
+                        <section 
+                            className="
+                                px-8
+                                md:px-12
+                                py-10
+                                bg-slate-50
+                                dark:bg-slate-950
+                                print:bg-white
+                                border-y
+                                border-slate-200
+                                dark:border-slate-800
+                                print-section
+                            "
+                        >
 
                             <div className="flex items-center gap-3 mb-5">
 
                                 <BarChart3 className="text-[#9b4c00]" />
 
-                                <h2 className="text-2xl font-black text-slate-800">
+                                <h2 className="text-2xl font-black text-slate-800 dark:text-white">
                                     Handwriting Activity Performance
                                 </h2>
 
@@ -961,18 +1023,27 @@ const Reports = () => {
                                             key={
                                                 item.category
                                             }
-                                            className="bg-white rounded-2xl border border-slate-200 p-6 print-category-card"
+                                            className="
+                                                bg-white
+                                                dark:bg-slate-900
+                                                rounded-2xl
+                                                border
+                                                border-slate-200
+                                                dark:border-slate-700
+                                                p-6
+                                                print-category-card
+                                            "
                                         >
 
                                             <div className="flex items-center justify-between">
 
-                                                <h3 className="capitalize text-lg font-black text-slate-700">
+                                                <h3 className="capitalize text-lg font-black text-slate-700 dark:text-slate-200">
                                                     {
                                                         item.category
                                                     }
                                                 </h3>
 
-                                                <span className="text-xs font-bold text-slate-400">
+                                                <span className="text-xs font-bold text-slate-400 dark:text-slate-400">
                                                     {
                                                         item.count
                                                     }{" "}
@@ -992,7 +1063,7 @@ const Reports = () => {
                                                 %
                                             </div>
 
-                                            <div className="h-3 rounded-full bg-slate-100 mt-4 overflow-hidden">
+                                            <div className="h-3 rounded-full bg-slate-100 dark:bg-slate-700 mt-4 overflow-hidden">
 
                                                 <div
                                                     className="h-full bg-sky-500 rounded-full"
@@ -1021,13 +1092,13 @@ const Reports = () => {
                             PROGRESS SUMMARY
                         ===================================== */}
 
-                        <section className="p-8 md:p-12 print-section">
+                        <section className="p-8 md:p-12 print-section bg-white dark:bg-slate-900">
 
                             <div className="flex items-center gap-3 mb-5">
 
                                 <Trophy className="text-amber-500" />
 
-                                <h2 className="text-2xl font-black text-slate-800">
+                                <h2 className="text-2xl font-black text-slate-800 dark:text-white">
                                     Progress Summary
                                 </h2>
 
@@ -1037,13 +1108,22 @@ const Reports = () => {
 
                             <div className="grid md:grid-cols-3 gap-5 print-grid-3">
 
-                                <div className="rounded-2xl border p-6 print-card">
+                                <div className="
+                                        rounded-2xl
+                                        border
+                                        border-slate-200
+                                        dark:border-slate-700
+                                        bg-white
+                                        dark:bg-slate-800
+                                        p-6
+                                        print-card
+                                    ">
 
-                                    <p className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+                                    <p className="text-sm font-bold text-slate-400  uppercase tracking-wider">
                                         Pre-Assessment
                                     </p>
 
-                                    <p className="text-3xl font-black text-slate-800 mt-2">
+                                    <p className="text-3xl font-black text-slate-800 dark:text-white mt-2">
                                         {latestAssessment
                                             ? `${preAssessmentScore.toFixed(
                                                   1
@@ -1053,13 +1133,22 @@ const Reports = () => {
 
                                 </div>
 
-                                <div className="rounded-2xl border p-6 print-card">
+                                <div className="
+                                    rounded-2xl
+                                    border
+                                    border-slate-200
+                                    dark:border-slate-700
+                                    bg-white
+                                    dark:bg-slate-800
+                                    p-6
+                                    print-card
+                                ">
 
-                                    <p className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+                                    <p className="text-sm font-bold text-slate-400  uppercase tracking-wider">
                                         Activity Performance
                                     </p>
 
-                                    <p className="text-3xl font-black text-sky-600 mt-2">
+                                    <p className="text-3xl font-black text-sky-600 dark:text-sky-400 mt-2">
                                         {attempts.length
                                             ? `${overallActivityScore.toFixed(
                                                   1
@@ -1069,7 +1158,16 @@ const Reports = () => {
 
                                 </div>
 
-                                <div className="rounded-2xl border p-6 print-card">
+                                <div className="
+                                    rounded-2xl
+                                    border
+                                    border-slate-200
+                                    dark:border-slate-700
+                                    bg-white
+                                    dark:bg-slate-800
+                                    p-6
+                                    print-card
+                                ">
 
                                     <p className="text-sm font-bold text-slate-400 uppercase tracking-wider">
                                         Difference
@@ -1079,11 +1177,11 @@ const Reports = () => {
                                         className={`text-3xl font-black mt-2 ${
                                             improvement ===
                                             null
-                                                ? "text-slate-400"
+                                                ? "text-slate-400 dark:text-slate-500"
                                                 : improvement >=
                                                   0
-                                                ? "text-emerald-600"
-                                                : "text-rose-600"
+                                                ? "text-emerald-600 dark:text-emerald-400"
+                                                : "text-rose-600 dark:text-rose-400"
                                         }`}
                                     >
                                         {improvement ===
@@ -1103,14 +1201,26 @@ const Reports = () => {
 
                             </div>
 
-                            <div className="mt-6 rounded-2xl bg-sky-50 border border-sky-100 p-6 text-slate-600 leading-relaxed">
+                            <div className="
+                                mt-6
+                                rounded-2xl
+                                bg-sky-50
+                                dark:bg-sky-950
+                                border
+                                border-sky-100
+                                dark:border-sky-800
+                                p-6
+                                text-slate-600
+                                dark:text-slate-300
+                                leading-relaxed
+                            ">
 
                                 The pre-assessment identifies handwriting areas that may require support. The activity results summarize the student's recorded performance while completing KineWrite handwriting exercises.
 
                             </div>
 
                         </section>
-
+ 
                         {/* =====================================
                             ACTIVITY DETAILS
                         ===================================== */}
@@ -1121,46 +1231,46 @@ const Reports = () => {
 
                                 <Star className="text-amber-500" />
 
-                                <h2 className="text-2xl font-black text-slate-800">
+                                <h2 className="text-2xl font-black text-slate-800 dark:text-white">
                                     Activity Details
                                 </h2>
 
                             </div>
 
                             {activityResults.length ? (
-                                <div className="overflow-x-auto border border-slate-200 rounded-2xl">
+                                <div className="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-2xl">
 
                                     <table className="w-full text-sm">
 
-                                        <thead className="bg-slate-50">
+                                        <thead className="bg-slate-50 dark:bg-slate-800">
 
                                             <tr className="text-left">
 
-                                                <th className="p-4">
+                                                <th className="p-4 text-slate-700 dark:text-slate-200">
                                                     #
                                                 </th>
 
-                                                <th className="p-4">
+                                                <th className="p-4 text-slate-700 dark:text-slate-200">
                                                     Activity
                                                 </th>
 
-                                                <th className="p-4">
+                                                <th className="p-4 text-slate-700 dark:text-slate-200">
                                                     Category
                                                 </th>
 
-                                                <th className="p-4">
+                                                <th className="p-4 text-slate-700 dark:text-slate-200">
                                                     Score
                                                 </th>
 
-                                                <th className="p-4">
+                                                <th className="p-4 text-slate-700 dark:text-slate-200">
                                                     Stars
                                                 </th>
 
-                                                <th className="p-4">
+                                                <th className="p-4 text-slate-700 dark:text-slate-200">
                                                     Items
                                                 </th>
 
-                                                <th className="p-4">
+                                                <th className="p-4 text-slate-700 dark:text-slate-200">
                                                     Time
                                                 </th>
 
@@ -1180,23 +1290,30 @@ const Reports = () => {
                                                             activity.activityId ||
                                                             index
                                                         }
-                                                        className="border-t border-slate-100"
+                                                        className="
+                                                            border-t
+                                                            border-slate-100
+                                                            dark:border-slate-700
+                                                            hover:bg-slate-50
+                                                            dark:hover:bg-slate-800
+                                                            transition-colors
+                                                        "
                                                     >
 
-                                                        <td className="p-4 font-bold">
+                                                        <td className="p-4 font-bold text-slate-700 dark:text-slate-200">
                                                             {
                                                                 index +
                                                                 1
                                                             }
                                                         </td>
 
-                                                        <td className="p-4 font-bold text-slate-700">
+                                                        <td className="p-4 font-bold text-slate-700 dark:text-slate-200">
                                                             {
                                                                 activity.title
                                                             }
                                                         </td>
 
-                                                        <td className="p-4 capitalize">
+                                                        <td className="p-4 capitalize text-slate-600 dark:text-slate-300">
                                                             {
                                                                 activity.category
                                                             }
@@ -1213,20 +1330,20 @@ const Reports = () => {
                                                             %
                                                         </td>
 
-                                                        <td className="p-4">
+                                                        <td className="p-4 text-slate-700 dark:text-slate-200">
                                                             {"⭐".repeat(
                                                                 activity.stars
                                                             ) ||
                                                                 "-"}
                                                         </td>
 
-                                                        <td className="p-4">
+                                                        <td className="p-4 text-slate-700 dark:text-slate-200">
                                                             {
                                                                 activity.itemCount
                                                             }
                                                         </td>
 
-                                                        <td className="p-4">
+                                                        <td className="p-4 text-slate-700 dark:text-slate-200">
                                                             {
                                                                 activity.completionTime
                                                             }
@@ -1254,13 +1371,21 @@ const Reports = () => {
 
                         <section className="px-8 md:px-12 pb-12 print-section">
 
-                            <div className="rounded-2xl bg-slate-50 border border-slate-200 p-6">
+                            <div className="
+                                    rounded-2xl
+                                    bg-slate-50
+                                    dark:bg-slate-800
+                                    border
+                                    border-slate-200
+                                    dark:border-slate-700
+                                    p-6
+                                ">
 
                                 <div className="flex items-center gap-3 mb-4">
 
                                     <CalendarDays className="text-sky-500" />
 
-                                    <h3 className="text-xl font-black text-slate-800">
+                                    <h3 className="text-xl font-black text-slate-800 dark:text-white">
                                         Latest Exercise Session
                                     </h3>
 
@@ -1270,11 +1395,11 @@ const Reports = () => {
                                     <div className="grid md:grid-cols-4 gap-5 text-sm print-grid-4">
 
                                         <div>
-                                            <p className="text-slate-400 font-bold">
+                                            <p className="text-slate-400 dark:text-slate-400 font-bold">
                                                 Session
                                             </p>
 
-                                            <p className="font-black text-slate-700 mt-1">
+                                            <p className="font-black text-slate-700 dark:text-slate-200 mt-1">
                                                 #
                                                 {
                                                     latestSession.session_id
@@ -1283,11 +1408,11 @@ const Reports = () => {
                                         </div>
 
                                         <div>
-                                            <p className="text-slate-400 font-bold">
+                                            <p className="text-slate-400 dark:text-slate-400 font-bold">
                                                 Date
                                             </p>
 
-                                            <p className="font-black text-slate-700 mt-1">
+                                            <p className="font-black text-slate-700 dark:text-slate-200 mt-1">
                                                 {formatDate(
                                                     latestSession.session_date
                                                 )}
@@ -1295,11 +1420,11 @@ const Reports = () => {
                                         </div>
 
                                         <div>
-                                            <p className="text-slate-400 font-bold">
+                                            <p className="text-slate-400 dark:text-slate-400 font-bold">
                                                 Score
                                             </p>
 
-                                            <p className="font-black text-sky-600 mt-1">
+                                            <p className="font-black text-sky-600 dark:text-sky-400 mt-1">
                                                 {Number(
                                                     latestSession.total_score ||
                                                         0
@@ -1311,11 +1436,11 @@ const Reports = () => {
                                         </div>
 
                                         <div>
-                                            <p className="text-slate-400 font-bold">
+                                            <p className="text-slate-400 dark:text-slate-400 font-bold">
                                                 Stars
                                             </p>
 
-                                            <p className="font-black text-amber-500 mt-1">
+                                            <p className="font-black text-amber-500 dark:text-amber-400 mt-1">
                                                 ⭐{" "}
                                                 {
                                                     latestSession.total_stars ||
@@ -1326,7 +1451,7 @@ const Reports = () => {
 
                                     </div>
                                 ) : (
-                                    <p className="text-slate-500">
+                                    <p className="text-slate-500 dark:text-slate-400">
                                         No exercise session has been completed yet.
                                     </p>
                                 )}
@@ -1339,7 +1464,19 @@ const Reports = () => {
                             FOOTER
                         ===================================== */}
 
-                        <footer className="px-8 md:px-12 py-8 border-t text-center text-xs text-slate-400 print-footer">
+                        <footer className="
+                            px-8
+                            md:px-12
+                            py-8
+                            border-t
+                            border-slate-200
+                            dark:border-slate-700
+                            text-center
+                            text-xs
+                            text-slate-400
+                            dark:text-slate-500
+                            print-footer
+                        ">
 
                             KineWrite — Handwriting Assessment and Activity Progress Report
 

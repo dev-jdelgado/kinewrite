@@ -15,19 +15,24 @@ const Button = ({
             "bg-blue-500 hover:bg-blue-600 text-white shadow-md",
 
         secondary:
-            "bg-slate-200 hover:bg-slate-300 text-slate-700",
+            "bg-slate-200 hover:bg-slate-300 text-slate-700" +
+            "dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-100",
 
         success:
-            "bg-green-600 hover:bg-green-700 text-white",
+            "bg-green-600 hover:bg-green-700 text-white" +
+            "dark:bg-green-600 dark:hover:bg-green-500",
 
         danger:
-            "bg-red-600 hover:bg-red-700 text-white",
+            "bg-red-600 hover:bg-red-700 text-white"+
+            "dark:bg-red-600 dark:hover:bg-red-500",
 
         outline:
-            "border border-orange-600 text-orange-600 hover:bg-orange-50",
+            "border border-orange-600 text-orange-600 hover:bg-orange-50"+
+            "dark:border-orange-400 dark:text-orange-400 dark:hover:bg-orange-950/50",
 
         ghost:
-            "bg-transparent hover:bg-slate-100 text-slate-700",
+            "bg-transparent hover:bg-slate-100 text-slate-700"+
+            "dark:hover:bg-slate-800 dark:text-slate-200",
     };
 
     const sizes = {

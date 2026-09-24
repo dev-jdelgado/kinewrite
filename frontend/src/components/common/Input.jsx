@@ -69,6 +69,7 @@ const Input = ({
                         px-4
                         py-3
                         text-slate-700
+                        placeholder:text-slate-400
                         outline-none
                         transition-all
                         duration-200
@@ -78,13 +79,13 @@ const Input = ({
 
                         ${
                             error
-                                ? "border-red-500 focus:ring-2 focus:ring-red-300"
-                                : "border-slate-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+                                ? "border-red-500 focus:ring-2 focus:ring-red-300 "
+                                : "border-slate-300  focus:border-orange-500 focus:ring-2 focus:ring-orange-200 "
                         }
 
                         ${
                             disabled
-                                ? "bg-slate-100 cursor-not-allowed"
+                                ? "bg-slate-100  cursor-not-allowed "
                                 : ""
                         }
                     `}
@@ -108,7 +109,7 @@ const Input = ({
 
             {error && (
 
-                <p className="mt-2 text-sm text-red-500">
+                <p className="mt-2 text-sm text-red-500 ">
                     {error}
                 </p>
 

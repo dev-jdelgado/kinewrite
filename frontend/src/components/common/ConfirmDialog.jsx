@@ -23,6 +23,7 @@ const ConfirmDialog = ({
                 items-center
                 justify-center
                 bg-black/50
+                dark:bg-black/70
                 p-6
             "
         >
@@ -32,8 +33,12 @@ const ConfirmDialog = ({
                     max-w-md
                     rounded-3xl
                     bg-white
+                    dark:bg-slate-800
                     shadow-2xl
+                    dark:shadow-black/50
                     overflow-hidden
+                    transition-colors
+                    duration-300
                 "
             >
                 <div className="p-8 text-center">
@@ -48,11 +53,15 @@ const ConfirmDialog = ({
                             justify-center
                             rounded-full
                             bg-orange-100
+                            dark:bg-orange-950/60
                         "
                     >
                         <AlertTriangle
                             size={42}
-                            className="text-[#9b4c00]"
+                            className="
+                            text-[#9b4c00]
+                            dark:text-orange-400"
+                            
                         />
                     </div>
                     <h2
@@ -60,6 +69,7 @@ const ConfirmDialog = ({
                             text-2xl
                             font-bold
                             text-slate-800
+                            dark:text-white
                         "
                     >
                         {title}
@@ -68,6 +78,7 @@ const ConfirmDialog = ({
                         className="
                             mt-4
                             text-slate-600
+                            dark:text-slate-300
                             leading-relaxed
                         "
                     >
@@ -78,7 +89,9 @@ const ConfirmDialog = ({
                 <div
                     className="
                         border-t
+                        dark:border-slate-700
                         bg-slate-50
+                        dark:bg-slate-900/60
                         px-6
                         py-5
                         flex
@@ -92,11 +105,16 @@ const ConfirmDialog = ({
                             rounded-xl
                             border
                             border-slate-300
+                            dark:border-slate-600
                             px-6
                             py-3
                             font-semibold
                             text-slate-700
+                            dark:text-slate-200
+                            bg-white
+                            dark:bg-slate-800
                             hover:bg-slate-100
+                            dark:hover:bg-slate-700
                             transition-all
                         "
                     >
