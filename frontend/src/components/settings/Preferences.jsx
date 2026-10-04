@@ -19,6 +19,7 @@ export default function Preferences() {
         setWebsiteMusicEnabled,
         startWebsiteMusic,
         stopWebsiteMusic,
+        resetSoundSettings,
 
         musicVolume,
         setMusicVolume,
@@ -27,6 +28,18 @@ export default function Preferences() {
         setSoundVolume
 
     } = useSound();
+
+    const resetToDefault = () => {
+        const confirmed = window.confirm(
+            "Reset all KineWrite preferences to their default settings?"
+        );
+
+        if (!confirmed) return;
+
+        setDarkMode(false);
+        localStorage.setItem("theme", "light");
+        resetSoundSettings();
+    };
 
     return (
 
@@ -170,6 +183,16 @@ export default function Preferences() {
                     </div>
 
                 </div>
+            </div>
+
+            <div className="mt-10 pt-6 border-t border-slate-200 dark:border-slate-700">
+                <button
+                    type="button"
+                    onClick={resetToDefault}
+                    className="px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-semibold transition"
+                >
+                    Reset to Default
+                </button>
             </div>
 
         </div>

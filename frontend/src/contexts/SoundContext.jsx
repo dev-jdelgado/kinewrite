@@ -224,6 +224,21 @@ export function SoundProvider({ children }) {
     };
 
 
+    const resetSoundSettings = () => {
+        stopWebsiteMusic();
+        stopGameMusic();
+
+        localStorage.removeItem("soundEnabled");
+        localStorage.removeItem("websiteMusicEnabled");
+        localStorage.removeItem("musicVolume");
+        localStorage.removeItem("soundVolume");
+
+        setSoundEnabled(true);
+        setWebsiteMusicEnabled(true);
+        setMusicVolume(0.15);
+        setSoundVolume(0.5);
+    };
+
     const stopWebsiteMusic = () => {
 
         if (websiteMusicRef.current) {
@@ -384,6 +399,7 @@ export function SoundProvider({ children }) {
 
                 startWebsiteMusic,
                 stopWebsiteMusic,
+                resetSoundSettings,
 
                 startGameMusic,
                 stopGameMusic,

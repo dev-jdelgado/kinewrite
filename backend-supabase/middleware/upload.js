@@ -1,15 +1,10 @@
 const multer = require("multer");
 const path = require("path");
-const fs = require("fs");
 
-const uploadDirectory = path.join(__dirname, "..", "uploads");
-
-// Ensure the directory exists on Render/local startup.
-fs.mkdirSync(uploadDirectory, { recursive: true });
-
+// Configure storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, uploadDirectory);
+        cb(null, "uploads/");
     },
 
     filename: (req, file, cb) => {
@@ -20,15 +15,36 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage,
+
+    // Limit file size to 2 MB
     limits: {
         fileSize: 2 * 1024 * 1024
     },
+
+    // Allow only image files
     fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith("image/")) {
+
+        const allowedTypes = new Set([
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        ]);
+
+        const allowedExtensions = new Set([
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp",
+        ]);
+
+        const extension = path.extname(file.originalname).toLowerCase();
+
+        if (allowedTypes.has(file.mimetype) && allowedExtensions.has(extension)) {
             cb(null, true);
         } else {
-            cb(new Error("Only image files are allowed."));
+            cb(new Error("Only JPG, JPEG, PNG, and WEBP image files are allowed."));
         }
+
     }
 });
 

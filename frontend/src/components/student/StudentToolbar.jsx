@@ -11,7 +11,7 @@ const StudentToolbar = ({
                 flex
                 flex-col
                 lg:flex-row
-                lg:items-center
+                lg:items-start
                 lg:justify-between
                 gap-6
                 mb-8

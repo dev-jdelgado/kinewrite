@@ -1,6 +1,25 @@
 const db = require("../config/db");
 const Student = require("../models/Student");
 const generateStudentCode = require("../utils/generateStudentCode");
+const namePattern = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/;
+
+const isAtLeastNineYearsOld = (birthDateValue) => {
+    if (!birthDateValue) return false;
+
+    const birthDate = new Date(`${birthDateValue}T00:00:00`);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const birthdayPassed =
+        today.getMonth() > birthDate.getMonth() ||
+        (today.getMonth() === birthDate.getMonth() &&
+            today.getDate() >= birthDate.getDate());
+
+    if (!birthdayPassed) age -= 1;
+
+    return age >= 9;
+};
+
 
 // ========================================
 // Get All Students
@@ -15,6 +34,31 @@ exports.getStudents = async (req, res) => {
         res.json({
             success: true,
             message: "Students retrieved successfully.",
+            data: {
+                total: students.length,
+                students,
+            },
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+// ========================================
+// Get Archived Students
+// ========================================
+
+exports.getArchivedStudents = async (req, res) => {
+    try {
+        const schoolId = req.user.school_id;
+        const students = await Student.findArchived(schoolId);
+
+        res.json({
+            success: true,
+            message: "Archived students retrieved successfully.",
             data: {
                 total: students.length,
                 students,
@@ -68,7 +112,7 @@ exports.getStudentById = async (req, res) => {
 // ========================================
 
 exports.createStudent = async (req, res) => {
-    const connection = await db.getConnection();
+    let connection;
 
     try {
         const {
@@ -93,6 +137,21 @@ exports.createStudent = async (req, res) => {
             });
         }
 
+        if (!namePattern.test(student_fname.trim()) || !namePattern.test(student_lname.trim())) {
+            return res.status(400).json({
+                success: false,
+                message: "Student names may contain letters, spaces, hyphens, and apostrophes only.",
+            });
+        }
+
+        if (!isAtLeastNineYearsOld(student_bday)) {
+            return res.status(400).json({
+                success: false,
+                message: "Student must be at least 9 years old.",
+            });
+        }
+
+        connection = await db.getConnection();
         await connection.beginTransaction();
 
         const schoolId = req.user.school_id;
@@ -182,6 +241,27 @@ exports.updateStudent = async (req, res) => {
             });
         }
 
+        if (!student_fname || !student_lname || !student_gender || !student_bday || !student_grade_level) {
+            return res.status(400).json({
+                success: false,
+                message: "Please complete all required fields.",
+            });
+        }
+
+        if (!namePattern.test(student_fname.trim()) || !namePattern.test(student_lname.trim())) {
+            return res.status(400).json({
+                success: false,
+                message: "Student names may contain letters, spaces, hyphens, and apostrophes only.",
+            });
+        }
+
+        if (!isAtLeastNineYearsOld(student_bday)) {
+            return res.status(400).json({
+                success: false,
+                message: "Student must be at least 9 years old.",
+            });
+        }
+
         await Student.update(
             req.params.id,
             schoolId,
@@ -260,3 +340,37 @@ exports.archiveStudent = async (req, res) => {
     }
 
 };
+
+// ========================================
+// Restore Student
+// ========================================
+
+exports.restoreStudent = async (req, res) => {
+    try {
+        const schoolId = req.user.school_id;
+        const student = await Student.findArchived(schoolId);
+        const exists = student.some(
+            (item) => String(item.student_id) === String(req.params.id)
+        );
+
+        if (!exists) {
+            return res.status(404).json({
+                success: false,
+                message: "Archived student not found.",
+            });
+        }
+
+        await Student.restore(req.params.id, schoolId);
+
+        res.json({
+            success: true,
+            message: "Student restored successfully.",
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+

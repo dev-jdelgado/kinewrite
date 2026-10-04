@@ -5,14 +5,21 @@ const router = express.Router();
 const studentController = require("../controllers/studentController");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// Get all students
+// Get all active students
 router.get(
     "/",
     authMiddleware,
     studentController.getStudents
 );
 
-// Get one student
+// Get all archived students
+router.get(
+    "/archived",
+    authMiddleware,
+    studentController.getArchivedStudents
+);
+
+// Get one active student
 router.get(
     "/:id",
     authMiddleware,
@@ -31,6 +38,13 @@ router.put(
     "/:id",
     authMiddleware,
     studentController.updateStudent
+);
+
+// Restore archived student
+router.put(
+    "/:id/restore",
+    authMiddleware,
+    studentController.restoreStudent
 );
 
 // Archive student

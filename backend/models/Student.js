@@ -30,6 +30,34 @@ const Student = {
     },
 
     // ==========================================
+    // Get All Archived Students
+    // ==========================================
+    async findArchived(schoolId) {
+        const [rows] = await db.query(
+            `
+        SELECT
+            student_id,
+            student_code,
+            student_fname,
+            student_lname,
+            student_gender,
+            student_grade_level,
+            student_classification,
+            student_assessment_status,
+            student_current_level,
+            student_last_activity
+        FROM students
+        WHERE student_is_active = 0
+        AND school_id = ?
+        ORDER BY student_fname ASC
+        `,
+            [schoolId]
+        );
+
+        return rows;
+    },
+
+    // ==========================================
     // Get Student By ID
     // ==========================================
     async findById(id, schoolId) {
@@ -184,6 +212,22 @@ const Student = {
         SET student_is_active = 0
         WHERE student_id = ?
         AND school_id = ?
+        `,
+            [id, schoolId]
+        );
+    },
+
+    // ==========================================
+    // Restore Student
+    // ==========================================
+    async restore(id, schoolId) {
+        await db.query(
+            `
+        UPDATE students
+        SET student_is_active = 1
+        WHERE student_id = ?
+        AND school_id = ?
+        AND student_is_active = 0
         `,
             [id, schoolId]
         );

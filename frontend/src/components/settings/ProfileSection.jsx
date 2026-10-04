@@ -27,9 +27,29 @@ export default function ProfileSection() {
         const file = e.target.files[0];
 
         if (!file) return;
-        // Create preview
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        ];
+
+        const allowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+        const extension = `.${file.name.split(".").pop().toLowerCase()}`;
+
+        if (!allowedTypes.includes(file.type) || !allowedExtensions.includes(extension)) {
+            toast.error("Only JPG, JPEG, PNG, and WEBP images are allowed.");
+            e.target.value = "";
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error("Profile image must be 2 MB or smaller.");
+            e.target.value = "";
+            return;
+        }
+
         setImage(URL.createObjectURL(file));
-        // Save actual file
         setImageFile(file);
     };
 
@@ -62,9 +82,23 @@ export default function ProfileSection() {
         }
     }, [admin]);
     const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        if (name === "name" && value !== "" && !/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/.test(value)) {
+            return;
+        }
+
+        if (name === "school" && value !== "" && !/^[A-Za-zÀ-ÖØ-öø-ÿ' .&-]+$/.test(value)) {
+            return;
+        }
+
+        if (name === "phone" && value !== "" && !/^[0-9+()\-\s]+$/.test(value)) {
+            return;
+        }
+
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [name]: value
         });
     };
 
@@ -73,6 +107,26 @@ export default function ProfileSection() {
 
         try {
             const admin = JSON.parse(localStorage.getItem("admin"));
+
+            if (!formData.name.trim()) {
+                toast.error("Name is required.");
+                return;
+            }
+
+            if (!/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/.test(formData.name.trim())) {
+                toast.error("Name may contain letters, spaces, hyphens, and apostrophes only.");
+                return;
+            }
+
+            if (formData.school.trim() && !/^[A-Za-zÀ-ÖØ-öø-ÿ' .&-]+$/.test(formData.school.trim())) {
+                toast.error("School name may contain letters, spaces, periods, apostrophes, ampersands, and hyphens only.");
+                return;
+            }
+
+            if (formData.phone.trim() && !/^[0-9+()\-\s]+$/.test(formData.phone.trim())) {
+                toast.error("Phone may contain numbers, spaces, +, -, and parentheses only.");
+                return;
+            }
 
             const data = new FormData();
 
@@ -172,7 +226,7 @@ export default function ProfileSection() {
 
                         <input
                             type="file"
-                            accept="image/*"
+                            accept=".jpg,.jpeg,.png,.webp"
                             ref={fileInputRef}
                             onChange={handleImageChange}
                             className="hidden"
