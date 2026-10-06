@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-
+import api from "../../api/axios";
 
 import {
     FaUserCircle,
@@ -87,8 +87,8 @@ export default function ProfileSection() {
                 data.append("image", imageFile);
             }
 
-            const response = await axios.put(
-                "http://localhost:5000/api/auth/profile",
+            const response = await api.put(
+                "/auth/profile",
                 data,
                 {
                     headers: {
@@ -155,7 +155,7 @@ export default function ProfileSection() {
                                 src={
                                     image
                                         ? image
-                                        : `http://localhost:5000/uploads/${admin.profile_image}`
+                                        : `https://kinewrite.online/uploads/${admin.profile_image}`
                                 }
                                 alt="Profile"
                                 className="w-28 h-28 rounded-full object-cover border-4 border-blue-400"

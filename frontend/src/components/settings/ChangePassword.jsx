@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import api from "../../api/axios";
 
 export default function ChangePassword() {
 
@@ -46,8 +46,8 @@ export default function ChangePassword() {
 
             const admin = JSON.parse(localStorage.getItem("admin"));
 
-            const response = await axios.put(
-                "http://localhost:5000/api/auth/change-password",
+            const response = await api.put(
+                "/auth/change-password",
                 {
                     id: admin.id,
                     currentPassword: passwordData.currentPassword,
