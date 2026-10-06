@@ -3,6 +3,26 @@ import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useStudents } from "../../contexts/StudentContext";
 
+const getMaxBirthDate = () => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 9);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+};
+
+const namePattern = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/;
+
+const isAtLeastNineYearsOld = (birthDateValue) => {
+    if (!birthDateValue) return false;
+    const birthDate = new Date(`${birthDateValue}T00:00:00`);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const birthdayPassed =
+        today.getMonth() > birthDate.getMonth() ||
+        (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+    if (!birthdayPassed) age -= 1;
+    return age >= 9;
+};
+
 const initialState = {
     student_fname: "",
     student_lname: "",
@@ -38,9 +58,15 @@ const StudentFormModal = ({
     }, [student, open]);
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        if (name === "student_fname" || name === "student_lname") {
+            if (value !== "" && !namePattern.test(value)) return;
+        }
+
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [name]: value,
         });
     };
 
@@ -57,6 +83,16 @@ const StudentFormModal = ({
             return;
         }
 
+        if (!namePattern.test(formData.student_fname.trim())) {
+            toast.error("First name may contain letters, spaces, hyphens, and apostrophes only.");
+            return;
+        }
+
+        if (!namePattern.test(formData.student_lname.trim())) {
+            toast.error("Last name may contain letters, spaces, hyphens, and apostrophes only.");
+            return;
+        }
+
         if (!formData.student_gender) {
             toast.error("Please select a gender.");
             return;
@@ -64,6 +100,11 @@ const StudentFormModal = ({
 
         if (!formData.student_bday) {
             toast.error("Please select the student's birthday.");
+            return;
+        }
+
+        if (!isAtLeastNineYearsOld(formData.student_bday)) {
+            toast.error("Student must be at least 9 years old.");
             return;
         }
 
@@ -321,6 +362,7 @@ const StudentFormModal = ({
                                     name="student_bday"
                                     value={formData.student_bday}
                                     onChange={handleChange}
+                                    max={getMaxBirthDate()}
                                     disabled={loading}
                                     className="
                                         w-full

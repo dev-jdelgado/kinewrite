@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArchiveRestore } from "lucide-react";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
@@ -16,6 +18,8 @@ import StudentFormModal from "../components/student/StudentFormModal";
 import { useStudents } from "../contexts/StudentContext";
 
 const StudentManagement = () => {
+
+    const navigate = useNavigate();
 
     const {
         students,
@@ -73,11 +77,24 @@ const StudentManagement = () => {
             </PageContainer>
 
             <PageContainer className="pt-6">
-                <StudentToolbar
-                    search={search}
-                    setSearch={setSearch}
-                    onAddStudent={handleAddStudent}
-                />
+                <div className="flex flex-col lg:flex-row lg:items-start gap-3">
+                    <div className="flex-1">
+                        <StudentToolbar
+                            search={search}
+                            setSearch={setSearch}
+                            onAddStudent={handleAddStudent}
+                        />
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={() => navigate("/students/archived")}
+                        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-semibold transition"
+                    >
+                        <ArchiveRestore size={18} />
+                        Archived Students
+                    </button>
+                </div>
                 {
                     filteredStudents.length === 0
                         ?
