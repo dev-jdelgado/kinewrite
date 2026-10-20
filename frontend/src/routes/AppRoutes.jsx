@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "../pages/Login";
+import Signup from "../pages/Signup";
 import TherapistDashboard from "../pages/TherapistDashboard";
 import StudentManagement from "../pages/StudentManagement";
 import StudentSelection from "../pages/StudentSelection";
@@ -8,12 +9,18 @@ import StudentRecords from "../pages/StudentRecords";
 import Settings from "../pages/Settings"
 
 import StudentProgress from "../pages/StudentProgress";
+import Reports from "../pages/Reports";
 
 import Assessment from "../pages/Assessment";
+import { AssessmentProvider } from "../components/assessment/utils/AssessmentContext";
+
+import Exercises from "../pages/Exercises";
 
 import ProtectedRoute from "./ProtectedRoute";
 
+import TakeHomeActivity from "../pages/TakeHomeActivity";
 import ArchivedStudents from "../pages/ArchivedStudents";
+
 
 const AppRoutes = () => {
     return (
@@ -23,6 +30,12 @@ const AppRoutes = () => {
             <Route
                 path="/"
                 element={<Login />}
+            />
+
+            {/* Signup */}
+            <Route
+                path="/signup"
+                element={<Signup />}
             />
 
             {/* Therapist Dashboard */}
@@ -45,7 +58,6 @@ const AppRoutes = () => {
                 }
             />
 
-            
             {/* Archived Students */}
             <Route
                 path="/students/archived"
@@ -55,6 +67,7 @@ const AppRoutes = () => {
                     </ProtectedRoute>
                 }
             />
+
 
             {/* Account Settings */}
             <Route
@@ -72,6 +85,16 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute>
                         <StudentRecords />
+                    </ProtectedRoute>
+                }
+            />
+
+            {/* Student Progress Report */}
+            <Route
+                path="/student-records/:studentId/report"
+                element={
+                    <ProtectedRoute>
+                        <Reports />
                     </ProtectedRoute>
                 }
             />
@@ -101,9 +124,9 @@ const AppRoutes = () => {
                 path="/exercise/:studentId"
                 element={
                     <ProtectedRoute>
-                        <div className="flex items-center justify-center min-h-screen text-4xl font-bold">
-                            Exercise Session Page
-                        </div>
+                        <AssessmentProvider>
+                            <Exercises />
+                        </AssessmentProvider>
                     </ProtectedRoute>
                 }
             />
@@ -115,6 +138,11 @@ const AppRoutes = () => {
                         <Assessment />
                     </ProtectedRoute>
                 }
+            />
+
+            <Route
+                path="/take-home/:studentId"
+                element={<TakeHomeActivity />}
             />
 
             {/* Unknown Routes */}
