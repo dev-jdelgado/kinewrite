@@ -1,5 +1,9 @@
 const ExerciseGuide = ({ mode, prompt }) => {
 
+    // Keep the prompt display case randomized, but normalize lookup keys for guides.
+    const normalizedPrompt = String(prompt ?? "");
+    const shapePrompt = normalizedPrompt.toLowerCase();
+
     // =====================================================
     // TEXT-BASED ACTIVITIES
     // =====================================================
@@ -291,7 +295,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
 
 
         const path =
-            paths[prompt];
+            paths[normalizedPrompt.charAt(0).toUpperCase() + normalizedPrompt.slice(1).toLowerCase()];
 
 
         if (!path) {
@@ -362,7 +366,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
                 viewBox="0 0 1000 500"
             >
 
-                {prompt === "Circle" && (
+                {shapePrompt === "circle" && (
                     <circle
                         {...common}
                         cx="500"
@@ -372,7 +376,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
                 )}
 
 
-                {prompt === "Square" && (
+                {shapePrompt === "square" && (
                     <rect
                         {...common}
                         x="350"
@@ -383,7 +387,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
                 )}
 
 
-                {prompt === "Triangle" && (
+                {shapePrompt === "triangle" && (
                     <path
                         {...common}
                         d="
@@ -396,7 +400,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
                 )}
 
 
-                {prompt === "Rectangle" && (
+                {shapePrompt === "rectangle" && (
                     <rect
                         {...common}
                         x="250"
@@ -407,7 +411,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
                 )}
 
 
-                {prompt === "Oval" && (
+                {shapePrompt === "oval" && (
                     <ellipse
                         {...common}
                         cx="500"
@@ -418,7 +422,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
                 )}
 
 
-                {prompt === "Diamond" && (
+                {shapePrompt === "diamond" && (
                     <path
                         {...common}
                         d="
@@ -432,7 +436,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
                 )}
 
 
-                {prompt === "Semicircle" && (
+                {shapePrompt === "semicircle" && (
                     <path
                         {...common}
                         d="
@@ -443,7 +447,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
                 )}
 
 
-                {prompt === "Heart" && (
+                {shapePrompt === "heart" && (
                     <path
                         {...common}
                         d="
@@ -457,7 +461,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
                 )}
 
 
-                {prompt === "Star" && (
+                {shapePrompt === "star" && (
                     <path
                         {...common}
                         d="
@@ -477,7 +481,7 @@ const ExerciseGuide = ({ mode, prompt }) => {
                 )}
 
 
-                {prompt === "Spiral" && (
+                {shapePrompt === "spiral" && (
                     <path
                         {...common}
                         d="

@@ -27,6 +27,34 @@ export const singleStrokeGlyphs = {
     X: "M0 0 L100 100 M100 0 L0 100",
     Y: "M0 0 L50 50 L100 0 M50 50 L50 100",
     Z: "M0 0 L100 0 L0 100 L100 100",
+
+    // Lowercase print letters with simple stroke paths for tracing.
+    a: "M80 45 C70 25 35 25 20 45 C5 65 20 90 45 90 C65 90 80 75 80 55 L80 90",
+    b: "M15 10 L15 90 M15 60 C20 35 65 30 80 55 C95 80 65 95 40 88 C25 84 15 72 15 60",
+    c: "M80 42 C65 25 35 30 20 50 C5 75 30 95 60 88 C70 85 75 80 80 75",
+    d: "M80 10 L80 90 M80 60 C70 30 35 30 20 50 C5 75 30 95 60 88 C72 84 80 72 80 60",
+    e: "M20 60 L80 60 C80 35 45 25 25 45 C5 65 20 90 50 90 C65 90 75 84 80 78",
+    f: "M70 10 C40 5 35 25 35 45 L35 90 M15 45 L60 45",
+    g: "M80 45 C65 25 35 30 20 50 C5 75 30 95 60 88 C72 84 80 72 80 55 L80 90 C80 110 45 110 25 98",
+    h: "M15 10 L15 90 M15 58 C25 30 75 30 80 58 L80 90",
+    i: "M50 40 L50 90 M50 15 L50 17",
+    j: "M65 40 L65 95 C65 110 45 110 35 100 M65 15 L65 17",
+    k: "M20 10 L20 90 M80 40 L20 65 L80 90",
+    l: "M50 10 L50 90",
+    m: "M12 40 L12 90 M12 58 C20 30 45 30 50 58 L50 90 M50 58 C60 30 85 30 90 58 L90 90",
+    n: "M15 40 L15 90 M15 58 C25 30 70 30 80 58 L80 90",
+    o: "M50 30 C25 30 12 45 12 62 C12 80 28 92 50 92 C72 92 88 80 88 62 C88 45 75 30 50 30",
+    p: "M15 40 L15 110 M15 58 C25 30 70 30 80 58 C90 82 65 95 40 88 C25 84 15 72 15 58",
+    q: "M80 40 L80 110 M80 58 C70 30 35 30 20 50 C5 75 30 95 60 88 C72 84 80 72 80 58",
+    r: "M18 40 L18 90 M18 58 C28 35 55 35 65 45",
+    s: "M78 42 C50 25 18 40 28 55 C38 67 75 60 75 78 C75 96 40 98 18 82",
+    t: "M45 15 L45 78 C45 92 58 95 70 88 M20 42 L68 42",
+    u: "M15 40 L15 70 C15 100 75 100 80 70 L80 40",
+    v: "M12 40 L48 90 L85 40",
+    w: "M8 40 L28 90 L50 55 L72 90 L92 40",
+    x: "M18 40 L80 90 M80 40 L18 90",
+    y: "M12 40 L45 88 L80 40 M45 88 L30 110",
+    z: "M18 42 L80 42 L18 90 L80 90",
 };
 
 export const renderSingleStrokeWord = (
@@ -53,7 +81,6 @@ export const renderSingleStrokeWord = (
     let cursorX = startX;
 
     return String(text || "")
-        .toUpperCase()
         .split("")
         .map((character, index) => {
 
@@ -77,22 +104,54 @@ export const renderSingleStrokeWord = (
                 letterWidth +
                 spacing;
 
+            // Split pen-lift subpaths so every stroke has its own start dot and arrow.
+            const strokePaths = path.match(/M[^M]*/g) || [path];
+            const transform = `translate(${currentX} ${topY}) scale(${scaleX} ${scaleY})`;
+
             return (
-                <path
-                    key={`${character}-${index}`}
-                    d={path}
-                    transform={`
-                        translate(${currentX} ${topY})
-                        scale(${scaleX} ${scaleY})
-                    `}
-                    fill="none"
-                    stroke={stroke}
-                    strokeWidth={strokeWidth}
-                    strokeDasharray={strokeDasharray}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    opacity={opacity}
-                />
+                <g key={`${character}-${index}`} transform={transform}>
+                    {strokePaths.map((strokePath, strokeIndex) => {
+                        const firstPoint = strokePath.match(/^M\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/i);
+                        const startPointX = firstPoint ? Number(firstPoint[1]) : 0;
+                        const startPointY = firstPoint ? Number(firstPoint[2]) : 0;
+                        return (
+                            <g key={`${character}-${index}-stroke-${strokeIndex}`}>
+                                <path
+                                    d={strokePath.trim()}
+                                    fill="none"
+                                    markerEnd="url(#kinewrite-motion-arrow)"
+                                    stroke={stroke}
+                                    strokeWidth={strokeWidth}
+                                    strokeDasharray={strokeDasharray}
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    opacity={opacity}
+                                />
+                                <circle
+                                    cx={startPointX}
+                                    cy={startPointY}
+                                    r={Math.max(2, strokeWidth * 1.4)}
+                                    fill="#22c55e"
+                                    opacity={Math.min(1, opacity + 0.25)}
+                                />
+                                <text
+                                    x={startPointX + 5 / Math.max(scaleX, 0.01)}
+                                    y={startPointY - 5 / Math.max(scaleY, 0.01)}
+                                    fontSize={12 / Math.max(scaleY, 0.01)}
+                                    fontWeight="700"
+                                    fill="#15803d"
+                                    stroke="white"
+                                    strokeWidth={2 / Math.max(scaleY, 0.01)}
+                                    paintOrder="stroke"
+                                    textAnchor="middle"
+                                    dominantBaseline="central"
+                                >
+                                    {strokeIndex + 1}
+                                </text>
+                            </g>
+                        );
+                    })}
+                </g>
             );
         });
 };

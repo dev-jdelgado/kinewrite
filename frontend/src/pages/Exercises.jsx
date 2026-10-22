@@ -280,7 +280,7 @@ const getAlignmentGuide = (
     if (mode === "trace-letter") {
 
         const prompt =
-            String(promptText || "").toUpperCase();
+            String(promptText || "");
 
         /*
          * Responsive guide area
@@ -455,7 +455,11 @@ const getAlignmentGuide = (
                     viewBox="0 0 1000 100"
                     preserveAspectRatio="xMidYMid slice"
                 >
-
+                    <defs>
+                        <marker id="kinewrite-motion-arrow" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#16a34a" />
+                        </marker>
+                    </defs>
                     {renderSingleStrokeWord(
                         prompt,
                         {
@@ -477,7 +481,7 @@ const getAlignmentGuide = (
     if (mode === "follow-line") {
 
         const prompt =
-            String(promptText || "").toUpperCase();
+            String(promptText || "");
 
         /*
          * SVG coordinate system
@@ -726,7 +730,11 @@ const getAlignmentGuide = (
                     viewBox="0 0 1000 100"
                     preserveAspectRatio="none"
                 >
-
+                    <defs>
+                        <marker id="kinewrite-motion-arrow" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#16a34a" />
+                        </marker>
+                    </defs>
                     {renderSingleStrokeWord(
                         prompt,
                         {
@@ -1066,33 +1074,57 @@ const DIFFICULTY_LEVELS = ["Easy", "Medium", "Hard"];
 const getDifficultyKey = (studentId, activityId) =>
     `kinewrite-exercise-difficulty-${studentId}-${activityId}`;
 
+const randomizePromptCase = (item) => {
+    const original = String(item?.promptText ?? "");
+    const hasLetters = /[A-Za-z]/.test(original);
+    if (!hasLetters) return { ...item };
+    const promptText = Math.random() < 0.5
+        ? original.toLowerCase()
+        : original.toUpperCase();
+    return { ...item, promptText, randomizedCase: promptText === promptText.toLowerCase() ? "lowercase" : "uppercase" };
+};
+
 const getAttemptItems = (activity, difficulty) => {
     const allItems = Array.isArray(activity?.items) ? activity.items : [];
     if (allItems.length <= 5) {
         return allItems.map((item, index) => ({
-            ...item,
+            ...randomizePromptCase(item),
             sourceItemNo: item.itemNo ?? index + 1,
             itemNo: index + 1,
         }));
     }
 
-    // Prompt banks are ordered from simpler to more demanding prompts.
-    const startByDifficulty = {
-        Easy: 0,
-        Medium: Math.max(0, allItems.length - 8),
-        Hard: Math.max(0, allItems.length - 6),
-    };
-    const start = startByDifficulty[difficulty] ?? 0;
-    const pool = allItems.slice(start, Math.min(allItems.length, start + 7));
-    const shuffled = [...pool];
+    // The sentence activity has 90 prompts: 30 per difficulty (15 uppercase + 15 lowercase).
+    // Other long activities retain the original 45-prompt structure (15 per difficulty).
+    // Shuffle each selected difficulty bank and take five, so letter case is randomized per item.
+    let pool;
+    if (allItems.length >= 90 && activity?.mode === "copy-sentence") {
+        const startByDifficulty = { Easy: 0, Medium: 30, Hard: 60 };
+        const start = startByDifficulty[difficulty] ?? 0;
+        pool = allItems.slice(start, start + 30);
+    } else if (allItems.length >= 45) {
+        const startByDifficulty = { Easy: 0, Medium: 15, Hard: 30 };
+        const start = startByDifficulty[difficulty] ?? 0;
+        pool = allItems.slice(start, start + 15);
+    } else {
+        // Existing shorter activities retain their established difficulty pools.
+        const startByDifficulty = {
+            Easy: 0,
+            Medium: Math.max(0, allItems.length - 8),
+            Hard: Math.max(0, allItems.length - 6),
+        };
+        const start = startByDifficulty[difficulty] ?? 0;
+        pool = allItems.slice(start, Math.min(allItems.length, start + 7));
+    }
 
+    const shuffled = [...pool];
     for (let i = shuffled.length - 1; i > 0; i -= 1) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
 
     return shuffled.slice(0, 5).map((item, index) => ({
-        ...item,
+        ...randomizePromptCase(item),
         sourceItemNo: item.itemNo ?? index + 1,
         itemNo: index + 1,
     }));
@@ -1281,6 +1313,10 @@ const Exercises = () => {
     const currentItem =
         attemptItems?.[itemIndex];
 
+    const displayPromptText = currentItem
+        ? String(currentItem.promptText ?? "")
+        : "";
+
     // Stroke Activities 1–3 already display their tracing guide
     // directly on the handwriting canvas, so the separate model card
     // above the canvas is redundant for those three activities.
@@ -1394,7 +1430,7 @@ const Exercises = () => {
             const result = calculateActivityScore({
                 category: activity.category,
                 mode: activity.mode,
-                prompt: currentItem.promptText,
+                prompt: displayPromptText,
                 strokes,
             });
             const sessionId = await ensureExerciseSession();
@@ -1409,7 +1445,7 @@ const Exercises = () => {
                     mode: activity.mode, activityType: activity.activityType, itemNo: currentItem.itemNo,
                     sourceItemNo: currentItem.sourceItemNo ?? currentItem.itemNo,
                     attemptRunId, difficulty,
-                    promptText: currentItem.promptText, metrics: result.metrics, score: result.score,
+                    promptText: displayPromptText, metrics: result.metrics, score: result.score,
                     stars: result.stars, strokes,
                 },
                 strokeCount: strokes.length, penLifts: Math.max(0, strokes.length - 1),
@@ -2659,7 +2695,7 @@ const Exercises = () => {
                                     break-words
                                 "
                                 >
-                                    {currentItem.promptText}
+                                    {displayPromptText}
                                 </div>
 
 
@@ -2791,7 +2827,7 @@ const Exercises = () => {
                                     dark:text-slate-100
                                 "
                                 >
-                                    {currentItem.promptText}
+                                    {displayPromptText}
                                 </div>
 
                             </div>
@@ -2826,7 +2862,7 @@ const Exercises = () => {
                                     }
 
                                     prompt={
-                                        currentItem.promptText
+                                        displayPromptText
                                     }
                                 />
 
@@ -2859,7 +2895,7 @@ const Exercises = () => {
                                         "
                                             >
                                                 {
-                                                    currentItem.promptText
+                                                    displayPromptText
                                                 }
                                             </span>
 
@@ -2911,7 +2947,7 @@ const Exercises = () => {
                                     activity.title,
 
                                 promptText:
-                                    currentItem.promptText,
+                                    displayPromptText,
 
                                 showGuide:
                                     activity.category === "stroke" &&
@@ -2936,7 +2972,7 @@ const Exercises = () => {
                                         ? getAlignmentGuide(
                                             activity.mode,
                                             itemIndex,
-                                            currentItem.promptText
+                                            displayPromptText
                                         )
                                         : null,
                             }}
