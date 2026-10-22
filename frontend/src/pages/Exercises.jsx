@@ -877,7 +877,8 @@ const getAlignmentGuide = (
 
 const getActivityProgress = (
     activity,
-    history
+    history,
+    studentId
 ) => {
 
     const attempts = history.filter(
@@ -903,8 +904,8 @@ const getActivityProgress = (
     );
 
     const totalItems =
-        Array.isArray(activity?.items)
-            ? activity.items.length
+        Array.isArray(activity?.items) && activity.items.length > 0
+            ? Math.min(5, activity.items.length)
             : 0;
 
     /*
@@ -959,24 +960,66 @@ const getActivityProgress = (
                 totalItems
             );
 
-    const isCompleted =
-        totalItems > 0 &&
-        completedCount >= totalItems;
+    // An activity is only fully completed after Hard is finished.
+    // Completing Easy or Medium must not mark the activity Completed.
+    const difficultyKey = getDifficultyKey(studentId, activity.id);
+    const finishedKey = `kinewrite-exercise-finished-${studentId}-${activity.id}`;
+    const difficultyIndex = Math.min(
+        2,
+        Math.max(0, Number(localStorage.getItem(difficultyKey)) || 0)
+    );
+    const finishedAllDifficulties =
+        localStorage.getItem(finishedKey) === "true";
 
-    const isOngoing =
-        completedCount > 0 &&
-        completedCount < totalItems;
+    const isCompleted = finishedAllDifficulties;
+    const isOngoing = !isCompleted && (
+        attempts.length > 0 || difficultyIndex > 0
+    );
+
+    // Show live progress across all 3 levels (5 items per level).
+    // The saved in-progress itemIndex represents items already completed
+    // in the current difficulty, so include it before the difficulty is finished.
+    const displayTotalItems = 15;
+    const progressKey = `kinewrite-exercise-progress-${studentId}-${activity.id}`;
+    let currentLevelCompleted = 0;
+
+    try {
+        // Read the current saved attempt so card progress updates item-by-item.
+        // forceDifficulty is only an argument to selectActivity, not this helper.
+        const savedProgress = localStorage.getItem(progressKey);
+        if (savedProgress) {
+            const parsedProgress = JSON.parse(savedProgress);
+            const savedDifficultyIndex = DIFFICULTY_LEVELS.indexOf(
+                parsedProgress.difficulty
+            );
+
+            if (savedDifficultyIndex >= 0) {
+                const savedItemIndex = Math.max(
+                    0,
+                    Math.min(5, Number(parsedProgress.itemIndex) || 0)
+                );
+                currentLevelCompleted = savedDifficultyIndex * 5 + savedItemIndex;
+            }
+        }
+    } catch (error) {
+        console.warn("Unable to read saved exercise progress:", error);
+    }
+
+    const displayCompletedCount = Math.min(
+        displayTotalItems - 1,
+        Math.max(completedCount, difficultyIndex * 5, currentLevelCompleted)
+    );
 
     /*
-     * Accuracy is only relevant/displayed after
-     * every item has been completed.
+     * Accuracy is only relevant/displayed after all three
+     * difficulty levels have been completed.
      */
     if (!isCompleted) {
         return {
             completed: false,
             ongoing: isOngoing,
-            completedCount,
-            totalItems,
+            completedCount: displayCompletedCount,
+            totalItems: displayTotalItems,
             score: null,
         };
     }
@@ -993,8 +1036,8 @@ const getActivityProgress = (
         return {
             completed: true,
             ongoing: false,
-            completedCount,
-            totalItems,
+            completedCount: displayTotalItems,
+            totalItems: displayTotalItems,
             score: null,
         };
     }
@@ -1009,13 +1052,50 @@ const getActivityProgress = (
     return {
         completed: true,
         ongoing: false,
-        completedCount,
-        totalItems,
+        completedCount: displayTotalItems,
+        totalItems: displayTotalItems,
         score: Number(
             average.toFixed(2)
         ),
     };
 
+};
+
+const DIFFICULTY_LEVELS = ["Easy", "Medium", "Hard"];
+
+const getDifficultyKey = (studentId, activityId) =>
+    `kinewrite-exercise-difficulty-${studentId}-${activityId}`;
+
+const getAttemptItems = (activity, difficulty) => {
+    const allItems = Array.isArray(activity?.items) ? activity.items : [];
+    if (allItems.length <= 5) {
+        return allItems.map((item, index) => ({
+            ...item,
+            sourceItemNo: item.itemNo ?? index + 1,
+            itemNo: index + 1,
+        }));
+    }
+
+    // Prompt banks are ordered from simpler to more demanding prompts.
+    const startByDifficulty = {
+        Easy: 0,
+        Medium: Math.max(0, allItems.length - 8),
+        Hard: Math.max(0, allItems.length - 6),
+    };
+    const start = startByDifficulty[difficulty] ?? 0;
+    const pool = allItems.slice(start, Math.min(allItems.length, start + 7));
+    const shuffled = [...pool];
+
+    for (let i = shuffled.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled.slice(0, 5).map((item, index) => ({
+        ...item,
+        sourceItemNo: item.itemNo ?? index + 1,
+        itemNo: index + 1,
+    }));
 };
 
 const Exercises = () => {
@@ -1033,16 +1113,28 @@ const Exercises = () => {
     const canvasRef =
         useRef(null);
 
+    const initialActivity = location.state?.activity || null;
+    const initialDifficulty = initialActivity
+        ? DIFFICULTY_LEVELS[
+            Math.min(2, Math.max(0, Number(localStorage.getItem(
+                getDifficultyKey(studentId, initialActivity.id)
+            )) || 0))
+        ]
+        : "Easy";
 
     const [activity, setActivity] =
-        useState(
-            location.state?.activity || null
-        );
-
+        useState(initialActivity);
 
     const [itemIndex, setItemIndex] =
         useState(0);
 
+    const [attemptItems, setAttemptItems] = useState(
+        initialActivity ? getAttemptItems(initialActivity, initialDifficulty) : []
+    );
+    const [difficulty, setDifficulty] = useState(initialDifficulty);
+    const [attemptRunId, setAttemptRunId] = useState(
+        () => `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+    );
 
     const [score, setScore] =
         useState(0);
@@ -1065,6 +1157,7 @@ const Exercises = () => {
     const [savingAttempt, setSavingAttempt] = useState(false);
 
     const [lastResult, setLastResult] = useState(null);
+    const [difficultyPickerActivity, setDifficultyPickerActivity] = useState(null);
 
     const [exerciseHistory, setExerciseHistory] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
@@ -1075,7 +1168,10 @@ const Exercises = () => {
     const saveActivityProgress = (
         activityId,
         nextItemIndex,
-        currentScore
+        currentScore,
+        items = attemptItems,
+        currentDifficulty = difficulty,
+        runId = attemptRunId
     ) => {
         if (!studentId || !activityId) return;
     
@@ -1084,6 +1180,9 @@ const Exercises = () => {
             JSON.stringify({
                 itemIndex: nextItemIndex,
                 score: Number(currentScore) || 0,
+                items,
+                difficulty: currentDifficulty,
+                attemptRunId: runId,
             })
         );
     };
@@ -1180,7 +1279,7 @@ const Exercises = () => {
 
 
     const currentItem =
-        activity?.items?.[itemIndex];
+        attemptItems?.[itemIndex];
 
     // Stroke Activities 1–3 already display their tracing guide
     // directly on the handwriting canvas, so the separate model card
@@ -1198,101 +1297,71 @@ const Exercises = () => {
     // Select Activity
     // ==========================================
 
-    const selectActivity = (
-        selected
-    ) => {
-    
-        const progressKey =
-            getActivityProgressKey(
-                selected.id
-            );
-    
+    const selectActivity = (selected, forceDifficulty = null) => {
+        const progressKey = getActivityProgressKey(selected.id);
+        const difficultyKey = getDifficultyKey(studentId, selected.id);
         let savedItemIndex = 0;
         let savedScore = 0;
-    
-        const savedProgress =
-            localStorage.getItem(
-                progressKey
-            );
-    
+        let savedItems = null;
+        let selectedDifficulty = forceDifficulty || DIFFICULTY_LEVELS[
+            Math.min(2, Math.max(0, Number(localStorage.getItem(difficultyKey)) || 0))
+        ];
+        let runId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+        const savedProgress = forceDifficulty
+            ? null
+            : localStorage.getItem(progressKey);
         if (savedProgress) {
             try {
-    
-                const parsed =
-                    JSON.parse(
-                        savedProgress
-                    );
-    
-                if (
-                    Number.isInteger(
-                        parsed.itemIndex
-                    )
-                ) {
-                    savedItemIndex =
-                        Math.max(
-                            0,
-                            Math.min(
-                                parsed.itemIndex,
-                                selected.items.length - 1
-                            )
-                        );
+                const parsed = JSON.parse(savedProgress);
+                if (Number.isInteger(parsed.itemIndex)) {
+                    savedItemIndex = Math.max(0, Math.min(parsed.itemIndex, 4));
                 }
-    
-                if (
-                    Number.isFinite(
-                        Number(parsed.score)
-                    )
-                ) {
-                    savedScore =
-                        Number(parsed.score);
+                if (Number.isFinite(Number(parsed.score))) {
+                    savedScore = Number(parsed.score);
                 }
-    
+                if (Array.isArray(parsed.items) && parsed.items.length > 0) {
+                    savedItems = parsed.items;
+                }
+                if (DIFFICULTY_LEVELS.includes(parsed.difficulty)) {
+                    selectedDifficulty = parsed.difficulty;
+                }
+                if (parsed.attemptRunId) runId = parsed.attemptRunId;
             } catch {
                 savedItemIndex = 0;
                 savedScore = 0;
             }
         }
-    
-        setActivity(
-            selected
-        );
-    
-        setItemIndex(
-            savedItemIndex
-        );
-    
-        setScore(
-            savedScore
-        );
-    
-        setChecked(
-            false
-        );
-    
-        setCompleted(
-            false
-        );
-    
-        setShowActivities(
-            false
-        );
-    
-        setLastResult(null);
-    
-        itemStartedAtRef.current =
-            Date.now();
-    
-        ensureExerciseSession()
-            .catch(console.error);
-    
-        setTimeout(() => {
-    
-            canvasRef.current?.clear?.();
-    
-        }, 100);
-    
-    };
 
+        if (forceDifficulty) {
+            localStorage.setItem(
+                difficultyKey,
+                String(DIFFICULTY_LEVELS.indexOf(forceDifficulty))
+            );
+            // A retake starts a fresh five-item run without erasing overall completion.
+            localStorage.removeItem(progressKey);
+            savedItemIndex = 0;
+            savedScore = 0;
+            savedItems = null;
+            runId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+        }
+
+        const selectedItems = savedItems || getAttemptItems(selected, selectedDifficulty);
+        setDifficultyPickerActivity(null);
+        setActivity(selected);
+        setAttemptItems(selectedItems);
+        setDifficulty(selectedDifficulty);
+        setAttemptRunId(runId);
+        setItemIndex(Math.min(savedItemIndex, Math.max(0, selectedItems.length - 1)));
+        setScore(savedScore);
+        setChecked(false);
+        setCompleted(false);
+        setShowActivities(false);
+        setLastResult(null);
+        itemStartedAtRef.current = Date.now();
+        ensureExerciseSession().catch(console.error);
+        setTimeout(() => canvasRef.current?.clear?.(), 100);
+    };
 
     // ==========================================
     // Clear
@@ -1338,6 +1407,8 @@ const Exercises = () => {
                 strokeData: {
                     activityId: activity.id, activityTitle: activity.title, category: activity.category,
                     mode: activity.mode, activityType: activity.activityType, itemNo: currentItem.itemNo,
+                    sourceItemNo: currentItem.sourceItemNo ?? currentItem.itemNo,
+                    attemptRunId, difficulty,
                     promptText: currentItem.promptText, metrics: result.metrics, score: result.score,
                     stars: result.stars, strokes,
                 },
@@ -1351,12 +1422,12 @@ const Exercises = () => {
                 Number(
                     (
                         previous +
-                        (result.score / Math.max(1, activity.items.length))
+                        (result.score / Math.max(1, attemptItems.length))
                     ).toFixed(2)
                 )
             );
             setChecked(true);
-            if (itemIndex >= activity.items.length - 1) {
+            if (itemIndex >= attemptItems.length - 1) {
                 // An exercise session represents the complete set of
                 // handwriting activities, not one individual activity.
                 // Keep the session open until all activities have been
@@ -1417,9 +1488,19 @@ const Exercises = () => {
                     );
                 }
 
-                clearActivityProgress(
-                    activity.id
+                clearActivityProgress(activity.id);
+                const difficultyKey = getDifficultyKey(studentId, activity.id);
+                const currentLevelIndex = DIFFICULTY_LEVELS.indexOf(difficulty);
+                localStorage.setItem(
+                    difficultyKey,
+                    String(Math.min(2, Math.max(0, currentLevelIndex + 1)))
                 );
+                if (difficulty === "Hard") {
+                    localStorage.setItem(
+                        `kinewrite-exercise-finished-${studentId}-${activity.id}`,
+                        "true"
+                    );
+                }
 
                 setCompleted(true);
                 return;
@@ -1437,7 +1518,7 @@ const Exercises = () => {
                                 result.score /
                                 Math.max(
                                     1,
-                                    activity.items.length
+                                    attemptItems.length
                                 )
                             )
                         ).toFixed(2)
@@ -1454,7 +1535,10 @@ const Exercises = () => {
                 saveActivityProgress(
                     activity.id,
                     nextItemIndex,
-                    nextScore
+                    nextScore,
+                    attemptItems,
+                    difficulty,
+                    attemptRunId
                 );
             
                 setChecked(false);
@@ -1488,7 +1572,10 @@ const Exercises = () => {
             saveActivityProgress(
                 activity.id,
                 itemIndex,
-                score
+                score,
+                attemptItems,
+                difficulty,
+                attemptRunId
             );
     
         }
@@ -1713,16 +1800,21 @@ const Exercises = () => {
                                                 const progress =
                                                     getActivityProgress(
                                                         item,
-                                                        exerciseHistory
+                                                        exerciseHistory,
+                                                        studentId
                                                     );
 
                                                 return (
 
                                                     <button
                                                         key={item.id}
-                                                        onClick={() =>
-                                                            selectActivity(item)
-                                                        }
+                                                        onClick={() => {
+                                                            if (progress.completed) {
+                                                                setDifficultyPickerActivity(item);
+                                                            } else {
+                                                                selectActivity(item);
+                                                            }
+                                                        }}
                                                         className="
                                                             text-left
                                                             bg-white
@@ -1976,6 +2068,44 @@ const Exercises = () => {
                         }
                     )}
 
+
+                    {difficultyPickerActivity && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+                            <div className="w-full max-w-3xl rounded-[36px] border-4 border-sky-400 bg-white p-6 sm:p-10 text-center shadow-2xl dark:bg-slate-800">
+                                <span className="inline-flex rounded-full bg-orange-100 px-4 py-2 text-xs font-black uppercase tracking-wide text-orange-700">
+                                    {categoryNames[difficultyPickerActivity.category]}
+                                </span>
+                                <h2 className="mt-3 text-3xl font-black text-slate-900 sm:text-5xl dark:text-white">
+                                    {difficultyPickerActivity.title}
+                                </h2>
+                                <p className="mx-auto mt-4 max-w-xl text-lg font-semibold text-slate-500 sm:text-2xl dark:text-slate-300">
+                                    Choose a difficulty to practice again.
+                                </p>
+                                <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+                                    {[
+                                        { name: "Easy", color: "bg-lime-500 hover:bg-lime-600" },
+                                        { name: "Medium", color: "bg-orange-500 hover:bg-orange-600" },
+                                        { name: "Hard", color: "bg-red-500 hover:bg-red-600" },
+                                    ].map(level => (
+                                        <button
+                                            key={level.name}
+                                            onClick={() => selectActivity(difficultyPickerActivity, level.name)}
+                                            className={`rounded-[28px] px-5 py-6 text-2xl font-medium text-black transition hover:scale-[1.02] ${level.color}`}
+                                        >
+                                            {level.name}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={() => setDifficultyPickerActivity(null)}
+                                    className="mt-6 rounded-xl px-5 py-3 font-bold text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {historyLoading && (
                         <div
                             className="
@@ -2078,7 +2208,7 @@ const Exercises = () => {
                         "
                     >
                         You completed{" "}
-                        {activity.title}.
+                        {activity.title} on {difficulty} difficulty.
                     </p>
 
 
@@ -2128,7 +2258,11 @@ const Exercises = () => {
 
                             <RotateCcw size={20} />
 
-                            Try Again
+                            {difficulty === "Easy"
+                                ? "Proceed with Medium"
+                                : difficulty === "Medium"
+                                    ? "Proceed with Hard"
+                                    : "Try Again"}
 
                         </button>
 
@@ -2308,9 +2442,7 @@ const Exercises = () => {
                         "
                     >
 
-                        {itemIndex + 1}
-                        {" / "}
-                        {activity.items.length}
+                        {difficulty}{" · "}{itemIndex + 1}{" / "}{attemptItems.length}
 
                     </div>
 
@@ -2342,7 +2474,7 @@ const Exercises = () => {
                             width:
                                 `${(
                                     itemIndex /
-                                    activity.items.length
+                                    attemptItems.length
                                 ) *
                                 100
                                 }%`,

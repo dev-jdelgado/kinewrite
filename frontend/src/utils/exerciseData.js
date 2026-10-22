@@ -68,6 +68,15 @@ const exerciseData = [
         themeColor: "#3A8DDE",
         items: makeItems([
             "I LIKE ______.",
+            "THE CAT IS ______.",
+            "MY FAVORITE COLOR IS ______.",
+            "I LIKE TO EAT ______.",
+            "MY BEST FRIEND IS ______.",
+            "I PLAY WITH ______.",
+            "MY FAVORITE FOOD IS ______.",
+            "I FEEL HAPPY WHEN ______.",
+            "AFTER SCHOOL, I LIKE TO ______.",
+            "I WANT TO LEARN HOW TO ______.",
         ]),
     },
 

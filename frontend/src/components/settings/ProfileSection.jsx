@@ -141,12 +141,12 @@ export default function ProfileSection() {
                 data.append("image", imageFile);
             }
 
-            const response = await axios.put(
-                "http://localhost:5000/api/auth/profile",
+            const response = await api.put(
+                "/auth/profile",
                 data,
                 {
                     headers: {
-                        "Content-Type": "multipart/form-data",
+                    "Content-Type": undefined,
                     },
                 }
             );
