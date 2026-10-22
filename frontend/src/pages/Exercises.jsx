@@ -4,6 +4,7 @@ import {
     CheckCircle2,
     RotateCcw,
     Sparkles,
+    Timer,
     Star,
     Trophy,
 } from "lucide-react";
@@ -1209,9 +1210,36 @@ const Exercises = () => {
 
     const [lastResult, setLastResult] = useState(null);
     const [difficultyPickerActivity, setDifficultyPickerActivity] = useState(null);
+    const [activityStartSelection, setActivityStartSelection] = useState(null);
+    const [trialMode, setTrialMode] = useState(false);
+    const [timeLimitSeconds, setTimeLimitSeconds] = useState(60);
+    const [timeLeftSeconds, setTimeLeftSeconds] = useState(60);
+    const [timeExpired, setTimeExpired] = useState(false);
 
     const [exerciseHistory, setExerciseHistory] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
+
+    useEffect(() => {
+        if (!trialMode || showActivities || completed || timeExpired || !activity) return undefined;
+        const timerId = window.setInterval(() => {
+            setTimeLeftSeconds(previous => {
+                if (previous <= 1) {
+                    window.clearInterval(timerId);
+                    setTimeExpired(true);
+                    return 0;
+                }
+                return previous - 1;
+            });
+        }, 1000);
+        return () => window.clearInterval(timerId);
+    }, [trialMode, showActivities, completed, timeExpired, activity?.id]);
+
+    const formatTime = (seconds) => {
+        const safeSeconds = Math.max(0, Number(seconds) || 0);
+        const minutes = Math.floor(safeSeconds / 60);
+        const remainder = safeSeconds % 60;
+        return `${minutes}:${String(remainder).padStart(2, "0")}`;
+    };
 
     const getActivityProgressKey = (activityId) =>
         `kinewrite-exercise-progress-${studentId}-${activityId}`;
@@ -1352,7 +1380,7 @@ const Exercises = () => {
     // Select Activity
     // ==========================================
 
-    const selectActivity = (selected, forceDifficulty = null) => {
+    const selectActivity = (selected, forceDifficulty = null, options = {}) => {
         const progressKey = getActivityProgressKey(selected.id);
         const difficultyKey = getDifficultyKey(studentId, selected.id);
         let savedItemIndex = 0;
@@ -1403,6 +1431,10 @@ const Exercises = () => {
 
         const selectedItems = savedItems || getAttemptItems(selected, selectedDifficulty);
         setDifficultyPickerActivity(null);
+        setActivityStartSelection(null);
+        setTrialMode(options.mode === "trial");
+        setTimeLeftSeconds(options.mode === "trial" ? options.timeLimitSeconds || timeLimitSeconds : 0);
+        setTimeExpired(false);
         setActivity(selected);
         setAttemptItems(selectedItems);
         setDifficulty(selectedDifficulty);
@@ -1867,7 +1899,8 @@ const Exercises = () => {
                                                             if (progress.completed) {
                                                                 setDifficultyPickerActivity(item);
                                                             } else {
-                                                                selectActivity(item);
+                                                                const savedDifficultyIndex = Math.min(2, Math.max(0, Number(localStorage.getItem(getDifficultyKey(studentId, item.id))) || 0));
+                                                                setActivityStartSelection({ activity: item, difficulty: DIFFICULTY_LEVELS[savedDifficultyIndex] || "Easy" });
                                                             }
                                                         }}
                                                         className="
@@ -2129,6 +2162,63 @@ const Exercises = () => {
                     )}
 
 
+                    {activityStartSelection && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-6">
+                            <div className="w-full max-w-3xl rounded-[32px] border-4 border-sky-400 bg-white p-6 sm:p-10 shadow-2xl dark:bg-slate-800">
+                                <div className="text-center">
+                                    <span className={`inline-flex rounded-full px-4 py-2 text-xs font-black uppercase tracking-wide ${categoryClasses[activityStartSelection.activity.category]}`}>
+                                        {categoryNames[activityStartSelection.activity.category]}
+                                    </span>
+                                    <h2 className="mt-4 text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
+                                        {activityStartSelection.activity.title}
+                                    </h2>
+                                    <p className="mt-3 text-lg font-semibold text-slate-500 dark:text-slate-300">
+                                        Choose your practice mode.
+                                    </p>
+                                </div>
+
+                                <div className="mt-7 grid grid-cols-1 sm:grid-cols-1 gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => selectActivity(activityStartSelection.activity, activityStartSelection.difficulty, { mode: "normal" })}
+                                        className="rounded-3xl border-2 border-slate-200 p-5 text-left transition hover:border-sky-400 hover:bg-sky-50 dark:border-slate-600 dark:hover:bg-slate-700"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <CheckCircle2 className="text-green-500" size={28} />
+                                            <span className="text-xl font-black text-slate-900 dark:text-white">Normal Mode</span>
+                                        </div>
+                                        <p className="mt-3 text-slate-500 dark:text-slate-300">Practice at your own pace with no timer.</p>
+                                    </button>
+                                    <div className="rounded-3xl border-2 border-sky-300 bg-sky-50 p-5 dark:bg-slate-700">
+                                        <div className="flex items-center gap-3">
+                                            <Timer className="text-sky-600" size={28} />
+                                            <span className="text-xl font-black text-slate-900 dark:text-white">Time Trial</span>
+                                        </div>
+                                        <p className="mt-3 text-slate-600 dark:text-slate-200">Finish as many items as you can before time runs out.</p>
+                                        <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-white px-3 py-3 dark:bg-slate-800">
+                                            <button type="button" aria-label="Decrease time by 10 seconds" onClick={() => setTimeLimitSeconds(value => Math.max(10, value - 10))} className="h-11 w-11 rounded-full bg-slate-200 text-2xl font-black text-slate-800 hover:bg-slate-300 dark:bg-slate-600 dark:text-white">−</button>
+                                            <div className="text-center">
+                                                <div className="text-xs font-bold text-slate-500">TIME LIMIT</div>
+                                                <div className="text-2xl font-black text-slate-900 dark:text-white">{formatTime(timeLimitSeconds)}</div>
+                                            </div>
+                                            <button type="button" aria-label="Increase time by 10 seconds" onClick={() => setTimeLimitSeconds(value => Math.min(600, value + 10))} className="h-11 w-11 rounded-full bg-slate-200 text-2xl font-black text-slate-800 hover:bg-slate-300 dark:bg-slate-600 dark:text-white">+</button>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => selectActivity(activityStartSelection.activity, activityStartSelection.difficulty, { mode: "trial", timeLimitSeconds })}
+                                            className="mt-4 w-full rounded-2xl bg-lime-500 px-5 py-4 text-xl font-black text-slate-900 transition hover:bg-lime-600"
+                                        >
+                                            Start Time Trial
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" onClick={() => setActivityStartSelection(null)} className="mt-6 w-full rounded-xl px-5 py-3 font-bold text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {difficultyPickerActivity && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
                             <div className="w-full max-w-3xl rounded-[36px] border-4 border-sky-400 bg-white p-6 sm:p-10 text-center shadow-2xl dark:bg-slate-800">
@@ -2149,7 +2239,10 @@ const Exercises = () => {
                                     ].map(level => (
                                         <button
                                             key={level.name}
-                                            onClick={() => selectActivity(difficultyPickerActivity, level.name)}
+                                            onClick={() => {
+                                                setActivityStartSelection({ activity: difficultyPickerActivity, difficulty: level.name });
+                                                setDifficultyPickerActivity(null);
+                                            }}
                                             className={`rounded-[28px] px-5 py-6 text-2xl font-medium text-black transition hover:scale-[1.02] ${level.color}`}
                                         >
                                             {level.name}
@@ -2363,6 +2456,26 @@ const Exercises = () => {
     }
 
 
+    if (timeExpired) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-sky-50 px-6 dark:bg-slate-950">
+                <div className="w-full max-w-xl rounded-[36px] bg-white p-10 text-center shadow-2xl dark:bg-slate-800">
+                    <Timer size={76} className="mx-auto text-red-500" />
+                    <h1 className="mt-5 text-4xl font-black text-slate-900 dark:text-white">Time's Up!</h1>
+                    <p className="mt-4 text-lg text-slate-500 dark:text-slate-300">
+                        Your time trial has ended. Your completed items have been saved.
+                    </p>
+                    <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                        Progress on the current unfinished item was not submitted.
+                    </p>
+                    <button onClick={handleBackToActivities} className="mt-8 rounded-2xl bg-sky-500 px-7 py-4 font-black text-white hover:bg-sky-600">
+                        Back to Activities
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     // ==========================================
     // ACTIVITY GAME
     // ==========================================
@@ -2503,7 +2616,6 @@ const Exercises = () => {
                     >
 
                         {difficulty}{" · "}{itemIndex + 1}{" / "}{attemptItems.length}
-
                     </div>
 
                 </div>
@@ -2627,24 +2739,24 @@ const Exercises = () => {
 
                         <div
                             className="
-                            flex
-                            items-center
-                            justify-between
-                            mb-5
-                        "
+                                grid
+                                grid-cols-3
+                                items-center
+                                mb-5
+                                gap-2
+                            "
                         >
-
-                            <div>
-
+                            {/* Left: Activity title */}
+                            <div className="min-w-0 text-left">
                                 <div
                                     className="
-                                    text-xs
-                                    uppercase
-                                    tracking-widest
-                                    font-black
-                                    text-slate-400
-                                    dark:text-slate-500
-                                "
+                                        text-xs
+                                        uppercase
+                                        tracking-widest
+                                        font-black
+                                        text-slate-400
+                                        dark:text-slate-500
+                                    "
                                 >
                                     {isTracing
                                         ? "Trace Guide"
@@ -2653,39 +2765,71 @@ const Exercises = () => {
                                             : "Target"}
                                 </div>
 
-
                                 <h2
                                     className="
-                                    mt-1
-                                    text-2xl
-                                    font-black
-                                    text-slate-800
-                                    dark:text-white
-                                "
+                                        mt-1
+                                        text-xl
+                                        sm:text-2xl
+                                        font-black
+                                        text-slate-800
+                                        dark:text-white
+                                        break-words
+                                    "
                                 >
-                                    {modeTitles[mode] ||
-                                        activity.title}
+                                    {modeTitles[mode] || activity.title}
                                 </h2>
-
                             </div>
 
-
-                            <div
-                                className="
-                                px-4
-                                py-2
-                                rounded-full
-                                bg-slate-100
-                                dark:bg-slate-700
-                                text-slate-500
-                                dark:text-slate-200
-                                font-black
-                                text-sm
-                            "
-                            >
-                                Item {itemIndex + 1}
+                            {/* Center: Timer */}
+                            <div className="flex justify-center">
+                                {trialMode && (
+                                    <div
+                                        className={`
+                                            inline-flex
+                                            items-center
+                                            whitespace-nowrap
+                                            rounded-full
+                                            px-3
+                                            sm:px-5
+                                            py-3
+                                            font-black
+                                            shadow
+                                            text-2xl
+                                            ${
+                                                timeLeftSeconds <= 10
+                                                    ? "bg-red-100 text-red-700 animate-pulse"
+                                                    : "bg-white text-sky-600 dark:bg-slate-800"
+                                            }
+                                        `}
+                                    >
+                                        <Timer className="mr-2 shrink-0" size={18} />
+                                        {formatTime(timeLeftSeconds)}
+                                    </div>
+                                )}
                             </div>
 
+                            {/* Right: Item number */}
+                            <div className="flex justify-end">
+                                <div
+                                    className="
+                                        inline-flex
+                                        whitespace-nowrap
+                                        px-3
+                                        sm:px-4
+                                        py-2
+                                        rounded-full
+                                        bg-slate-100
+                                        dark:bg-slate-700
+                                        text-slate-500
+                                        dark:text-slate-200
+                                        font-black
+                                        text-xs
+                                        sm:text-sm
+                                    "
+                                >
+                                    Item {itemIndex + 1}
+                                </div>
+                            </div>
                         </div>
 
 
