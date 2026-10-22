@@ -990,6 +990,8 @@ const getActivityProgress = (
     const displayTotalItems = 15;
     const progressKey = `kinewrite-exercise-progress-${studentId}-${activity.id}`;
     let currentLevelCompleted = 0;
+    let savedDifficulty = DIFFICULTY_LEVELS[difficultyIndex] || "Easy";
+    let savedDifficultyItemCount = 0;
 
     try {
         // Read the current saved attempt so card progress updates item-by-item.
@@ -1002,10 +1004,12 @@ const getActivityProgress = (
             );
 
             if (savedDifficultyIndex >= 0) {
+                savedDifficulty = parsedProgress.difficulty;
                 const savedItemIndex = Math.max(
                     0,
                     Math.min(5, Number(parsedProgress.itemIndex) || 0)
                 );
+                savedDifficultyItemCount = savedItemIndex;
                 currentLevelCompleted = savedDifficultyIndex * 5 + savedItemIndex;
             }
         }
@@ -1018,6 +1022,20 @@ const getActivityProgress = (
         Math.max(completedCount, difficultyIndex * 5, currentLevelCompleted)
     );
 
+    // Show completed difficulty milestones as text, and item counts only
+    // for the current unfinished difficulty (for example, "Hard: 1/5").
+    const savedDifficultyIndex = DIFFICULTY_LEVELS.indexOf(savedDifficulty);
+    const hasCurrentDifficultyProgress = savedDifficultyIndex === difficultyIndex;
+    const activeDifficulty = DIFFICULTY_LEVELS[difficultyIndex] || "Easy";
+    const activeItemCount = hasCurrentDifficultyProgress
+        ? Math.max(0, Math.min(4, savedDifficultyItemCount))
+        : 0;
+    const progressLabel = hasCurrentDifficultyProgress
+        ? `${activeDifficulty}: ${activeItemCount}/5`
+        : difficultyIndex > 0
+            ? `Completed ${DIFFICULTY_LEVELS[difficultyIndex - 1]}`
+            : "Easy: 0/5";
+
     /*
      * Accuracy is only relevant/displayed after all three
      * difficulty levels have been completed.
@@ -1028,6 +1046,7 @@ const getActivityProgress = (
             ongoing: isOngoing,
             completedCount: displayCompletedCount,
             totalItems: displayTotalItems,
+            progressLabel,
             score: null,
         };
     }
@@ -1864,228 +1883,233 @@ const Exercises = () => {
                                                             hover:border-sky-400
                                                             hover:-translate-y-1
                                                             transition-all
+                                                            flex
+                                                            flex-col
+                                                            justify-between
                                                         "
                                                     >
-
-                                                        <div
-                                                            className="
-                                                                flex
-                                                                items-center
-                                                                justify-between
-                                                            "
-                                                        >
-
-                                                            <span
+                                                        <div>
+                                                            <div
                                                                 className="
-                                                                    text-xs
-                                                                    font-black
-                                                                    uppercase
-                                                                    tracking-widest
+                                                                    flex
+                                                                    items-center
+                                                                    justify-between
                                                                 "
-                                                                style={{
-                                                                    color:
-                                                                        item.themeColor,
-                                                                }}
                                                             >
-                                                                Activity {index + 1}
-                                                            </span>
-
-
-                                                            {progress.completed ? (
 
                                                                 <span
                                                                     className="
-                                                                        inline-flex
-                                                                        items-center
-                                                                        gap-1
-                                                                        px-3
-                                                                        py-1.5
-                                                                        rounded-full
-                                                                        bg-green-100
-                                                                        text-green-700
                                                                         text-xs
                                                                         font-black
+                                                                        uppercase
+                                                                        tracking-widest
                                                                     "
+                                                                    style={{
+                                                                        color:
+                                                                            item.themeColor,
+                                                                    }}
                                                                 >
-
-                                                                    <CheckCircle2
-                                                                        size={15}
-                                                                    />
-
-                                                                    Completed
-
+                                                                    Activity {index + 1}
                                                                 </span>
 
-                                                                ) : progress.ongoing ? (
 
-                                                                <span
-                                                                    className="
-                                                                        inline-flex
-                                                                        items-center
-                                                                        gap-1
-                                                                        px-3
-                                                                        py-1.5
-                                                                        rounded-full
-                                                                        bg-orange-100
-                                                                        text-orange-700
-                                                                        text-xs
-                                                                        font-black
-                                                                    "
-                                                                >
+                                                                {progress.completed ? (
 
-                                                                    <RotateCcw
-                                                                        size={15}
-                                                                    />
-
-                                                                    Ongoing
-
-                                                                </span>
-
-                                                                ) : (
-
-                                                                <Star
-                                                                    size={24}
-                                                                    className="
-                                                                        text-yellow-400
-                                                                        fill-yellow-400
-                                                                    "
-                                                                />
-
-                                                                )}
-
-                                                        </div>
-
-
-                                                        <h2
-                                                            className="
-                                                                mt-4
-                                                                text-2xl
-                                                                font-black
-                                                                text-slate-800
-                                                                dark:text-white
-                                                            "
-                                                        >
-                                                            {item.title}
-                                                        </h2>
-
-
-                                                        <p
-                                                            className="
-                                                                mt-3
-                                                                text-slate-500
-                                                                dark:text-slate-300
-                                                                leading-7
-                                                            "
-                                                        >
-                                                            {item.description}
-                                                        </p>
-
-
-                                                        <div
-                                                            className="
-                                                                mt-6
-                                                                flex
-                                                                justify-between
-                                                                items-end
-                                                                gap-4
-                                                                h-9
-                                                            "
-                                                        >
-
-                                                            <div>
-
-                                                            {progress.completed ? (
-
-                                                                <>
-
-                                                                    <div
+                                                                    <span
                                                                         className="
+                                                                            inline-flex
+                                                                            items-center
+                                                                            gap-1
+                                                                            px-3
+                                                                            py-1.5
+                                                                            rounded-full
+                                                                            bg-green-100
+                                                                            text-green-700
                                                                             text-xs
                                                                             font-black
-                                                                            uppercase
-                                                                            tracking-widest
-                                                                            text-slate-400
-                                                                            dark:text-slate-500
                                                                         "
                                                                     >
-                                                                        Score / Accuracy
-                                                                    </div>
 
-                                                                    <div
+                                                                        <CheckCircle2
+                                                                            size={15}
+                                                                        />
+
+                                                                        Completed
+
+                                                                    </span>
+
+                                                                    ) : progress.ongoing ? (
+
+                                                                    <span
                                                                         className="
-                                                                            text-xl
-                                                                            font-black
-                                                                            text-green-600
-                                                                        "
-                                                                    >
-                                                                        {progress.score !== null
-                                                                            ? `${progress.score}%`
-                                                                            : "Completed"}
-                                                                    </div>
-
-                                                                </>
-
-                                                                ) : progress.ongoing ? (
-
-                                                                <>
-
-                                                                    <div
-                                                                        className="
+                                                                            inline-flex
+                                                                            items-center
+                                                                            gap-1
+                                                                            px-3
+                                                                            py-1.5
+                                                                            rounded-full
+                                                                            bg-orange-100
+                                                                            text-orange-700
                                                                             text-xs
                                                                             font-black
-                                                                            uppercase
-                                                                            tracking-widest
-                                                                            text-slate-400
-                                                                            dark:text-slate-500
                                                                         "
                                                                     >
-                                                                        Progress
-                                                                    </div>
 
-                                                                    <div
+                                                                        <RotateCcw
+                                                                            size={15}
+                                                                        />
+
+                                                                        Ongoing
+
+                                                                    </span>
+
+                                                                    ) : (
+
+                                                                    <Star
+                                                                        size={24}
                                                                         className="
-                                                                            text-xl
-                                                                            font-black
-                                                                            text-orange-500
+                                                                            text-yellow-400
+                                                                            fill-yellow-400
                                                                         "
-                                                                    >
-                                                                        {progress.completedCount} / {progress.totalItems}
-                                                                    </div>
+                                                                    />
 
-                                                                </>
-
-                                                                ) : (
-
-                                                                <span
-                                                                    className="
-                                                                        text-sm
-                                                                        font-bold
-                                                                        text-slate-400
-                                                                        dark:text-slate-200
-                                                                    "
-                                                                >
-                                                                    Not started
-                                                                </span>
-
-                                                            )}
+                                                                    )}
 
                                                             </div>
 
 
-                                                            <span
+                                                            <h2
                                                                 className="
+                                                                    mt-4
+                                                                    text-2xl
                                                                     font-black
-                                                                    text-sky-500
-                                                                    whitespace-nowrap
+                                                                    text-slate-800
+                                                                    dark:text-white
                                                                 "
                                                             >
-                                                                {progress.completed
-                                                                    ? "Practice Again →"
-                                                                    : progress.ongoing
-                                                                        ? "Continue Activity →"
-                                                                        : "Start Activity →"}
-                                                            </span>
+                                                                {item.title}
+                                                            </h2>
 
+
+                                                            <p
+                                                                className="
+                                                                    mt-3
+                                                                    text-slate-500
+                                                                    dark:text-slate-300
+                                                                    leading-7
+                                                                "
+                                                            >
+                                                                {item.description}
+                                                            </p>
+                                                        </div>                                
+
+                                                        <div>
+                                                            <div
+                                                                className="
+                                                                    mt-6
+                                                                    flex
+                                                                    justify-between
+                                                                    items-end
+                                                                    gap-4
+                                                                    h-9
+                                                                "
+                                                            >
+
+                                                                <div>
+
+                                                                {progress.completed ? (
+
+                                                                    <>
+
+                                                                        <div
+                                                                            className="
+                                                                                text-xs
+                                                                                font-black
+                                                                                uppercase
+                                                                                tracking-widest
+                                                                                text-slate-400
+                                                                                dark:text-slate-500
+                                                                            "
+                                                                        >
+                                                                            Score / Accuracy
+                                                                        </div>
+
+                                                                        <div
+                                                                            className="
+                                                                                text-xl
+                                                                                font-black
+                                                                                text-green-600
+                                                                            "
+                                                                        >
+                                                                            {progress.score !== null
+                                                                                ? `${progress.score}%`
+                                                                                : "Completed"}
+                                                                        </div>
+
+                                                                    </>
+
+                                                                    ) : progress.ongoing ? (
+
+                                                                    <>
+
+                                                                        <div
+                                                                            className="
+                                                                                text-xs
+                                                                                font-black
+                                                                                uppercase
+                                                                                tracking-widest
+                                                                                text-slate-400
+                                                                                dark:text-slate-500
+                                                                            "
+                                                                        >
+                                                                            Progress
+                                                                        </div>
+
+                                                                        <div
+                                                                            className="
+                                                                                text-sm
+                                                                                font-black
+                                                                                text-orange-500
+                                                                            "
+                                                                        >
+                                                                            {progress.progressLabel || `${progress.completedCount} / ${progress.totalItems}`}
+                                                                        </div>
+
+                                                                    </>
+
+                                                                    ) : (
+
+                                                                    <span
+                                                                        className="
+                                                                            text-sm
+                                                                            font-bold
+                                                                            text-slate-400
+                                                                            dark:text-slate-200
+                                                                        "
+                                                                    >
+                                                                        Not started
+                                                                    </span>
+
+                                                                )}
+
+                                                                </div>
+
+
+                                                                <span
+                                                                    className="
+                                                                        font-black
+                                                                        text-sky-500
+                                                                        whitespace-nowrap
+                                                                    "
+                                                                >
+                                                                    {progress.completed
+                                                                        ? "Practice Again →"
+                                                                        : progress.ongoing
+                                                                            ? "Continue Activity →"
+                                                                            : "Start Activity →"}
+                                                                </span>
+
+                                                            </div>
                                                         </div>
 
                                                     </button>
